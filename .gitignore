@@ -1,0 +1,23 @@
+# Compiler files
+cache/
+out/
+
+# Ignores development broadcast logs
+broadcast/
+
+# Dotenv file
+.env
+
+notes.md
+
+coverage/
+lcov.info
+
+.DS_Store
+
+docs/
+
+node_modules/
+
+results.sarif
+yarn-error.log
