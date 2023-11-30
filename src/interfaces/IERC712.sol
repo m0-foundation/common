@@ -2,10 +2,25 @@
 
 pragma solidity 0.8.21;
 
-import { IStatelessERC712 } from "./IStatelessERC712.sol";
+/// @title Typed structured data hashing and signing via EIP-712.
+/// @dev   The interface as defined by EIP-712: https://eips.ethereum.org/EIPS/eip-712
+interface IERC712 {
+    /// @notice Revert message when an invalid signature is detected.
+    error InvalidSignature();
 
-interface IERC712 is IStatelessERC712 {
-    error ReusedNonce(uint256 nonce, uint256 currentNonce);
+    /// @notice Revert message when a signature with invalid length is detected.
+    error InvalidSignatureLength();
 
-    function nonces(address account) external view returns (uint256 nonce);
+    /**
+     * @notice Revert message when a signature is being used beyond its deadline (i.e. expiry).
+     * @param  deadline  The deadline of the signature.
+     * @param  timestamp The current timestamp.
+     */
+    error SignatureExpired(uint256 deadline, uint256 timestamp);
+
+    /// @notice Revert message when a recovered signer does not match the account being purported to have signed.
+    error SignerMismatch();
+
+    /// @notice Returns the EIP712 domain separator used in the encoding of a signed digest.
+    function DOMAIN_SEPARATOR() external view returns (bytes32 domainSeparator);
 }
