@@ -16,5 +16,13 @@ interface IERC20Permit is IERC20, IERC712 {
         bytes32 s
     ) external;
 
+    function permit(
+        address account,
+        address spender,
+        uint256 amount,
+        uint256 deadline,
+        bytes memory signature
+    ) external;
+
     function PERMIT_TYPEHASH() external view returns (bytes32 typehash);
 }
