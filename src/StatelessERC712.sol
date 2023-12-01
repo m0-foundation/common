@@ -45,7 +45,7 @@ abstract contract StatelessERC712 is IStatelessERC712 {
         digest_ = keccak256(abi.encodePacked("\x19\x01", _domainSeparator, internalDigest_));
     }
 
-    function _getSignerAndRevertItInvalidSignature(
+    function _getSignerAndRevertIfInvalidSignature(
         bytes32 digest_,
         uint8 v_,
         bytes32 r_,
@@ -74,11 +74,11 @@ abstract contract StatelessERC712 is IStatelessERC712 {
         if (block.timestamp > expiry_) revert SignatureExpired(expiry_, block.timestamp);
     }
 
-    function _revertItInvalidSignature(address signer_, bytes32 digest_, bytes memory signature) internal view {
+    function _revertIfInvalidSignature(address signer_, bytes32 digest_, bytes memory signature) internal view {
         if (!SignatureChecker.isValidSignature(signer_, digest_, signature)) revert InvalidSignature();
     }
 
-    function _revertItInvalidSignature(
+    function _revertIfInvalidSignature(
         address signer_,
         bytes32 digest_,
         uint8 v_,

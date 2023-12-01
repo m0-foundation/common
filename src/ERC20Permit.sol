@@ -51,7 +51,7 @@ abstract contract ERC20Permit is IERC20Permit, ERC712 {
         bytes32 r_,
         bytes32 s_
     ) external {
-        _revertItInvalidSignature(owner_, _permit(owner_, spender_, amount_, deadline_), v_, r_, s_);
+        _revertIfInvalidSignature(owner_, _permit(owner_, spender_, amount_, deadline_), v_, r_, s_);
     }
 
     function permit(
@@ -61,7 +61,7 @@ abstract contract ERC20Permit is IERC20Permit, ERC712 {
         uint256 deadline_,
         bytes memory signature_
     ) external {
-        _revertItInvalidSignature(owner_, _permit(owner_, spender_, amount_, deadline_), signature_);
+        _revertIfInvalidSignature(owner_, _permit(owner_, spender_, amount_, deadline_), signature_);
     }
 
     function transfer(address recipient_, uint256 amount_) external returns (bool success_) {

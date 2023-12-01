@@ -3,10 +3,6 @@
 pragma solidity 0.8.21;
 
 interface IERC20 {
-    error ZeroDecreaseAllowance();
-
-    error ZeroIncreaseAllowance();
-
     event Approval(address indexed account, address indexed spender, uint256 amount);
 
     event Transfer(address indexed sender, address indexed recipient, uint256 amount);
