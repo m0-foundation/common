@@ -4,6 +4,8 @@ pragma solidity 0.8.21;
 
 import { IStatelessERC712 } from "./interfaces/IStatelessERC712.sol";
 
+import { SignatureChecker } from "./SignatureChecker.sol";
+
 abstract contract StatelessERC712 is IStatelessERC712 {
     // keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")
     bytes32 internal constant _EIP712_DOMAIN_HASH = 0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f;
@@ -43,24 +45,46 @@ abstract contract StatelessERC712 is IStatelessERC712 {
         digest_ = keccak256(abi.encodePacked("\x19\x01", _domainSeparator, internalDigest_));
     }
 
-    function _getSigner(
+    function _getSignerAndRevertIfInvalidSignature(
         bytes32 digest_,
-        uint256 expiry_,
         uint8 v_,
         bytes32 r_,
         bytes32 s_
-    ) internal view returns (address signer_) {
+    ) internal pure returns (address signer_) {
+        SignatureChecker.Error error_;
+
+        (error_, signer_) = SignatureChecker.recoverECDSASigner(digest_, v_, r_, s_);
+
+        _revertIfError(error_);
+    }
+
+    function _revertIfError(SignatureChecker.Error error_) private pure {
+        if (error_ == SignatureChecker.Error.NoError) return;
+
+        if (error_ == SignatureChecker.Error.InvalidSignature) revert InvalidSignature();
+
+        if (error_ == SignatureChecker.Error.InvalidSignatureLength) revert InvalidSignatureLength();
+
+        if (error_ == SignatureChecker.Error.SignerMismatch) revert SignerMismatch();
+
+        revert InvalidSignature();
+    }
+
+    function _revertIfExpired(uint256 expiry_) internal view {
         if (block.timestamp > expiry_) revert SignatureExpired(expiry_, block.timestamp);
+    }
 
-        // Appendix F in the Ethereum Yellow paper (https://ethereum.github.io/yellowpaper/paper.pdf), defines
-        // the valid range for s in (301): 0 < s < secp256k1n ÷ 2 + 1, and for v in (302): v ∈ {27, 28}.
-        if (
-            (uint256(s_) > uint256(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0)) ||
-            (v_ != 27 && v_ != 28)
-        ) revert MalleableSignature();
+    function _revertIfInvalidSignature(address signer_, bytes32 digest_, bytes memory signature) internal view {
+        if (!SignatureChecker.isValidSignature(signer_, digest_, signature)) revert InvalidSignature();
+    }
 
-        signer_ = ecrecover(digest_, v_, r_, s_);
-
-        if (signer_ == address(0)) revert InvalidSignature();
+    function _revertIfInvalidSignature(
+        address signer_,
+        bytes32 digest_,
+        uint8 v_,
+        bytes32 r_,
+        bytes32 s_
+    ) internal pure {
+        _revertIfError(SignatureChecker.validateECDSASignature(signer_, digest_, v_, r_, s_));
     }
 }

@@ -1,5 +1,5 @@
 # coverage report
-coverage :; forge coverage --report lcov && lcov --remove ./lcov.info -o ./lcov.info 'script/*' 'test/*' && genhtml lcov.info --branch-coverage --output-dir coverage
+coverage :; forge coverage --report lcov && lcov --remove ./lcov.info -o ./lcov.info 'test/*' && genhtml lcov.info --branch-coverage --output-dir coverage
 
 coverage-summary :; forge coverage --report summary
 
