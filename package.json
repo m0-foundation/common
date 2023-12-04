@@ -1,7 +1,7 @@
 {
-  "name": "@mzero-labs/protocol",
+  "name": "@mzero-labs/common",
   "version": "1.0.0",
-  "description": "Protocol contract ABIs",
+  "description": "Common contracts",
   "main": "index.js",
   "author": "mZero Labs <contact@m0.xyz>",
   "license": "GPL-3.0",
