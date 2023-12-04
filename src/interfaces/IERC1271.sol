@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.23;
 
 /// @title Standard Signature Validation Method for Contracts via EIP-1271.
 /// @dev   The interface as defined by EIP-1271: https://eips.ethereum.org/EIPS/eip-1271

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.8.21;
+pragma solidity 0.8.23;
 
 import { IERC20Permit } from "./interfaces/IERC20Permit.sol";
 
@@ -82,13 +82,9 @@ abstract contract ERC20Permit is IERC20Permit, StatefulERC712 {
     |                                       External/Public View/Pure Functions                                        |
     \******************************************************************************************************************/
 
-    function balanceOf(address account_) external view virtual returns (uint256 balance_);
-
     function name() external view returns (string memory name_) {
         return _name;
     }
-
-    function totalSupply() external view virtual returns (uint256 totalSupply_);
 
     /******************************************************************************************************************\
     |                                          Internal Interactive Functions                                          |
