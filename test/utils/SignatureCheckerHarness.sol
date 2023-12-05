@@ -13,8 +13,8 @@ contract SignatureCheckerHarness {
         address signer,
         bytes32 digest,
         bytes memory signature
-    ) external pure returns (bool isValid) {
-        return SignatureChecker.isValidECDSASignature(signer, digest, signature);
+    ) external view returns (bool isValid) {
+        return SignatureChecker.isValidSignature(signer, digest, signature);
     }
 
     function isValidECDSASignature(
