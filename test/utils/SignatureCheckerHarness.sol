@@ -1,0 +1,86 @@
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity 0.8.23;
+
+import { SignatureChecker } from "../../src/SignatureChecker.sol";
+
+contract SignatureCheckerHarness {
+    function decodeECDSASignature(bytes memory signature) external pure returns (uint8 v, bytes32 r, bytes32 s) {
+        return SignatureChecker.decodeECDSASignature(signature);
+    }
+
+    function isValidSignature(
+        address signer,
+        bytes32 digest,
+        bytes memory signature
+    ) external pure returns (bool isValid) {
+        return SignatureChecker.isValidECDSASignature(signer, digest, signature);
+    }
+
+    function isValidECDSASignature(
+        address signer,
+        bytes32 digest,
+        bytes memory signature
+    ) external pure returns (bool isValid) {
+        return SignatureChecker.isValidECDSASignature(signer, digest, signature);
+    }
+
+    function isValidECDSASignature(
+        address signer,
+        bytes32 digest,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external pure returns (bool isValid) {
+        return SignatureChecker.isValidECDSASignature(signer, digest, v, r, s);
+    }
+
+    function isValidERC1271Signature(
+        address signer,
+        bytes32 digest,
+        bytes memory signature
+    ) external view returns (bool isValid) {
+        return SignatureChecker.isValidERC1271Signature(signer, digest, signature);
+    }
+
+    function recoverECDSASigner(
+        bytes32 digest,
+        bytes memory signature
+    ) external pure returns (SignatureChecker.Error error, address signer) {
+        return SignatureChecker.recoverECDSASigner(digest, signature);
+    }
+
+    function recoverECDSASigner(
+        bytes32 digest,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external pure returns (SignatureChecker.Error error, address signer) {
+        return SignatureChecker.recoverECDSASigner(digest, v, r, s);
+    }
+
+    function validateECDSASignature(
+        address signer,
+        bytes32 digest,
+        bytes memory signature
+    ) external pure returns (SignatureChecker.Error error) {
+        return SignatureChecker.validateECDSASignature(signer, digest, signature);
+    }
+
+    function validateECDSASignature(
+        address signer,
+        bytes32 digest,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external pure returns (SignatureChecker.Error error) {
+        return SignatureChecker.validateECDSASignature(signer, digest, v, r, s);
+    }
+
+    function validateRecoveredSigner(
+        address signer,
+        address recoveredSigner
+    ) external pure returns (SignatureChecker.Error error) {
+        return SignatureChecker.validateRecoveredSigner(signer, recoveredSigner);
+    }
+}
