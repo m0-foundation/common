@@ -33,42 +33,26 @@ interface IERC20 {
      * @notice Allows a calling account to approve `spender` to spend up to `amount` of its token balance.
      * @param  spender The address of the account being allowed to spend up to the allowed amount.
      * @param  amount  The amount of the allowance being approved.
-     * @return success Whether or not the approval was successful.
+     * @return Whether or not the approval was successful.
      */
-    function approve(address spender, uint256 amount) external returns (bool success);
-
-    /**
-     * @notice Allows a calling account to decrease the allowance `spender` has, by `subtractedAmount`.
-     * @param  spender          The address of the account being who allowance is being decreased.
-     * @param  subtractedAmount The amount the allowance is being decreased by.
-     * @return success          Whether or not the decrease in allowance was successful.
-     */
-    function decreaseAllowance(address spender, uint256 subtractedAmount) external returns (bool success);
-
-    /**
-     * @notice Allows a calling account to increase the allowance `spender` has, by `addedAmount`.
-     * @param  spender     The address of the account being who allowance is being increased.
-     * @param  addedAmount The amount the allowance is being increased by.
-     * @return success     Whether or not the increase in allowance was successful.
-     */
-    function increaseAllowance(address spender, uint256 addedAmount) external returns (bool success);
+    function approve(address spender, uint256 amount) external returns (bool);
 
     /**
      * @notice Allows a calling account to transfer `amount` tokens to `recipient`.
      * @param  recipient The address of the recipient who's token balance will be incremented.
      * @param  amount    The amount of tokens being transferred.
-     * @return success   Whether or not the transfer was successful.
+     * @return Whether or not the transfer was successful.
      */
-    function transfer(address recipient, uint256 amount) external returns (bool success);
+    function transfer(address recipient, uint256 amount) external returns (bool);
 
     /**
      * @notice Allows a calling account to transfer `amount` tokens from `sender`, with allowance, to a `recipient`.
      * @param  sender    The address of the sender who's token balance will be decremented.
      * @param  recipient The address of the recipient who's token balance will be incremented.
      * @param  amount    The amount of tokens being transferred.
-     * @return success   Whether or not the transfer was successful.
+     * @return Whether or not the transfer was successful.
      */
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool success);
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
 
     /******************************************************************************************************************\
     |                                              View/Pure Functions                                                 |
@@ -78,26 +62,26 @@ interface IERC20 {
      * @notice Returns the allowance `spender` is allowed to spend on behalf of `account`.
      * @param  account   The address of the account who's token balance `spender` is allowed to spend.
      * @param  spender   The address of an account allowed to spend on behalf of `account`.
-     * @return allowance The amount `spender` can spend on behalf of `account`.
+     * @return The amount `spender` can spend on behalf of `account`.
      */
-    function allowance(address account, address spender) external view returns (uint256 allowance);
+    function allowance(address account, address spender) external view returns (uint256);
 
     /**
      * @notice Returns the token balance of `account`.
      * @param  account The address of some account.
-     * @return balance The token balance of `account`.
+     * @return The token balance of `account`.
      */
-    function balanceOf(address account) external view returns (uint256 balance);
+    function balanceOf(address account) external view returns (uint256);
 
     /// @notice Returns the number of decimals UIs should assume all amounts have.
-    function decimals() external view returns (uint8 decimals);
+    function decimals() external view returns (uint8);
 
     /// @notice Returns the name of the contract/token.
-    function name() external view returns (string memory name);
+    function name() external view returns (string memory);
 
     /// @notice Returns the symbol of the token.
-    function symbol() external view returns (string memory symbol);
+    function symbol() external view returns (string memory);
 
     /// @notice Returns the current total supply of the token.
-    function totalSupply() external view returns (uint256 totalSupply);
+    function totalSupply() external view returns (uint256);
 }
