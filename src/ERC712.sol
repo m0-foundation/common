@@ -15,29 +15,51 @@ abstract contract ERC712 is IERC712 {
     // keccak256("1")
     bytes32 internal constant _EIP712_VERSION_HASH = 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
 
-    bytes32 public immutable DOMAIN_SEPARATOR;
+    /// @dev Initial Chain ID set at deployment.
+    uint256 internal immutable INITIAL_CHAIN_ID;
+
+    /// @dev Initial EIP-712 domain separator set at deployment.
+    bytes32 internal immutable INITIAL_DOMAIN_SEPARATOR;
 
     string internal _name;
 
     constructor(string memory name_) {
-        DOMAIN_SEPARATOR = keccak256(
-            abi.encode(
-                _EIP712_DOMAIN_HASH,
-                keccak256(bytes(_name = name_)),
-                _EIP712_VERSION_HASH,
-                block.chainid,
-                address(this)
-            )
-        );
+        _name = name_;
+
+        INITIAL_CHAIN_ID = block.chainid;
+        INITIAL_DOMAIN_SEPARATOR = _computeDomainSeparator();
+    }
+
+    /******************************************************************************************************************\
+    |                                             Public View/Pure Functions                                           |
+    \******************************************************************************************************************/
+
+    /// @inheritdoc IERC712
+    function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
+        return block.chainid == INITIAL_CHAIN_ID ? INITIAL_DOMAIN_SEPARATOR : _computeDomainSeparator();
     }
 
     /******************************************************************************************************************\
     |                                           Internal View/Pure Functions                                           |
     \******************************************************************************************************************/
 
+    /// @dev Computes the EIP-712 domain separator.
+    function _computeDomainSeparator() internal view virtual returns (bytes32) {
+        return
+            keccak256(
+                abi.encode(
+                    _EIP712_DOMAIN_HASH,
+                    keccak256(bytes(_name)),
+                    _EIP712_VERSION_HASH,
+                    block.chainid,
+                    address(this)
+                )
+            );
+    }
+
     /// @dev Returns the digest to be signed, via EIP-712, given an internal digest (i.e. hash struct).
     function _getDigest(bytes32 internalDigest_) internal view returns (bytes32 digest_) {
-        digest_ = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, internalDigest_));
+        digest_ = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), internalDigest_));
     }
 
     function _getSignerAndRevertIfInvalidSignature(
