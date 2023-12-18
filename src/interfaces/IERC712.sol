@@ -22,5 +22,5 @@ interface IERC712 {
     error SignerMismatch();
 
     /// @notice Returns the EIP712 domain separator used in the encoding of a signed digest.
-    function DOMAIN_SEPARATOR() external view returns (bytes32 domainSeparator);
+    function DOMAIN_SEPARATOR() external view returns (bytes32);
 }
