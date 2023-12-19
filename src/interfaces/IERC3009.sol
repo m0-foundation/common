@@ -46,7 +46,7 @@ interface IERC3009 {
     error CallerMustBePayee(address caller, address payee);
 
     /**
-     * @notice Returns the state of an authorization
+     * @notice Returns the state of an authorization.
      * @dev Nonces are randomly generated 32-byte data unique to the authorizer's
      * address
      * @param authorizer    Authorizer's address
@@ -56,7 +56,7 @@ interface IERC3009 {
     function authorizationState(address authorizer, bytes32 nonce) external view returns (bool);
 
     /**
-     * @notice Execute a transfer with a signed authorization
+     * @notice Execute a transfer with a signed authorization.
      * @param from          Payer's address (Authorizer)
      * @param to            Payee's address
      * @param value         Amount to be transferred
@@ -80,7 +80,7 @@ interface IERC3009 {
     ) external;
 
     /**
-     * @notice Receive a transfer with a signed authorization from the payer
+     * @notice Receive a transfer with a signed authorization from the payer.
      * @dev This has an additional check to ensure that the payee's address matches
      * the caller of this function to prevent front-running attacks. (See security
      * considerations)
@@ -107,7 +107,7 @@ interface IERC3009 {
     ) external;
 
     /**
-     * @notice Attempt to cancel an authorization
+     * @notice Attempt to cancel an authorization.
      * @param authorizer    Authorizer's address
      * @param nonce         Nonce of the authorization
      * @param v             v of the signature

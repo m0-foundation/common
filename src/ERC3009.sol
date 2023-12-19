@@ -3,10 +3,11 @@
 pragma solidity 0.8.23;
 
 import { IERC3009 } from "./interfaces/IERC3009.sol";
+import { ERC712 } from "./libs/ERC712.sol";
 
-import { ERC20Permit } from "./ERC20Permit.sol";
+import { StatefulERC712 } from "./StatefulERC712.sol";
 
-abstract contract ERC3009 is IERC3009, ERC20Permit {
+abstract contract ERC3009 is IERC3009, StatefulERC712 {
     // keccak256("TransferWithAuthorization(address from,address to,uint256 value,uint256 validAfter,uint256 validBefore,bytes32 nonce)")
     bytes32 public constant TRANSFER_WITH_AUTHORIZATION_TYPEHASH =
         0x7c7c6cdb67a18743f49ec6fa9b35f50d52ed05cbed4cc592e13b44501c1a2267;
@@ -19,26 +20,27 @@ abstract contract ERC3009 is IERC3009, ERC20Permit {
     bytes32 public constant CANCEL_AUTHORIZATION_TYPEHASH =
         0x158b0a9edf7a828aad02f63cd515c68ef2f50ba807396f6d12842833a1597429;
 
-    string internal constant _INVALID_SIGNATURE_ERROR = "EIP3009: invalid signature";
-
-    /// @dev
-    string internal constant _AUTHORIZATION_USED_ERROR = "EIP3009: authorization is used";
-
     /// @dev authorizer => nonce => state (true = used / false = unused)
     mapping(address authorizer => mapping(bytes32 nonce => bool isNonceUsed)) internal _authorizationStates;
 
     /**
      * @notice Construct the ERC3009 contract.
-     * @param  name_     The name of the token.
-     * @param  symbol_   The symbol of the token.
-     * @param  decimals_ The number of decimals the token uses.
+     * @param  name_     The name of the contract.
      */
-    constructor(string memory name_, string memory symbol_, uint8 decimals_) ERC20Permit(name_, symbol_, decimals_) {}
+    constructor(string memory name_) StatefulERC712(name_) {}
+
+    /******************************************************************************************************************\
+    |                                             Public View/Pure Functions                                           |
+    \******************************************************************************************************************/
 
     /// @inheritdoc IERC3009
     function authorizationState(address authorizer_, bytes32 nonce_) external view returns (bool) {
         return _authorizationStates[authorizer_][nonce_];
     }
+
+    /******************************************************************************************************************\
+    |                                      External/Public Interactive Functions                                       |
+    \******************************************************************************************************************/
 
     /// @inheritdoc IERC3009
     function transferWithAuthorization(
@@ -98,9 +100,12 @@ abstract contract ERC3009 is IERC3009, ERC20Permit {
     function cancelAuthorization(address authorizer_, bytes32 nonce_, uint8 v_, bytes32 r_, bytes32 s_) external {
         if (_authorizationStates[authorizer_][nonce_]) revert AuthorizationAlreadyUsed(authorizer_, nonce_);
 
-        _revertIfInvalidSignature(
+        ERC712.revertIfInvalidSignature(
             authorizer_,
-            _getDigest(keccak256(abi.encode(CANCEL_AUTHORIZATION_TYPEHASH, authorizer_, nonce_))),
+            ERC712.getDigest(
+                DOMAIN_SEPARATOR(),
+                keccak256(abi.encode(CANCEL_AUTHORIZATION_TYPEHASH, authorizer_, nonce_))
+            ),
             v_,
             r_,
             s_
@@ -109,6 +114,10 @@ abstract contract ERC3009 is IERC3009, ERC20Permit {
         _authorizationStates[authorizer_][nonce_] = true;
         emit AuthorizationCanceled(authorizer_, nonce_);
     }
+
+    /******************************************************************************************************************\
+    |                                           Internal View/Pure Functions                                           |
+    \******************************************************************************************************************/
 
     /**
      * @notice Common transfer function used by `transferWithAuthorization` and `receiveWithAuthorization`.
@@ -139,9 +148,12 @@ abstract contract ERC3009 is IERC3009, ERC20Permit {
         if (block.timestamp > validBefore_) revert AuthorizationExpired(block.timestamp, validBefore_);
         _revertIfAuthorizationAlreadyUsed(from_, nonce_);
 
-        _revertIfInvalidSignature(
+        ERC712.revertIfInvalidSignature(
             from_,
-            _getDigest(keccak256(abi.encode(typeHash_, from_, to_, value_, validAfter_, validBefore_, nonce_))),
+            ERC712.getDigest(
+                DOMAIN_SEPARATOR(),
+                keccak256(abi.encode(typeHash_, from_, to_, value_, validAfter_, validBefore_, nonce_))
+            ),
             v_,
             r_,
             s_
@@ -161,4 +173,12 @@ abstract contract ERC3009 is IERC3009, ERC20Permit {
     function _revertIfAuthorizationAlreadyUsed(address authorizer_, bytes32 nonce_) internal view {
         if (_authorizationStates[authorizer_][nonce_]) revert AuthorizationAlreadyUsed(authorizer_, nonce_);
     }
+
+    /**
+     * @notice ERC20 transfer function that needs to ve overriden by the inheriting contract.
+     * @param  sender_    The sender's address
+     * @param  recipient_ The recipient's address
+     * @param  amount_    The amount to be transferred
+     */
+    function _transfer(address sender_, address recipient_, uint256 amount_) internal virtual;
 }

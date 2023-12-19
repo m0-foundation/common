@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.23;
 
-import { SignatureChecker } from "../../src/SignatureChecker.sol";
+import { SignatureChecker } from "../../src/libs/SignatureChecker.sol";
 
 contract SignatureCheckerHarness {
     function decodeECDSASignature(bytes memory signature) external pure returns (uint8 v, bytes32 r, bytes32 s) {

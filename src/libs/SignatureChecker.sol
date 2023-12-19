@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.23;
 
-import { IERC1271 } from "./interfaces/IERC1271.sol";
+import { IERC1271 } from "../interfaces/IERC1271.sol";
 
 /// @title A library to handle ECDSA/secp256k1 and ERC1271 signatures, individually or in arbitrarily in combination.
 library SignatureChecker {
