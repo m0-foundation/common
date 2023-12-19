@@ -3,6 +3,7 @@
 pragma solidity 0.8.23;
 
 import { IERC3009 } from "./interfaces/IERC3009.sol";
+import { ERC712 } from "./libs/ERC712.sol";
 
 import { StatefulERC712 } from "./StatefulERC712.sol";
 
@@ -31,6 +32,10 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
      * @param  name_     The name of the contract.
      */
     constructor(string memory name_) StatefulERC712(name_) {}
+
+    /******************************************************************************************************************\
+    |                                      External/Public Interactive Functions                                       |
+    \******************************************************************************************************************/
 
     /******************************************************************************************************************\
     |                                      External/Public Interactive Functions                                       |
@@ -94,9 +99,12 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
     function cancelAuthorization(address authorizer_, bytes32 nonce_, uint8 v_, bytes32 r_, bytes32 s_) external {
         if (authorizationState[authorizer_][nonce_]) revert AuthorizationAlreadyUsed(authorizer_, nonce_);
 
-        _revertIfInvalidSignature(
+        ERC712.revertIfInvalidSignature(
             authorizer_,
-            _getDigest(keccak256(abi.encode(CANCEL_AUTHORIZATION_TYPEHASH, authorizer_, nonce_))),
+            ERC712.getDigest(
+                DOMAIN_SEPARATOR(),
+                keccak256(abi.encode(CANCEL_AUTHORIZATION_TYPEHASH, authorizer_, nonce_))
+            ),
             v_,
             r_,
             s_
@@ -139,9 +147,12 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
         if (block.timestamp > validBefore_) revert AuthorizationExpired(block.timestamp, validBefore_);
         _revertIfAuthorizationAlreadyUsed(from_, nonce_);
 
-        _revertIfInvalidSignature(
+        ERC712.revertIfInvalidSignature(
             from_,
-            _getDigest(keccak256(abi.encode(typeHash_, from_, to_, value_, validAfter_, validBefore_, nonce_))),
+            ERC712.getDigest(
+                DOMAIN_SEPARATOR(),
+                keccak256(abi.encode(typeHash_, from_, to_, value_, validAfter_, validBefore_, nonce_))
+            ),
             v_,
             r_,
             s_
