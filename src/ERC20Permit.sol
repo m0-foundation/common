@@ -2,7 +2,8 @@
 
 pragma solidity 0.8.23;
 
-import { IERC20Permit, IERC20 } from "./interfaces/IERC20Permit.sol";
+import { IERC20 } from "./interfaces/IERC20.sol";
+import { IERC20Permit } from "./interfaces/IERC20Permit.sol";
 import { ERC712 } from "./libs/ERC712.sol";
 
 import { ERC3009 } from "./ERC3009.sol";
@@ -127,7 +128,7 @@ abstract contract ERC20Permit is IERC20Permit, ERC3009 {
         return
             ERC712.getDigest(
                 DOMAIN_SEPARATOR(),
-                keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, amount_, currentNonce_, deadline_))
+                keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, amount_, nonce_, deadline_))
             );
     }
 }

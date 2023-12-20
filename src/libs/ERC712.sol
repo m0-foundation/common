@@ -80,10 +80,12 @@ library ERC712 {
 
     /**
      * @notice Revert if the signature is expired.
-     * @param  expiry_ Timestamp at which the signature expires.
+     * @param  expiry_ Timestamp at which the signature expires or max uint256 for no expiry
      */
     function revertIfExpired(uint256 expiry_) internal view {
-        if (block.timestamp > expiry_) revert SignatureExpired(expiry_, block.timestamp);
+        if (expiry_ != type(uint256).max) {
+            if (block.timestamp > expiry_) revert SignatureExpired(expiry_, block.timestamp);
+        }
     }
 
     /**
