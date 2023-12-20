@@ -4,7 +4,7 @@ pragma solidity 0.8.23;
 
 import { Test } from "../../lib/forge-std/src/Test.sol";
 
-import { ERC3009Harness } from "./ERC3009Harness.sol";
+import { ERC20PermitHarness } from "./ERC20PermitHarness.sol";
 
 contract TestUtils is Test {
     /* ============ Permit ============ */
@@ -16,13 +16,13 @@ contract TestUtils is Test {
     }
 
     function _getTransferWithAuthorizationDigest(
-        ERC3009Harness asset_,
+        ERC20PermitHarness asset_,
         address from_,
         address to_,
         uint256 value_,
         uint256 validAfter_,
         uint256 validBefore_,
-        uint256 fromNonce_
+        bytes32 fromNonce_
     ) internal view returns (bytes32 digest_) {
         return
             asset_.getDigest(
@@ -41,13 +41,13 @@ contract TestUtils is Test {
     }
 
     function _getReceiveWithAuthorizationDigest(
-        ERC3009Harness asset_,
+        ERC20PermitHarness asset_,
         address from_,
         address to_,
         uint256 value_,
         uint256 validAfter_,
         uint256 validBefore_,
-        uint256 fromNonce_
+        bytes32 fromNonce_
     ) internal view returns (bytes32 digest_) {
         return
             asset_.getDigest(
@@ -66,9 +66,9 @@ contract TestUtils is Test {
     }
 
     function _getCancelAuthorizationDigest(
-        ERC3009Harness asset_,
+        ERC20PermitHarness asset_,
         address from_,
-        uint256 fromNonce_
+        bytes32 fromNonce_
     ) internal view returns (bytes32 digest_) {
         return asset_.getDigest(keccak256(abi.encode(asset_.CANCEL_AUTHORIZATION_TYPEHASH(), from_, fromNonce_)));
     }
