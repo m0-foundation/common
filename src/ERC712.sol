@@ -27,7 +27,7 @@ abstract contract ERC712 is IERC712 {
         _name = name_;
 
         INITIAL_CHAIN_ID = block.chainid;
-        INITIAL_DOMAIN_SEPARATOR = _computeDomainSeparator();
+        INITIAL_DOMAIN_SEPARATOR = _domainSeparator();
     }
 
     /******************************************************************************************************************\
@@ -36,7 +36,7 @@ abstract contract ERC712 is IERC712 {
 
     /// @inheritdoc IERC712
     function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
-        return block.chainid == INITIAL_CHAIN_ID ? INITIAL_DOMAIN_SEPARATOR : _computeDomainSeparator();
+        return block.chainid == INITIAL_CHAIN_ID ? INITIAL_DOMAIN_SEPARATOR : _domainSeparator();
     }
 
     /******************************************************************************************************************\
@@ -44,7 +44,7 @@ abstract contract ERC712 is IERC712 {
     \******************************************************************************************************************/
 
     /// @dev Computes the EIP-712 domain separator.
-    function _computeDomainSeparator() internal view virtual returns (bytes32) {
+    function _domainSeparator() internal view virtual returns (bytes32) {
         return
             keccak256(
                 abi.encode(
