@@ -127,7 +127,7 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
         return
             ERC712.getDigest(
                 DOMAIN_SEPARATOR(),
-                keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, amount_, currentNonce_, deadline_))
+                keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, amount_, nonce_, deadline_))
             );
     }
 }
