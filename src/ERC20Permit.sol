@@ -2,7 +2,8 @@
 
 pragma solidity 0.8.23;
 
-import { IERC20Permit, IERC20 } from "./interfaces/IERC20Permit.sol";
+import { IERC20 } from "./interfaces/IERC20.sol";
+import { IERC20Permit } from "./interfaces/IERC20Permit.sol";
 
 import { StatefulERC712 } from "./StatefulERC712.sol";
 
@@ -81,7 +82,9 @@ abstract contract ERC20Permit is IERC20Permit, StatefulERC712 {
     function transferFrom(address sender_, address recipient_, uint256 amount_) external returns (bool success_) {
         uint256 spenderAllowance_ = allowance[sender_][msg.sender]; // Cache `spenderAllowance_` to stack.
 
-        if (spenderAllowance_ != type(uint256).max) allowance[sender_][msg.sender] = spenderAllowance_ - amount_;
+        if (spenderAllowance_ != type(uint256).max) {
+            allowance[sender_][msg.sender] = spenderAllowance_ - amount_;
+        }
 
         _transfer(sender_, recipient_, amount_);
 
@@ -113,15 +116,15 @@ abstract contract ERC20Permit is IERC20Permit, StatefulERC712 {
     ) internal virtual returns (bytes32 digest_) {
         _revertIfExpired(deadline_);
 
-        uint256 currentNonce_ = _nonces[owner_]; // Cache `currentNonce_` to stack.
+        uint256 nonce_ = _nonces[owner_]; // Cache `nonce_` to stack.
 
         unchecked {
-            _nonces[owner_] = currentNonce_ + 1; // Nonce realistically cannot overflow.
+            _nonces[owner_] = nonce_ + 1; // Nonce realistically cannot overflow.
         }
 
         _approve(owner_, spender_, amount_);
 
-        return _getDigest(keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, amount_, currentNonce_, deadline_)));
+        return _getDigest(keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, amount_, nonce_, deadline_)));
     }
 
     function _transfer(address sender_, address recipient_, uint256 amount_) internal virtual;
