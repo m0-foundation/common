@@ -73,6 +73,13 @@ contract TestUtils is Test {
         return asset_.getDigest(keccak256(abi.encode(asset_.CANCEL_AUTHORIZATION_TYPEHASH(), from_, fromNonce_)));
     }
 
+    function _getVS(uint8 v_, bytes32 s_) internal pure returns (bytes32 vs_) {
+        if (v_ == 28) {
+            // then left-most bit of s has to be flipped to 1 to get vs
+            vs_ = s_ | bytes32(uint256(1) << 255);
+        }
+    }
+
     function _encodeSignature(uint8 v_, bytes32 r_, bytes32 s_) internal pure returns (bytes memory signature_) {
         return abi.encodePacked(r_, s_, v_);
     }
