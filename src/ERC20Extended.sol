@@ -57,7 +57,7 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
         bytes32 s_
     ) external {
         // NOTE: `_permit` returns the digest.
-        ERC712.revertIfInvalidSignature(owner_, _permit(owner_, spender_, value_, deadline_), v_, r_, s_);
+        _revertIfInvalidSignature(owner_, _permit(owner_, spender_, value_, deadline_), v_, r_, s_);
     }
 
     /// @inheritdoc IERC20Extended
@@ -69,7 +69,7 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
         bytes memory signature_
     ) external {
         // NOTE: `_permit` returns the digest.
-        ERC712.revertIfInvalidSignature(owner_, _permit(owner_, spender_, value_, deadline_), signature_);
+        _revertIfInvalidSignature(owner_, _permit(owner_, spender_, value_, deadline_), signature_);
     }
 
     /// @inheritdoc IERC20
@@ -114,7 +114,7 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
         uint256 amount_,
         uint256 deadline_
     ) internal virtual returns (bytes32 digest_) {
-        ERC712.revertIfExpired(deadline_);
+        _revertIfExpired(deadline_);
 
         uint256 nonce_ = nonces[owner_]; // Cache `nonce_` to stack.
 
@@ -124,10 +124,6 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
 
         _approve(owner_, spender_, amount_);
 
-        return
-            ERC712.getDigest(
-                DOMAIN_SEPARATOR(),
-                keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, amount_, nonce_, deadline_))
-            );
+        return _getDigest(keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, amount_, nonce_, deadline_)));
     }
 }

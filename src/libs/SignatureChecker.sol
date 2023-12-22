@@ -33,7 +33,26 @@ library SignatureChecker {
     }
 
     /**
+     * @dev    Decodes an ECDSA/secp256k1 short signature as defined by EIP2098
+     *         from a byte array to standard v, r, and s parameters.
+     * @param  signature A byte array ECDSA/secp256k1 short signature.
+     * @return r         An ECDSA/secp256k1 signature parameter.
+     * @return  vs     An ECDSA/secp256k1 short signature parameter.
+     */
+    function decodeShortECDSASignature(bytes memory signature) internal pure returns (bytes32 r, bytes32 vs) {
+        // ecrecover takes the signature parameters, and they can be decoded using assembly.
+        /// @solidity memory-safe-assembly
+        assembly {
+            r := mload(add(signature, 0x20))
+            vs := mload(add(signature, 0x40))
+        }
+    }
+
+    /**
      * @dev    Returns whether a signature is valid (ECDSA/secp256k1 or ERC1271) for a signer and digest.
+     * @dev    Signatures must not be used as unique identifiers since the `ecrecover` EVM opcode
+     *         allows for malleable (non-unique) signatures.
+     *         See https://github.com/OpenZeppelin/openzeppelin-contracts/security/advisories/GHSA-4h98-2769-gh6h
      * @param  signer    The address of the account purported to have signed.
      * @param  digest    The hash of the data that was signed.
      * @param  signature A byte array signature.
@@ -44,6 +63,11 @@ library SignatureChecker {
         bytes32 digest,
         bytes memory signature
     ) internal view returns (bool isValid) {
+        if (signature.length == 64) {
+            (bytes32 r, bytes32 vs) = decodeShortECDSASignature(signature);
+            return isValidECDSASignature(signer, digest, r, vs);
+        }
+
         return isValidECDSASignature(signer, digest, signature) || isValidERC1271Signature(signer, digest, signature);
     }
 
@@ -63,7 +87,7 @@ library SignatureChecker {
     }
 
     /**
-     * @dev    Returns whether an ECDSA/secp256k1 signature is valid for a signer and digest.
+     * @dev    Returns whether an ECDSA/secp256k1 short signature is valid for a signer and digest.
      * @param  signer The address of the account purported to have signed.
      * @param  digest The hash of the data that was signed.
      * @param  r      An ECDSA/secp256k1 signature parameter.
@@ -139,7 +163,7 @@ library SignatureChecker {
     }
 
     /**
-     * @dev    Returns the signer of an ECDSA/secp256k1 signature for some digest.
+     * @dev    Returns the signer of an ECDSA/secp256k1 short signature for some digest.
      * @dev    See https://eips.ethereum.org/EIPS/eip-2098
      * @param  digest The hash of the data that was signed.
      * @param  r      An ECDSA/secp256k1 signature parameter.
@@ -205,7 +229,7 @@ library SignatureChecker {
     }
 
     /**
-     * @dev    Returns an error, if any, in validating an ECDSA/secp256k1 signature for a signer and digest.
+     * @dev    Returns an error, if any, in validating an ECDSA/secp256k1 short signature for a signer and digest.
      * @param  signer The address of the account purported to have signed.
      * @param  digest The hash of the data that was signed.
      * @param  r      An ECDSA/secp256k1 signature parameter.

@@ -433,7 +433,7 @@ contract SignatureCheckerTests is TestUtils {
 
         bytes32 digest_ = "TEST_DIGEST";
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
-        bytes memory signature_ = abi.encodePacked(r_, s_, v_);
+        bytes memory signature_ = _encodeSignature(v_, r_, s_);
 
         vm.prank(alice_);
         _verifier.verifySignature(digest_, signature_);
@@ -443,7 +443,7 @@ contract SignatureCheckerTests is TestUtils {
         vm.expectRevert(abi.encodeWithSelector(Verifier.SignatureUsed.selector, address(_verifier)));
         _verifier.verifySignature(digest_, signature_);
 
-        bytes memory signature2098 = abi.encodePacked(r_, _getVS(v_, s_));
+        bytes memory signature2098 = _encodeShortSignature(r_, _getVS(v_, s_));
 
         // Reverts because SignatureChecker.recoverECDSASigner() only accepts full EDSCA signature.
         vm.expectRevert(abi.encodeWithSelector(Verifier.InvalidSignature.selector, address(_verifier)));
@@ -505,12 +505,18 @@ contract SignatureCheckerTests is TestUtils {
         bytes32 digest_ = "TEST_DIGEST";
         (address account_, uint256 privateKey_) = makeAddrAndKey("account");
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
+        bytes32 vs_ = _getVS(v_, s_);
 
         assertFalse(_signatureChecker.isValidSignature(address(1), digest_, _encodeSignature(v_, r_, s_)));
         assertFalse(_signatureChecker.isValidSignature(account_, "DIFF", _encodeSignature(v_, r_, s_)));
         assertFalse(_signatureChecker.isValidSignature(account_, digest_, _encodeSignature(26, r_, s_)));
         assertFalse(_signatureChecker.isValidSignature(account_, digest_, _encodeSignature(v_, 0, s_)));
         assertFalse(_signatureChecker.isValidSignature(account_, digest_, _encodeSignature(v_, r_, invalidS_)));
+
+        assertFalse(_signatureChecker.isValidSignature(address(1), digest_, _encodeShortSignature(r_, vs_)));
+        assertFalse(_signatureChecker.isValidSignature(account_, "DIFF", _encodeShortSignature(r_, vs_)));
+        assertFalse(_signatureChecker.isValidSignature(account_, digest_, _encodeShortSignature(0, vs_)));
+        assertFalse(_signatureChecker.isValidSignature(account_, digest_, _encodeShortSignature(r_, invalidS_)));
 
         assertFalse(_signatureChecker.isValidSignature(makeAddr("account"), "DIGEST", ""));
         assertFalse(_signatureChecker.isValidSignature(address(new AccountWithFallback()), "DIGEST", ""));
@@ -533,6 +539,7 @@ contract SignatureCheckerTests is TestUtils {
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
 
         assertTrue(_signatureChecker.isValidSignature(account_, digest_, _encodeSignature(v_, r_, s_)));
+        assertTrue(_signatureChecker.isValidSignature(account_, digest_, _encodeShortSignature(r_, _getVS(v_, s_))));
     }
 
     function test_isValidSignature_erc1271() external {

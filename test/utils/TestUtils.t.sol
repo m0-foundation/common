@@ -83,4 +83,8 @@ contract TestUtils is Test {
     function _encodeSignature(uint8 v_, bytes32 r_, bytes32 s_) internal pure returns (bytes memory signature_) {
         return abi.encodePacked(r_, s_, v_);
     }
+
+    function _encodeShortSignature(bytes32 r_, bytes32 vs_) internal pure returns (bytes memory signature_) {
+        return abi.encodePacked(r_, vs_);
+    }
 }
