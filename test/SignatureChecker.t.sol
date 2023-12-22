@@ -2,9 +2,9 @@
 
 pragma solidity 0.8.23;
 
-import { Test } from "../lib/forge-std/src/Test.sol";
+import { TestUtils } from "./utils/TestUtils.t.sol";
 
-import { SignatureChecker } from "../src/SignatureChecker.sol";
+import { SignatureChecker } from "../src/libs/SignatureChecker.sol";
 import { SignatureCheckerHarness } from "./utils/SignatureCheckerHarness.sol";
 
 contract AccountWithFallback {
@@ -45,7 +45,7 @@ contract AccountWithValidFunction {
     }
 }
 
-contract SignatureCheckerTests is Test {
+contract SignatureCheckerTests is TestUtils {
     uint256 internal constant _MAX_S = uint256(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0);
 
     SignatureCheckerHarness internal _signatureChecker;
@@ -373,9 +373,5 @@ contract SignatureCheckerTests is Test {
 
     function test_isValidSignature_erc1271() external {
         assertTrue(_signatureChecker.isValidSignature(address(new AccountWithValidFunction()), "DIGEST", ""));
-    }
-
-    function _encodeSignature(uint8 v_, bytes32 r_, bytes32 s_) internal pure returns (bytes memory signature_) {
-        return abi.encodePacked(r_, s_, v_);
     }
 }

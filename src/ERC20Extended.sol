@@ -3,15 +3,15 @@
 pragma solidity 0.8.23;
 
 import { IERC20 } from "./interfaces/IERC20.sol";
-import { IERC20Permit } from "./interfaces/IERC20Permit.sol";
+import { IERC20Extended } from "./interfaces/IERC20Extended.sol";
 
-import { StatefulERC712 } from "./StatefulERC712.sol";
+import { ERC3009 } from "./ERC3009.sol";
 
-/// @title Permit Extension for ERC20 Signed Approvals via EIP-712 with EIP-2612 and EIP-1271 compatibility.
-/// @dev   An abstract implementation to satisfy EIP-2612: https://eips.ethereum.org/EIPS/eip-2612
-abstract contract ERC20Permit is IERC20Permit, StatefulERC712 {
+/// @title An ERC20 token extended with EIP-2612 permits for signed approvals (via EIP-712 and with EIP-1271
+///        compatibility), and extended with EIP-3009 transfer with authorization (via EIP-712).
+abstract contract ERC20Extended is IERC20Extended, ERC3009 {
     /**
-     * @inheritdoc IERC20Permit
+     * @inheritdoc IERC20Extended
      * @dev Keeping this constant, despite `permit` parameter name differences, to ensure max EIP-2612 compatibility.
      *      keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)")
      */
@@ -26,12 +26,12 @@ abstract contract ERC20Permit is IERC20Permit, StatefulERC712 {
     mapping(address account => mapping(address spender => uint256 allowance)) public allowance;
 
     /**
-     * @notice Constructs the ERC20Permit contract.
+     * @notice Constructs the ERC20Extended contract.
      * @param  name_     The name of the token.
      * @param  symbol_   The symbol of the token.
      * @param  decimals_ The number of decimals the token uses.
      */
-    constructor(string memory name_, string memory symbol_, uint8 decimals_) StatefulERC712(name_) {
+    constructor(string memory name_, string memory symbol_, uint8 decimals_) ERC3009(name_) {
         symbol = symbol_;
         decimals = decimals_;
     }
@@ -46,7 +46,7 @@ abstract contract ERC20Permit is IERC20Permit, StatefulERC712 {
         return true;
     }
 
-    /// @inheritdoc IERC20Permit
+    /// @inheritdoc IERC20Extended
     function permit(
         address owner_,
         address spender_,
@@ -60,7 +60,7 @@ abstract contract ERC20Permit is IERC20Permit, StatefulERC712 {
         _revertIfInvalidSignature(owner_, _permit(owner_, spender_, value_, deadline_), v_, r_, s_);
     }
 
-    /// @inheritdoc IERC20Permit
+    /// @inheritdoc IERC20Extended
     function permit(
         address owner_,
         address spender_,
@@ -83,7 +83,7 @@ abstract contract ERC20Permit is IERC20Permit, StatefulERC712 {
         uint256 spenderAllowance_ = allowance[sender_][msg.sender]; // Cache `spenderAllowance_` to stack.
 
         if (spenderAllowance_ != type(uint256).max) {
-            allowance[sender_][msg.sender] = spenderAllowance_ - amount_;
+            _approve(sender_, msg.sender, spenderAllowance_ - amount_);
         }
 
         _transfer(sender_, recipient_, amount_);
@@ -116,16 +116,14 @@ abstract contract ERC20Permit is IERC20Permit, StatefulERC712 {
     ) internal virtual returns (bytes32 digest_) {
         _revertIfExpired(deadline_);
 
-        uint256 nonce_ = _nonces[owner_]; // Cache `nonce_` to stack.
+        uint256 nonce_ = nonces[owner_]; // Cache `nonce_` to stack.
 
         unchecked {
-            _nonces[owner_] = nonce_ + 1; // Nonce realistically cannot overflow.
+            nonces[owner_] = nonce_ + 1; // Nonce realistically cannot overflow.
         }
 
         _approve(owner_, spender_, amount_);
 
         return _getDigest(keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, amount_, nonce_, deadline_)));
     }
-
-    function _transfer(address sender_, address recipient_, uint256 amount_) internal virtual;
 }

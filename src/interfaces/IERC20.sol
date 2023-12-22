@@ -60,8 +60,8 @@ interface IERC20 {
 
     /**
      * @notice Returns the allowance `spender` is allowed to spend on behalf of `account`.
-     * @param  account   The address of the account who's token balance `spender` is allowed to spend.
-     * @param  spender   The address of an account allowed to spend on behalf of `account`.
+     * @param  account The address of the account who's token balance `spender` is allowed to spend.
+     * @param  spender The address of an account allowed to spend on behalf of `account`.
      * @return The amount `spender` can spend on behalf of `account`.
      */
     function allowance(address account, address spender) external view returns (uint256);
