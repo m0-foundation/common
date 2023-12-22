@@ -10,7 +10,7 @@ import { ERC3009 } from "./ERC3009.sol";
 
 /// @title Permit Extension for ERC20 Signed Approvals via EIP-712 with EIP-2612 and EIP-1271 compatibility.
 /// @dev   An abstract implementation to satisfy EIP-2612: https://eips.ethereum.org/EIPS/eip-2612
-abstract contract ERC20Permit is IERC20Permit, ERC3009 {
+abstract contract ERC20Permit is IERC20, IERC20Permit, ERC3009 {
     /**
      * @inheritdoc IERC20Permit
      * @dev Keeping this constant, despite `permit` parameter name differences, to ensure max EIP-2612 compatibility.

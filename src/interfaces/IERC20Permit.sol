@@ -2,12 +2,11 @@
 
 pragma solidity 0.8.23;
 
-import { IERC20 } from "./IERC20.sol";
-import { IStatefulERC712 } from "./IStatefulERC712.sol";
+import { IERC3009 } from "./IERC3009.sol";
 
 /// @title Permit Extension for ERC20 Signed Approvals via EIP-712 with EIP-2612 and EIP-1271 compatibility.
 /// @dev   The interface as defined by EIP-2612: https://eips.ethereum.org/EIPS/eip-2612
-interface IERC20Permit is IERC20, IStatefulERC712 {
+interface IERC20Permit is IERC3009 {
     /**
      * @notice Approves `spender` to spend up to `amount` of the token balance of `owner`, via a signature.
      * @param  owner    The address of the account who's token balance is being approved to be spent by `spender`.
