@@ -3,7 +3,6 @@
 pragma solidity 0.8.23;
 
 import { IERC3009 } from "../src/interfaces/IERC3009.sol";
-import { SignatureChecker } from "../src/libs/SignatureChecker.sol";
 
 import { ERC20ExtendedHarness } from "./utils/ERC20ExtendedHarness.sol";
 import { TestUtils } from "./utils/TestUtils.t.sol";
@@ -68,7 +67,7 @@ contract ERC3009Tests is TestUtils {
     }
 
     /* ============ Typehashes ============ */
-    function test_TransferWithAuthorizationTypehash() external {
+    function test_transferWithAuthorizationTypehash() external {
         assertEq(
             _token.TRANSFER_WITH_AUTHORIZATION_TYPEHASH(),
             keccak256(
@@ -77,7 +76,7 @@ contract ERC3009Tests is TestUtils {
         );
     }
 
-    function test_ReceiveWithAuthorizationTypehash() external {
+    function test_receiveWithAuthorizationTypehash() external {
         assertEq(
             _token.RECEIVE_WITH_AUTHORIZATION_TYPEHASH(),
             keccak256(
@@ -86,7 +85,7 @@ contract ERC3009Tests is TestUtils {
         );
     }
 
-    function test_CancelAuthorizationTypehash() external {
+    function test_cancelAuthorizationTypehash() external {
         assertEq(
             _token.CANCEL_AUTHORIZATION_TYPEHASH(),
             keccak256("CancelAuthorization(address authorizer,bytes32 nonce)")

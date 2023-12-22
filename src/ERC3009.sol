@@ -6,6 +6,8 @@ import { IERC3009 } from "./interfaces/IERC3009.sol";
 
 import { StatefulERC712 } from "./StatefulERC712.sol";
 
+// TODO: Better natspec than the EIP.
+
 /// @title EIP-3009: Transfer With Authorization
 /// @dev Abstract implementation of the ERC3009 standard inheriting from ERC712 and StatefulERC712.
 abstract contract ERC3009 is IERC3009, StatefulERC712 {
@@ -110,16 +112,16 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
 
     /**
      * @notice Common transfer function used by `transferWithAuthorization` and `receiveWithAuthorization`.
-     * @param  typeHash_    Typehash of the transfer authorization
-     * @param  from_        Payer's address (Authorizer)
-     * @param  to_          Payee's address
-     * @param  value_       Amount to be transferred
-     * @param  validAfter_  The time after which this is valid (unix time)
-     * @param  validBefore_ The time before which this is valid (unix time)
-     * @param  nonce_       Unique nonce
-     * @param  v_           v of the signature
-     * @param  r_           r of the signature
-     * @param  s_           s of the signature
+     * @param  typeHash_    Typehash of the transfer authorization.
+     * @param  from_        Payer's address (Authorizer).
+     * @param  to_          Payee's address.
+     * @param  value_       Amount to be transferred.
+     * @param  validAfter_  The time after which this is valid (unix time).
+     * @param  validBefore_ The time before which this is valid (unix time).
+     * @param  nonce_       Unique nonce.
+     * @param  v_           v of the signature.
+     * @param  r_           r of the signature.
+     * @param  s_           s of the signature.
      */
     function _transferWithAuthorization(
         bytes32 typeHash_,
@@ -153,18 +155,18 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
 
     /**
      * @notice Reverts if the authorization is already used.
-     * @param  authorizer_ The authorizer's address
-     * @param  nonce_      The nonce of the authorization
+     * @param  authorizer_ The authorizer's address.
+     * @param  nonce_      The nonce of the authorization.
      */
     function _revertIfAuthorizationAlreadyUsed(address authorizer_, bytes32 nonce_) internal view {
         if (authorizationState[authorizer_][nonce_]) revert AuthorizationAlreadyUsed(authorizer_, nonce_);
     }
 
     /**
-     * @notice ERC20 transfer function that needs to be overriden by the inheriting contract.
-     * @param  sender_    The sender's address
-     * @param  recipient_ The recipient's address
-     * @param  amount_    The amount to be transferred
+     * @notice ERC20 transfer function that needs to be overridden by the inheriting contract.
+     * @param  sender_    The sender's address.
+     * @param  recipient_ The recipient's address.
+     * @param  amount_    The amount to be transferred.
      */
     function _transfer(address sender_, address recipient_, uint256 amount_) internal virtual;
 }

@@ -11,8 +11,8 @@ contract TestUtils is Test {
     function _signPermit(
         uint256 signerPrivateKey_,
         bytes32 digest_
-    ) internal pure returns (uint8 _v, bytes32 _r, bytes32 _s) {
-        (_v, _r, _s) = vm.sign(signerPrivateKey_, digest_);
+    ) internal pure returns (uint8 v_, bytes32 r_, bytes32 s_) {
+        (v_, r_, s_) = vm.sign(signerPrivateKey_, digest_);
     }
 
     function _getTransferWithAuthorizationDigest(

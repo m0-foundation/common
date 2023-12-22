@@ -4,70 +4,74 @@ pragma solidity 0.8.23;
 
 import { IStatefulERC712 } from "./IStatefulERC712.sol";
 
+// TODO: EIP-1271 variants (64-byte and 65-byte signatures).
+// TODO: Better natspec than the EIP.
+
 /// @title EIP-3009: Transfer With Authorization
+/// @dev   The interface as defined by EIP-3009: https://eips.ethereum.org/EIPS/eip-3009
 interface IERC3009 is IStatefulERC712 {
     /**
      * @notice Emitted when an authorization has been used.
-     * @param  authorizer Authorizer's address
-     * @param  nonce      Nonce of the used authorization
+     * @param  authorizer Authorizer's address.
+     * @param  nonce      Nonce of the used authorization.
      */
     event AuthorizationUsed(address indexed authorizer, bytes32 indexed nonce);
 
     /**
      * @notice Emitted when an authorization has been canceled.
-     * @param  authorizer Authorizer's address
-     * @param  nonce      Nonce of the canceled authorization
+     * @param  authorizer Authorizer's address.
+     * @param  nonce      Nonce of the canceled authorization.
      */
     event AuthorizationCanceled(address indexed authorizer, bytes32 indexed nonce);
 
     /**
      * @notice Emitted when an authorization has already been used.
-     * @param  authorizer Authorizer's address
-     * @param  nonce      Nonce of the used authorization
+     * @param  authorizer Authorizer's address.
+     * @param  nonce      Nonce of the used authorization.
      */
     error AuthorizationAlreadyUsed(address authorizer, bytes32 nonce);
 
     /**
      * @notice Emitted when an authorization is not yet valid.
-     * @param  timestamp  Timestamp at which the transaction was submitted
-     * @param  validAfter Timestamp after which the authorization will be valid
+     * @param  timestamp  Timestamp at which the transaction was submitted.
+     * @param  validAfter Timestamp after which the authorization will be valid.
      */
     error AuthorizationNotYetValid(uint256 timestamp, uint256 validAfter);
 
     /**
      * @notice Emitted when an authorization is expired.
-     * @param  timestamp   Timestamp at which the transaction was submitted
-     * @param  validBefore Timestamp before which the authorization would have been valid
+     * @param  timestamp   Timestamp at which the transaction was submitted.
+     * @param  validBefore Timestamp before which the authorization would have been valid.
      */
     error AuthorizationExpired(uint256 timestamp, uint256 validBefore);
 
     /**
      * @notice Emitted when the caller of `receiveWithAuthorization` is not the payee.
-     * @param  caller Caller's address
-     * @param  payee  Payee's address
+     * @param  caller Caller's address.
+     * @param  payee  Payee's address.
      */
     error CallerMustBePayee(address caller, address payee);
 
     /**
      * @notice Returns the state of an authorization.
      * @dev    Nonces are randomly generated 32-byte data unique to the authorizer's address
-     * @param  authorizer Authorizer's address
-     * @param  nonce      Nonce of the authorization
-     * @return True if the nonce is used
+     * @param  authorizer Authorizer's address.
+     * @param  nonce      Nonce of the authorization.
+     * @return True if the nonce is used.
      */
     function authorizationState(address authorizer, bytes32 nonce) external view returns (bool);
 
     /**
      * @notice Execute a transfer with a signed authorization.
-     * @param  from        Payer's address (Authorizer)
-     * @param  to          Payee's address
-     * @param  value       Amount to be transferred
-     * @param  validAfter  The time after which this is valid (unix time)
-     * @param  validBefore The time before which this is valid (unix time)
-     * @param  nonce       Unique nonce
-     * @param  v           v of the signature
-     * @param  r           r of the signature
-     * @param  s           s of the signature
+     * @param  from        Payer's address (Authorizer).
+     * @param  to          Payee's address.
+     * @param  value       Amount to be transferred.
+     * @param  validAfter  The time after which this is valid (unix time).
+     * @param  validBefore The time before which this is valid (unix time).
+     * @param  nonce       Unique nonce.
+     * @param  v           v of the signature.
+     * @param  r           r of the signature.
+     * @param  s           s of the signature.
      */
     function transferWithAuthorization(
         address from,
@@ -86,15 +90,15 @@ interface IERC3009 is IStatefulERC712 {
      * @dev    This has an additional check to ensure that the payee's address matches
      *         the caller of this function to prevent front-running attacks.
      *         (See security considerations)
-     * @param  from        Payer's address (Authorizer)
-     * @param  to          Payee's address
-     * @param  value       Amount to be transferred
-     * @param  validAfter  The time after which this is valid (unix time)
-     * @param  validBefore The time before which this is valid (unix time)
-     * @param  nonce       Unique nonce
-     * @param  v           v of the signature
-     * @param  r           r of the signature
-     * @param  s           s of the signature
+     * @param  from        Payer's address (Authorizer).
+     * @param  to          Payee's address.
+     * @param  value       Amount to be transferred.
+     * @param  validAfter  The time after which this is valid (unix time).
+     * @param  validBefore The time before which this is valid (unix time).
+     * @param  nonce       Unique nonce.
+     * @param  v           v of the signature.
+     * @param  r           r of the signature.
+     * @param  s           s of the signature.
      */
     function receiveWithAuthorization(
         address from,
@@ -110,11 +114,11 @@ interface IERC3009 is IStatefulERC712 {
 
     /**
      * @notice Attempt to cancel an authorization.
-     * @param  authorizer Authorizer's address
-     * @param  nonce      Nonce of the authorization
-     * @param  v          v of the signature
-     * @param  r          r of the signature
-     * @param  s          s of the signature
+     * @param  authorizer Authorizer's address.
+     * @param  nonce      Nonce of the authorization.
+     * @param  v          v of the signature.
+     * @param  r          r of the signature.
+     * @param  s          s of the signature.
      */
     function cancelAuthorization(address authorizer, bytes32 nonce, uint8 v, bytes32 r, bytes32 s) external;
 }

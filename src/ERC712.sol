@@ -50,7 +50,7 @@ abstract contract ERC712 is IERC712 {
 
     /**
      * @notice Computes the EIP-712 domain separator.
-     * @return The EIP-712 domain separator
+     * @return The EIP-712 domain separator.
      */
     function _getDomainSeparator() internal view returns (bytes32) {
         return
@@ -67,8 +67,8 @@ abstract contract ERC712 is IERC712 {
 
     /**
      * @notice Returns the digest to be signed, via EIP-712, given an internal digest (i.e. hash struct).
-     * @param  internalDigest_  The internal digest
-     * @return The digest to be signed
+     * @param  internalDigest_ The internal digest.
+     * @return The digest to be signed.
      */
     function _getDigest(bytes32 internalDigest_) internal view returns (bytes32) {
         return keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), internalDigest_));
@@ -76,11 +76,11 @@ abstract contract ERC712 is IERC712 {
 
     /**
      * @notice Returns the signer of a signed digest, via EIP-712, and reverts if the signature is invalid.
-     * @param  digest_ The digest that was signed
-     * @param  v_      v of the signature
-     * @param  r_      r of the signature
-     * @param  s_      s of the signature
-     * @return signer_ The signer of the digest
+     * @param  digest_ The digest that was signed.
+     * @param  v_      v of the signature.
+     * @param  r_      r of the signature.
+     * @param  s_      s of the signature.
+     * @return signer_ The signer of the digest.
      */
     function _getSignerAndRevertIfInvalidSignature(
         bytes32 digest_,
@@ -97,7 +97,7 @@ abstract contract ERC712 is IERC712 {
 
     /**
      * @notice Revert if the signature is expired.
-     * @param  expiry_ Timestamp at which the signature expires or max uint256 for no expiry
+     * @param  expiry_ Timestamp at which the signature expires or max uint256 for no expiry.
      */
     function _revertIfExpired(uint256 expiry_) internal view {
         if (expiry_ != type(uint256).max && block.timestamp > expiry_)
@@ -106,9 +106,9 @@ abstract contract ERC712 is IERC712 {
 
     /**
      * @notice Revert if the signature is invalid.
-     * @param  signer_    The signer of the signature
-     * @param  digest_    The digest that was signed
-     * @param  signature_ The signature
+     * @param  signer_    The signer of the signature.
+     * @param  digest_    The digest that was signed.
+     * @param  signature_ The signature.
      */
     function _revertIfInvalidSignature(address signer_, bytes32 digest_, bytes memory signature_) internal view {
         if (!SignatureChecker.isValidSignature(signer_, digest_, signature_)) revert InvalidSignature();
@@ -116,11 +116,11 @@ abstract contract ERC712 is IERC712 {
 
     /**
      * @notice Revert if the signature is invalid.
-     * @param  signer_ The signer of the signature
-     * @param  digest_ The digest that was signed
-     * @param  v_      v of the signature
-     * @param  r_      r of the signature
-     * @param  s_      s of the signature
+     * @param  signer_ The signer of the signature.
+     * @param  digest_ The digest that was signed.
+     * @param  v_      v of the signature.
+     * @param  r_      r of the signature.
+     * @param  s_      s of the signature.
      */
     function _revertIfInvalidSignature(
         address signer_,
@@ -134,7 +134,7 @@ abstract contract ERC712 is IERC712 {
 
     /**
      * @notice Revert if error.
-     * @param  error_ The SignatureChecker Error enum
+     * @param  error_ The SignatureChecker Error enum.
      */
     function _revertIfError(SignatureChecker.Error error_) private pure {
         if (error_ == SignatureChecker.Error.NoError) return;

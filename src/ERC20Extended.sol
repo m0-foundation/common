@@ -3,17 +3,15 @@
 pragma solidity 0.8.23;
 
 import { IERC20 } from "./interfaces/IERC20.sol";
-import { IERC20Permit } from "./interfaces/IERC20Permit.sol";
+import { IERC20Extended } from "./interfaces/IERC20Extended.sol";
 
 import { ERC3009 } from "./ERC3009.sol";
 
-/**
- * @title ERC20 implementationn extended to support Signed Approvals via EIP-712 with EIP-2612 and EIP-1271 compatibility,
- *        as well as EIP-3009 for transfers with authorization.
- */
-abstract contract ERC20Extended is IERC20Permit, ERC3009 {
+/// @title An ERC20 token extended with EIP-2612 permits for signed approvals (via EIP-712 and with EIP-1271
+///        compatibility), and extended with EIP-3009 transfer with authorization (via EIP-712).
+abstract contract ERC20Extended is IERC20Extended, ERC3009 {
     /**
-     * @inheritdoc IERC20Permit
+     * @inheritdoc IERC20Extended
      * @dev Keeping this constant, despite `permit` parameter name differences, to ensure max EIP-2612 compatibility.
      *      keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)")
      */
@@ -48,7 +46,7 @@ abstract contract ERC20Extended is IERC20Permit, ERC3009 {
         return true;
     }
 
-    /// @inheritdoc IERC20Permit
+    /// @inheritdoc IERC20Extended
     function permit(
         address owner_,
         address spender_,
@@ -62,7 +60,7 @@ abstract contract ERC20Extended is IERC20Permit, ERC3009 {
         _revertIfInvalidSignature(owner_, _permit(owner_, spender_, value_, deadline_), v_, r_, s_);
     }
 
-    /// @inheritdoc IERC20Permit
+    /// @inheritdoc IERC20Extended
     function permit(
         address owner_,
         address spender_,
