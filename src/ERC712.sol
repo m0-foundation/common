@@ -2,44 +2,62 @@
 
 pragma solidity 0.8.23;
 
-import { SignatureChecker } from "./SignatureChecker.sol";
+import { IERC712 } from "./interfaces/IERC712.sol";
+
+import { SignatureChecker } from "./libs/SignatureChecker.sol";
 
 /// @title Typed structured data hashing and signing via EIP-712.
 /// @dev   An abstract implementation to satisfy EIP-712: https://eips.ethereum.org/EIPS/eip-712
-library ERC712 {
+abstract contract ERC712 is IERC712 {
     // keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")
     bytes32 internal constant _EIP712_DOMAIN_HASH = 0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f;
 
     // keccak256("1")
     bytes32 internal constant _EIP712_VERSION_HASH = 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
 
-    /// @notice Revert message when an invalid signature is detected.
-    error InvalidSignature();
+    /// @dev Initial Chain ID set at deployment.
+    uint256 internal immutable INITIAL_CHAIN_ID;
 
-    /// @notice Revert message when a signature with invalid length is detected.
-    error InvalidSignatureLength();
+    /// @dev Initial EIP-712 domain separator set at deployment.
+    bytes32 internal immutable INITIAL_DOMAIN_SEPARATOR;
+
+    /// @dev The name of the contract.
+    string internal _name;
 
     /**
-     * @notice Revert message when a signature is being used beyond its deadline (i.e. expiry).
-     * @param  deadline  The deadline of the signature.
-     * @param  timestamp The current timestamp.
+     * @notice Constructs the EIP-712 domain separator.
+     * @param  name_ The name of the contract.
      */
-    error SignatureExpired(uint256 deadline, uint256 timestamp);
+    constructor(string memory name_) {
+        _name = name_;
 
-    /// @notice Revert message when a recovered signer does not match the account being purported to have signed.
-    error SignerMismatch();
+        INITIAL_CHAIN_ID = block.chainid;
+        INITIAL_DOMAIN_SEPARATOR = _getDomainSeparator();
+    }
+
+    /******************************************************************************************************************\
+    |                                             Public View/Pure Functions                                           |
+    \******************************************************************************************************************/
+
+    /// @inheritdoc IERC712
+    function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
+        return block.chainid == INITIAL_CHAIN_ID ? INITIAL_DOMAIN_SEPARATOR : _getDomainSeparator();
+    }
+
+    /******************************************************************************************************************\
+    |                                           Internal View/Pure Functions                                           |
+    \******************************************************************************************************************/
 
     /**
      * @notice Computes the EIP-712 domain separator.
-     * @param  name_ The name of the contract
-     * @return       The EIP-712 domain separator
+     * @return The EIP-712 domain separator
      */
-    function computeDomainSeparator(string memory name_) internal view returns (bytes32) {
+    function _getDomainSeparator() internal view returns (bytes32) {
         return
             keccak256(
                 abi.encode(
                     _EIP712_DOMAIN_HASH,
-                    keccak256(bytes(name_)),
+                    keccak256(bytes(_name)),
                     _EIP712_VERSION_HASH,
                     block.chainid,
                     address(this)
@@ -49,23 +67,22 @@ library ERC712 {
 
     /**
      * @notice Returns the digest to be signed, via EIP-712, given an internal digest (i.e. hash struct).
-     * @param  domainSeparator_ The EIP-712 domain separator
      * @param  internalDigest_  The internal digest
-     * @return digest_          The digest to be signed
+     * @return The digest to be signed
      */
-    function getDigest(bytes32 domainSeparator_, bytes32 internalDigest_) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked("\x19\x01", domainSeparator_, internalDigest_));
+    function _getDigest(bytes32 internalDigest_) internal view returns (bytes32) {
+        return keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), internalDigest_));
     }
 
     /**
      * @notice Returns the signer of a signed digest, via EIP-712, and reverts if the signature is invalid.
-     * @param  digest_  The digest that was signed
-     * @param  v_       v of the signature
-     * @param  r_       r of the signature
-     * @param  s_       s of the signature
-     * @return signer_  The signer of the digest
+     * @param  digest_ The digest that was signed
+     * @param  v_      v of the signature
+     * @param  r_      r of the signature
+     * @param  s_      s of the signature
+     * @return signer_ The signer of the digest
      */
-    function getSignerAndRevertIfInvalidSignature(
+    function _getSignerAndRevertIfInvalidSignature(
         bytes32 digest_,
         uint8 v_,
         bytes32 r_,
@@ -82,10 +99,9 @@ library ERC712 {
      * @notice Revert if the signature is expired.
      * @param  expiry_ Timestamp at which the signature expires or max uint256 for no expiry
      */
-    function revertIfExpired(uint256 expiry_) internal view {
-        if (expiry_ != type(uint256).max) {
-            if (block.timestamp > expiry_) revert SignatureExpired(expiry_, block.timestamp);
-        }
+    function _revertIfExpired(uint256 expiry_) internal view {
+        if (expiry_ != type(uint256).max && block.timestamp > expiry_)
+            revert SignatureExpired(expiry_, block.timestamp);
     }
 
     /**
@@ -94,19 +110,19 @@ library ERC712 {
      * @param  digest_    The digest that was signed
      * @param  signature_ The signature
      */
-    function revertIfInvalidSignature(address signer_, bytes32 digest_, bytes memory signature_) internal view {
+    function _revertIfInvalidSignature(address signer_, bytes32 digest_, bytes memory signature_) internal view {
         if (!SignatureChecker.isValidSignature(signer_, digest_, signature_)) revert InvalidSignature();
     }
 
     /**
      * @notice Revert if the signature is invalid.
-     * @param  signer_    The signer of the signature
-     * @param  digest_    The digest that was signed
-     * @param  v_         v of the signature
-     * @param  r_         r of the signature
-     * @param  s_         s of the signature
+     * @param  signer_ The signer of the signature
+     * @param  digest_ The digest that was signed
+     * @param  v_      v of the signature
+     * @param  r_      r of the signature
+     * @param  s_      s of the signature
      */
-    function revertIfInvalidSignature(
+    function _revertIfInvalidSignature(
         address signer_,
         bytes32 digest_,
         uint8 v_,

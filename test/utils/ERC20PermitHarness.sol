@@ -2,8 +2,7 @@
 
 pragma solidity 0.8.23;
 
-import { ERC712 } from "../../src/libs/ERC712.sol";
-
+import { ERC712 } from "../../src/ERC712.sol";
 import { ERC20Permit } from "../../src/ERC20Permit.sol";
 
 contract ERC20PermitHarness is ERC20Permit {
@@ -26,7 +25,7 @@ contract ERC20PermitHarness is ERC20Permit {
     }
 
     function getDigest(bytes32 internalDigest_) external view returns (bytes32) {
-        return ERC712.getDigest(DOMAIN_SEPARATOR(), internalDigest_);
+        return _getDigest(internalDigest_);
     }
 
     /******************************************************************************************************************\

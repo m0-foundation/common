@@ -3,7 +3,6 @@
 pragma solidity 0.8.23;
 
 import { IERC3009 } from "./interfaces/IERC3009.sol";
-import { ERC712 } from "./libs/ERC712.sol";
 
 import { StatefulERC712 } from "./StatefulERC712.sol";
 
@@ -100,12 +99,9 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
     function cancelAuthorization(address authorizer_, bytes32 nonce_, uint8 v_, bytes32 r_, bytes32 s_) external {
         if (_authorizationStates[authorizer_][nonce_]) revert AuthorizationAlreadyUsed(authorizer_, nonce_);
 
-        ERC712.revertIfInvalidSignature(
+        _revertIfInvalidSignature(
             authorizer_,
-            ERC712.getDigest(
-                DOMAIN_SEPARATOR(),
-                keccak256(abi.encode(CANCEL_AUTHORIZATION_TYPEHASH, authorizer_, nonce_))
-            ),
+            _getDigest(keccak256(abi.encode(CANCEL_AUTHORIZATION_TYPEHASH, authorizer_, nonce_))),
             v_,
             r_,
             s_
@@ -148,12 +144,9 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
         if (block.timestamp > validBefore_) revert AuthorizationExpired(block.timestamp, validBefore_);
         _revertIfAuthorizationAlreadyUsed(from_, nonce_);
 
-        ERC712.revertIfInvalidSignature(
+        _revertIfInvalidSignature(
             from_,
-            ERC712.getDigest(
-                DOMAIN_SEPARATOR(),
-                keccak256(abi.encode(typeHash_, from_, to_, value_, validAfter_, validBefore_, nonce_))
-            ),
+            _getDigest(keccak256(abi.encode(typeHash_, from_, to_, value_, validAfter_, validBefore_, nonce_))),
             v_,
             r_,
             s_
@@ -175,7 +168,7 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
     }
 
     /**
-     * @notice ERC20 transfer function that needs to ve overriden by the inheriting contract.
+     * @notice ERC20 transfer function that needs to be overriden by the inheriting contract.
      * @param  sender_    The sender's address
      * @param  recipient_ The recipient's address
      * @param  amount_    The amount to be transferred

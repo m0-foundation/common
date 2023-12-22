@@ -4,13 +4,12 @@ pragma solidity 0.8.23;
 
 import { IERC20 } from "./interfaces/IERC20.sol";
 import { IERC20Permit } from "./interfaces/IERC20Permit.sol";
-import { ERC712 } from "./libs/ERC712.sol";
 
 import { ERC3009 } from "./ERC3009.sol";
 
 /// @title Permit Extension for ERC20 Signed Approvals via EIP-712 with EIP-2612 and EIP-1271 compatibility.
 /// @dev   An abstract implementation to satisfy EIP-2612: https://eips.ethereum.org/EIPS/eip-2612
-abstract contract ERC20Permit is IERC20, IERC20Permit, ERC3009 {
+abstract contract ERC20Permit is IERC20Permit, ERC3009 {
     /**
      * @inheritdoc IERC20Permit
      * @dev Keeping this constant, despite `permit` parameter name differences, to ensure max EIP-2612 compatibility.
@@ -58,7 +57,7 @@ abstract contract ERC20Permit is IERC20, IERC20Permit, ERC3009 {
         bytes32 s_
     ) external {
         // NOTE: `_permit` returns the digest.
-        ERC712.revertIfInvalidSignature(owner_, _permit(owner_, spender_, value_, deadline_), v_, r_, s_);
+        _revertIfInvalidSignature(owner_, _permit(owner_, spender_, value_, deadline_), v_, r_, s_);
     }
 
     /// @inheritdoc IERC20Permit
@@ -70,7 +69,7 @@ abstract contract ERC20Permit is IERC20, IERC20Permit, ERC3009 {
         bytes memory signature_
     ) external {
         // NOTE: `_permit` returns the digest.
-        ERC712.revertIfInvalidSignature(owner_, _permit(owner_, spender_, value_, deadline_), signature_);
+        _revertIfInvalidSignature(owner_, _permit(owner_, spender_, value_, deadline_), signature_);
     }
 
     /// @inheritdoc IERC20
@@ -115,7 +114,7 @@ abstract contract ERC20Permit is IERC20, IERC20Permit, ERC3009 {
         uint256 amount_,
         uint256 deadline_
     ) internal virtual returns (bytes32 digest_) {
-        ERC712.revertIfExpired(deadline_);
+        _revertIfExpired(deadline_);
 
         uint256 nonce_ = _nonces[owner_]; // Cache `nonce_` to stack.
 
@@ -125,10 +124,6 @@ abstract contract ERC20Permit is IERC20, IERC20Permit, ERC3009 {
 
         _approve(owner_, spender_, amount_);
 
-        return
-            ERC712.getDigest(
-                DOMAIN_SEPARATOR(),
-                keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, amount_, nonce_, deadline_))
-            );
+        return _getDigest(keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, amount_, nonce_, deadline_)));
     }
 }
