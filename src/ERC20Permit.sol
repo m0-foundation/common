@@ -116,10 +116,10 @@ abstract contract ERC20Permit is IERC20Permit, ERC3009 {
     ) internal virtual returns (bytes32 digest_) {
         _revertIfExpired(deadline_);
 
-        uint256 nonce_ = _nonces[owner_]; // Cache `nonce_` to stack.
+        uint256 nonce_ = nonces[owner_]; // Cache `nonce_` to stack.
 
         unchecked {
-            _nonces[owner_] = nonce_ + 1; // Nonce realistically cannot overflow.
+            nonces[owner_] = nonce_ + 1; // Nonce realistically cannot overflow.
         }
 
         _approve(owner_, spender_, amount_);

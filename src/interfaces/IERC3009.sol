@@ -4,6 +4,7 @@ pragma solidity 0.8.23;
 
 import { IStatefulERC712 } from "./IStatefulERC712.sol";
 
+/// @title EIP-3009: Transfer With Authorization
 interface IERC3009 is IStatefulERC712 {
     /**
      * @notice Emitted when an authorization has been used.

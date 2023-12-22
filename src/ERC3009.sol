@@ -6,6 +6,8 @@ import { IERC3009 } from "./interfaces/IERC3009.sol";
 
 import { StatefulERC712 } from "./StatefulERC712.sol";
 
+/// @title EIP-3009: Transfer With Authorization
+/// @dev Abstract implementation of the ERC3009 standard inheriting from ERC712 and StatefulERC712.
 abstract contract ERC3009 is IERC3009, StatefulERC712 {
     // keccak256("TransferWithAuthorization(address from,address to,uint256 value,uint256 validAfter,uint256 validBefore,bytes32 nonce)")
     bytes32 public constant TRANSFER_WITH_AUTHORIZATION_TYPEHASH =
@@ -19,23 +21,14 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
     bytes32 public constant CANCEL_AUTHORIZATION_TYPEHASH =
         0x158b0a9edf7a828aad02f63cd515c68ef2f50ba807396f6d12842833a1597429;
 
-    /// @dev authorizer => nonce => state (true = used / false = unused)
-    mapping(address authorizer => mapping(bytes32 nonce => bool isNonceUsed)) internal _authorizationStates;
+    /// @inheritdoc IERC3009
+    mapping(address authorizer => mapping(bytes32 nonce => bool isNonceUsed)) public authorizationState;
 
     /**
      * @notice Construct the ERC3009 contract.
      * @param  name_     The name of the contract.
      */
     constructor(string memory name_) StatefulERC712(name_) {}
-
-    /******************************************************************************************************************\
-    |                                             Public View/Pure Functions                                           |
-    \******************************************************************************************************************/
-
-    /// @inheritdoc IERC3009
-    function authorizationState(address authorizer_, bytes32 nonce_) external view returns (bool) {
-        return _authorizationStates[authorizer_][nonce_];
-    }
 
     /******************************************************************************************************************\
     |                                      External/Public Interactive Functions                                       |
@@ -97,7 +90,7 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
 
     /// @inheritdoc IERC3009
     function cancelAuthorization(address authorizer_, bytes32 nonce_, uint8 v_, bytes32 r_, bytes32 s_) external {
-        if (_authorizationStates[authorizer_][nonce_]) revert AuthorizationAlreadyUsed(authorizer_, nonce_);
+        if (authorizationState[authorizer_][nonce_]) revert AuthorizationAlreadyUsed(authorizer_, nonce_);
 
         _revertIfInvalidSignature(
             authorizer_,
@@ -107,7 +100,7 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
             s_
         );
 
-        _authorizationStates[authorizer_][nonce_] = true;
+        authorizationState[authorizer_][nonce_] = true;
         emit AuthorizationCanceled(authorizer_, nonce_);
     }
 
@@ -152,7 +145,7 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
             s_
         );
 
-        _authorizationStates[from_][nonce_] = true;
+        authorizationState[from_][nonce_] = true;
         emit AuthorizationUsed(from_, nonce_);
 
         _transfer(from_, to_, value_);
@@ -164,7 +157,7 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
      * @param  nonce_      The nonce of the authorization
      */
     function _revertIfAuthorizationAlreadyUsed(address authorizer_, bytes32 nonce_) internal view {
-        if (_authorizationStates[authorizer_][nonce_]) revert AuthorizationAlreadyUsed(authorizer_, nonce_);
+        if (authorizationState[authorizer_][nonce_]) revert AuthorizationAlreadyUsed(authorizer_, nonce_);
     }
 
     /**

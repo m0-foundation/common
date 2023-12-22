@@ -37,7 +37,7 @@ contract ERC20PermitHarness is ERC20Permit {
     }
 
     function setAuthorizationState(address authorizer_, bytes32 nonce_, bool isNonceUsed_) external {
-        _authorizationStates[authorizer_][nonce_] = isNonceUsed_;
+        authorizationState[authorizer_][nonce_] = isNonceUsed_;
     }
 
     /******************************************************************************************************************\
