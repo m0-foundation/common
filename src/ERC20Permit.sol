@@ -84,7 +84,7 @@ abstract contract ERC20Permit is IERC20Permit, ERC3009 {
         uint256 spenderAllowance_ = allowance[sender_][msg.sender]; // Cache `spenderAllowance_` to stack.
 
         if (spenderAllowance_ != type(uint256).max) {
-            allowance[sender_][msg.sender] = spenderAllowance_ - amount_;
+            _approve(sender_, msg.sender, spenderAllowance_ - amount_);
         }
 
         _transfer(sender_, recipient_, amount_);
