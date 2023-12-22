@@ -7,9 +7,11 @@ import { IERC20Permit } from "./interfaces/IERC20Permit.sol";
 
 import { ERC3009 } from "./ERC3009.sol";
 
-/// @title Permit Extension for ERC20 Signed Approvals via EIP-712 with EIP-2612 and EIP-1271 compatibility.
-/// @dev   An abstract implementation to satisfy EIP-2612: https://eips.ethereum.org/EIPS/eip-2612
-abstract contract ERC20Permit is IERC20Permit, ERC3009 {
+/**
+ * @title ERC20 implementationn extended to support Signed Approvals via EIP-712 with EIP-2612 and EIP-1271 compatibility,
+ *        as well as EIP-3009 for transfers with authorization.
+ */
+abstract contract ERC20Extended is IERC20Permit, ERC3009 {
     /**
      * @inheritdoc IERC20Permit
      * @dev Keeping this constant, despite `permit` parameter name differences, to ensure max EIP-2612 compatibility.
@@ -26,7 +28,7 @@ abstract contract ERC20Permit is IERC20Permit, ERC3009 {
     mapping(address account => mapping(address spender => uint256 allowance)) public allowance;
 
     /**
-     * @notice Constructs the ERC20Permit contract.
+     * @notice Constructs the ERC20Extended contract.
      * @param  name_     The name of the token.
      * @param  symbol_   The symbol of the token.
      * @param  decimals_ The number of decimals the token uses.

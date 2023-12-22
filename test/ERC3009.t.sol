@@ -6,11 +6,11 @@ import { IERC20 } from "../src/interfaces/IERC20.sol";
 import { IERC3009 } from "../src/interfaces/IERC3009.sol";
 import { SignatureChecker } from "../src/libs/SignatureChecker.sol";
 
-import { ERC20PermitHarness } from "./utils/ERC20PermitHarness.sol";
+import { ERC20ExtendedHarness } from "./utils/ERC20ExtendedHarness.sol";
 import { TestUtils } from "./utils/TestUtils.t.sol";
 
 contract ERC3009Tests is TestUtils {
-    ERC20PermitHarness internal _token;
+    ERC20ExtendedHarness internal _token;
     string internal constant _NAME = "ERC3009 Token";
     string internal constant _SYMBOL = "ERC3009_TKN";
     uint8 internal constant _DECIMALS = 6;
@@ -33,7 +33,7 @@ contract ERC3009Tests is TestUtils {
         (_bob, _bobKey) = makeAddrAndKey("bob");
         (_charlie, _charlieKey) = makeAddrAndKey("charlie");
 
-        _token = new ERC20PermitHarness(_NAME, _SYMBOL, _DECIMALS);
+        _token = new ERC20ExtendedHarness(_NAME, _SYMBOL, _DECIMALS);
 
         _token.mint(_alice, 1_000e6);
 

@@ -3,14 +3,14 @@
 pragma solidity 0.8.23;
 
 import { ERC712 } from "../../src/ERC712.sol";
-import { ERC20Permit } from "../../src/ERC20Permit.sol";
+import { ERC20Extended } from "../../src/ERC20Extended.sol";
 
-contract ERC20PermitHarness is ERC20Permit {
+contract ERC20ExtendedHarness is ERC20Extended {
     mapping(address account => uint256 balance) internal _balances;
 
     uint256 _totalSupply;
 
-    constructor(string memory name_, string memory symbol_, uint8 decimals_) ERC20Permit(name_, symbol_, decimals_) {}
+    constructor(string memory name_, string memory symbol_, uint8 decimals_) ERC20Extended(name_, symbol_, decimals_) {}
 
     /******************************************************************************************************************\
     |                                       External/Public View/Pure Functions                                        |

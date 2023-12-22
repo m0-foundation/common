@@ -4,7 +4,7 @@ pragma solidity 0.8.23;
 
 import { Test } from "../../lib/forge-std/src/Test.sol";
 
-import { ERC20PermitHarness } from "./ERC20PermitHarness.sol";
+import { ERC20ExtendedHarness } from "./ERC20ExtendedHarness.sol";
 
 contract TestUtils is Test {
     /* ============ Permit ============ */
@@ -16,7 +16,7 @@ contract TestUtils is Test {
     }
 
     function _getTransferWithAuthorizationDigest(
-        ERC20PermitHarness asset_,
+        ERC20ExtendedHarness asset_,
         address from_,
         address to_,
         uint256 value_,
@@ -41,7 +41,7 @@ contract TestUtils is Test {
     }
 
     function _getReceiveWithAuthorizationDigest(
-        ERC20PermitHarness asset_,
+        ERC20ExtendedHarness asset_,
         address from_,
         address to_,
         uint256 value_,
@@ -66,7 +66,7 @@ contract TestUtils is Test {
     }
 
     function _getCancelAuthorizationDigest(
-        ERC20PermitHarness asset_,
+        ERC20ExtendedHarness asset_,
         address from_,
         bytes32 fromNonce_
     ) internal view returns (bytes32 digest_) {
