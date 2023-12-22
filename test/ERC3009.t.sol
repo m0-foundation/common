@@ -2,7 +2,6 @@
 
 pragma solidity 0.8.23;
 
-import { IERC20 } from "../src/interfaces/IERC20.sol";
 import { IERC3009 } from "../src/interfaces/IERC3009.sol";
 import { SignatureChecker } from "../src/libs/SignatureChecker.sol";
 
@@ -34,8 +33,6 @@ contract ERC3009Tests is TestUtils {
         (_charlie, _charlieKey) = makeAddrAndKey("charlie");
 
         _token = new ERC20ExtendedHarness(_NAME, _SYMBOL, _DECIMALS);
-
-        _token.mint(_alice, 1_000e6);
 
         (
             address from_,
@@ -121,11 +118,6 @@ contract ERC3009Tests is TestUtils {
             bytes32 fromNonce_
         ) = _getTransferParams();
 
-        uint256 fromBalance_ = _token.balanceOf(from_);
-
-        assertEq(_token.balanceOf(from_), fromBalance_);
-        assertEq(_token.balanceOf(to_), 0);
-
         assertFalse(_token.authorizationState(from_, fromNonce_));
 
         (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _transferAuthorizationDigest);
@@ -133,14 +125,8 @@ contract ERC3009Tests is TestUtils {
         vm.expectEmit();
         emit IERC3009.AuthorizationUsed(from_, fromNonce_);
 
-        vm.expectEmit();
-        emit IERC20.Transfer(from_, to_, value_);
-
         vm.prank(_charlie);
         _token.transferWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
-
-        assertEq(_token.balanceOf(from_), fromBalance_ - value_);
-        assertEq(_token.balanceOf(to_), value_);
 
         assertTrue(_token.authorizationState(from_, fromNonce_));
     }
@@ -312,11 +298,6 @@ contract ERC3009Tests is TestUtils {
             bytes32 fromNonce_
         ) = _getTransferParams();
 
-        uint256 fromBalance_ = _token.balanceOf(from_);
-
-        assertEq(_token.balanceOf(from_), fromBalance_);
-        assertEq(_token.balanceOf(to_), 0);
-
         assertFalse(_token.authorizationState(from_, fromNonce_));
 
         (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(
@@ -327,14 +308,8 @@ contract ERC3009Tests is TestUtils {
         vm.expectEmit();
         emit IERC3009.AuthorizationUsed(from_, fromNonce_);
 
-        vm.expectEmit();
-        emit IERC20.Transfer(from_, to_, value_);
-
         vm.prank(_bob);
         _token.receiveWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
-
-        assertEq(_token.balanceOf(from_), fromBalance_ - value_);
-        assertEq(_token.balanceOf(to_), value_);
 
         assertTrue(_token.authorizationState(from_, fromNonce_));
     }

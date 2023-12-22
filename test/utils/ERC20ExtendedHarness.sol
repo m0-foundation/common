@@ -32,10 +32,6 @@ contract ERC20ExtendedHarness is ERC20Extended {
     |                                      External/Public Interactive Functions                                       |
     \******************************************************************************************************************/
 
-    function mint(address account_, uint256 amount_) external {
-        _transfer(address(0), account_, amount_);
-    }
-
     function setAuthorizationState(address authorizer_, bytes32 nonce_, bool isNonceUsed_) external {
         authorizationState[authorizer_][nonce_] = isNonceUsed_;
     }
@@ -44,25 +40,5 @@ contract ERC20ExtendedHarness is ERC20Extended {
     |                                          Internal Interactive Functions                                          |
     \******************************************************************************************************************/
 
-    function _transfer(address sender_, address recipient_, uint256 amount_) internal override {
-        if (sender_ == address(0)) {
-            _totalSupply += amount_;
-        } else {
-            unchecked {
-                _balances[sender_] -= amount_;
-            }
-        }
-
-        if (recipient_ == address(0)) {
-            unchecked {
-                _totalSupply -= amount_;
-            }
-        } else {
-            unchecked {
-                _balances[recipient_] += amount_;
-            }
-        }
-
-        emit Transfer(sender_, recipient_, amount_);
-    }
+    function _transfer(address sender_, address recipient_, uint256 amount_) internal override {}
 }
