@@ -118,6 +118,17 @@ abstract contract ERC712 is IERC712 {
      * @notice Revert if the signature is invalid.
      * @param  signer_ The signer of the signature.
      * @param  digest_ The digest that was signed.
+     * @param  r_      An ECDSA/secp256k1 signature parameter.
+     * @param  vs_     An ECDSA/secp256k1 short signature parameter.
+     */
+    function _revertIfInvalidSignature(address signer_, bytes32 digest_, bytes32 r_, bytes32 vs_) internal pure {
+        _revertIfError(SignatureChecker.validateECDSASignature(signer_, digest_, r_, vs_));
+    }
+
+    /**
+     * @notice Revert if the signature is invalid.
+     * @param  signer_ The signer of the signature.
+     * @param  digest_ The digest that was signed.
      * @param  v_      v of the signature.
      * @param  r_      r of the signature.
      * @param  s_      s of the signature.
