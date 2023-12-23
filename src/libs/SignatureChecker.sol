@@ -37,7 +37,7 @@ library SignatureChecker {
      *         from a byte array to standard v, r, and s parameters.
      * @param  signature A byte array ECDSA/secp256k1 short signature.
      * @return r         An ECDSA/secp256k1 signature parameter.
-     * @return  vs     An ECDSA/secp256k1 short signature parameter.
+     * @return vs        An ECDSA/secp256k1 short signature parameter.
      */
     function decodeShortECDSASignature(bytes memory signature) internal pure returns (bytes32 r, bytes32 vs) {
         // ecrecover takes the signature parameters, and they can be decoded using assembly.
@@ -88,10 +88,10 @@ library SignatureChecker {
 
     /**
      * @dev    Returns whether an ECDSA/secp256k1 short signature is valid for a signer and digest.
-     * @param  signer The address of the account purported to have signed.
-     * @param  digest The hash of the data that was signed.
-     * @param  r      An ECDSA/secp256k1 signature parameter.
-     * @param  vs     An ECDSA/secp256k1 short signature parameter.
+     * @param  signer  The address of the account purported to have signed.
+     * @param  digest  The hash of the data that was signed.
+     * @param  r       An ECDSA/secp256k1 signature parameter.
+     * @param  vs      An ECDSA/secp256k1 short signature parameter.
      * @return isValid Whether the signature is valid.
      */
     function isValidECDSASignature(
@@ -177,10 +177,10 @@ library SignatureChecker {
         bytes32 vs
     ) internal pure returns (Error error, address signer) {
         unchecked {
-            bytes32 s = vs & bytes32(0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff);
             // We do not check for an overflow here since the shift operation results in 0 or 1.
             uint8 v = uint8((uint256(vs) >> 255) + 27);
-            (error, signer) = recoverECDSASigner(digest, v, r, s);
+            bytes32 s = vs & bytes32(0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff);
+            return recoverECDSASigner(digest, v, r, s);
         }
     }
 
