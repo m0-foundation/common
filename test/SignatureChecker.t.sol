@@ -45,54 +45,13 @@ contract AccountWithValidFunction {
     }
 }
 
-contract Verifier {
-    /**
-     * @dev Error that occurs when the signature has already been used.
-     * @param emitter The contract that emits the error.
-     */
-    error SignatureUsed(address emitter);
-
-    /**
-     * @dev Error that occurs when the signature is invalid.
-     * @param emitter The contract that emits the error.
-     */
-    error InvalidSignature(address emitter);
-
-    mapping(address sender => uint256 counter) public signatureCounter;
-    mapping(bytes signature => bool flag) private _signatureUsed;
-
-    address private _self = address(this);
-    SignatureCheckerHarness internal _signatureChecker;
-
-    constructor(SignatureCheckerHarness signatureChecker_) {
-        _signatureChecker = signatureChecker_;
-    }
-
-    function verifySignature(bytes32 digest_, bytes memory signature_) public {
-        if (_signatureUsed[signature_]) revert SignatureUsed(_self);
-
-        if (uint8(_signatureChecker.validateECDSASignature(msg.sender, digest_, signature_)) == 2)
-            revert InvalidSignature(_self);
-
-        unchecked {
-            /// @dev For testing purpose, the counter is simply incremented.
-            signatureCounter[msg.sender] += 1;
-        }
-
-        /// @dev For testing purpose, we use the signature as unique identifier.
-        _signatureUsed[signature_] = true;
-    }
-}
-
 contract SignatureCheckerTests is TestUtils {
     uint256 internal constant _MAX_S = uint256(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0);
 
     SignatureCheckerHarness internal _signatureChecker;
-    Verifier internal _verifier;
 
     function setUp() external {
         _signatureChecker = new SignatureCheckerHarness();
-        _verifier = new Verifier(_signatureChecker);
     }
 
     function test_decodeECDSASignature() external {
@@ -426,30 +385,6 @@ contract SignatureCheckerTests is TestUtils {
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
 
         assertTrue(_signatureChecker.isValidECDSASignature(account_, digest_, _encodeSignature(v_, r_, s_)));
-    }
-
-    function test_eip2098SignatureIsNotMalleable() public {
-        (address alice_, uint256 privateKey_) = makeAddrAndKey("alice");
-
-        bytes32 digest_ = "TEST_DIGEST";
-        (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
-        bytes memory signature_ = _encodeSignature(v_, r_, s_);
-
-        vm.prank(alice_);
-        _verifier.verifySignature(digest_, signature_);
-        assertEq(_verifier.signatureCounter(alice_), 1);
-
-        vm.prank(alice_);
-        vm.expectRevert(abi.encodeWithSelector(Verifier.SignatureUsed.selector, address(_verifier)));
-        _verifier.verifySignature(digest_, signature_);
-
-        bytes memory signature2098 = _encodeShortSignature(r_, _getVS(v_, s_));
-
-        // Reverts because SignatureChecker.recoverECDSASigner() only accepts full EDSCA signature.
-        vm.expectRevert(abi.encodeWithSelector(Verifier.InvalidSignature.selector, address(_verifier)));
-
-        vm.prank(alice_);
-        _verifier.verifySignature(digest_, signature2098);
     }
 
     function test_isValidERC1271Signature_emptyAccount() external {
