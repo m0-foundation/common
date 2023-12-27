@@ -63,11 +63,6 @@ library SignatureChecker {
         bytes32 digest,
         bytes memory signature
     ) internal view returns (bool isValid) {
-        if (signature.length == 64) {
-            (bytes32 r, bytes32 vs) = decodeShortECDSASignature(signature);
-            return isValidECDSASignature(signer, digest, r, vs);
-        }
-
         return isValidECDSASignature(signer, digest, signature) || isValidERC1271Signature(signer, digest, signature);
     }
 
@@ -83,6 +78,11 @@ library SignatureChecker {
         bytes32 digest,
         bytes memory signature
     ) internal pure returns (bool isValid) {
+        if (signature.length == 64) {
+            (bytes32 r, bytes32 vs) = decodeShortECDSASignature(signature);
+            return isValidECDSASignature(signer, digest, r, vs);
+        }
+
         return validateECDSASignature(signer, digest, signature) == Error.NoError;
     }
 
