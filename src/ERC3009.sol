@@ -97,7 +97,8 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
                     )
                 )
             ),
-            abi.encodePacked(r_, vs_)
+            r_,
+            vs_
         );
 
         _transferWithAuthorizationAfter(from_, to_, value_, nonce_);
@@ -132,7 +133,9 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
                     )
                 )
             ),
-            abi.encodePacked(r_, s_, v_)
+            v_,
+            r_,
+            s_
         );
 
         _transferWithAuthorizationAfter(from_, to_, value_, nonce_);
@@ -195,7 +198,8 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
                     )
                 )
             ),
-            abi.encodePacked(r_, vs_)
+            r_,
+            vs_
         );
 
         _receiveWithAuthorization(from_, to_, value_, validAfter_, validBefore_, nonce_);
@@ -228,7 +232,9 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
                     )
                 )
             ),
-            abi.encodePacked(r_, s_, v_)
+            v_,
+            r_,
+            s_
         );
 
         _receiveWithAuthorization(from_, to_, value_, validAfter_, validBefore_, nonce_);
@@ -250,7 +256,8 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
         _revertIfInvalidSignature(
             authorizer_,
             _getDigest(keccak256(abi.encode(CANCEL_AUTHORIZATION_TYPEHASH, authorizer_, nonce_))),
-            abi.encodePacked(r_, vs_)
+            r_,
+            vs_
         );
 
         _cancelAuthorization(authorizer_, nonce_);
@@ -261,7 +268,9 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
         _revertIfInvalidSignature(
             authorizer_,
             _getDigest(keccak256(abi.encode(CANCEL_AUTHORIZATION_TYPEHASH, authorizer_, nonce_))),
-            abi.encodePacked(r_, s_, v_)
+            v_,
+            r_,
+            s_
         );
 
         _cancelAuthorization(authorizer_, nonce_);
