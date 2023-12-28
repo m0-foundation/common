@@ -3,67 +3,31 @@
 pragma solidity 0.8.23;
 
 import { IERC3009 } from "../src/interfaces/IERC3009.sol";
+import { IERC712 } from "../src/interfaces/IERC712.sol";
 
 import { ERC20ExtendedHarness } from "./utils/ERC20ExtendedHarness.sol";
 import { TestUtils } from "./utils/TestUtils.t.sol";
 
 contract ERC3009Tests is TestUtils {
+    bytes32 internal constant _SOME_NONCE = bytes32(uint256(1234));
+
+    address internal _alice;
+    uint256 internal _aliceKey;
+
+    address internal _bob;
+    uint256 internal _bobKey;
+
+    address internal _charlie;
+    uint256 internal _charlieKey;
+
     ERC20ExtendedHarness internal _token;
-    string internal constant _NAME = "ERC3009 Token";
-    string internal constant _SYMBOL = "ERC3009_TKN";
-    uint8 internal constant _DECIMALS = 6;
-
-    address _alice;
-    uint256 _aliceKey;
-
-    address _bob;
-    uint256 _bobKey;
-
-    address _charlie;
-    uint256 _charlieKey;
-
-    bytes32 _transferAuthorizationDigest;
-    bytes32 _receiveAuthorizationDigest;
-    bytes32 _cancelAuthorizationDigest;
 
     function setUp() external {
         (_alice, _aliceKey) = makeAddrAndKey("alice");
         (_bob, _bobKey) = makeAddrAndKey("bob");
         (_charlie, _charlieKey) = makeAddrAndKey("charlie");
 
-        _token = new ERC20ExtendedHarness(_NAME, _SYMBOL, _DECIMALS);
-
-        (
-            address from_,
-            ,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
-
-        _receiveAuthorizationDigest = _getReceiveWithAuthorizationDigest(
-            _token,
-            from_,
-            to_,
-            value_,
-            validAfter_,
-            validBefore_,
-            fromNonce_
-        );
-
-        _transferAuthorizationDigest = _getTransferWithAuthorizationDigest(
-            _token,
-            from_,
-            to_,
-            value_,
-            validAfter_,
-            validBefore_,
-            fromNonce_
-        );
-
-        _cancelAuthorizationDigest = _getCancelAuthorizationDigest(_token, from_, fromNonce_);
+        _token = new ERC20ExtendedHarness("ERC3009 Token", "ERC3009_TKN", 0);
     }
 
     /* ============ Typehashes ============ */
@@ -94,426 +58,381 @@ contract ERC3009Tests is TestUtils {
 
     /* ============ authorizationState ============ */
     function test_authorizationState() external {
-        bytes32 nonce_ = bytes32(uint256(1));
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
-        assertFalse(_token.authorizationState(_alice, nonce_));
+        _token.setAuthorizationState(_alice, _SOME_NONCE, true);
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
 
-        _token.setAuthorizationState(_alice, nonce_, true);
-        assertTrue(_token.authorizationState(_alice, nonce_));
-
-        _token.setAuthorizationState(_alice, nonce_, false);
-        assertFalse(_token.authorizationState(_alice, nonce_));
+        _token.setAuthorizationState(_alice, _SOME_NONCE, false);
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
     }
 
     /* ============ transferWithAuthorization ============ */
     function test_transferWithAuthorization_fullSignature() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        assertFalse(_token.authorizationState(from_, fromNonce_));
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _transferAuthorizationDigest);
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getTransferWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
 
         vm.expectEmit();
-        emit IERC3009.AuthorizationUsed(from_, fromNonce_);
+        emit IERC3009.AuthorizationUsed(_alice, _SOME_NONCE);
 
         vm.prank(_charlie);
         _token.transferWithAuthorization(
-            from_,
-            to_,
+            _alice,
+            _bob,
             value_,
             validAfter_,
             validBefore_,
-            fromNonce_,
-            abi.encodePacked(r_, s_, v_)
+            _SOME_NONCE,
+            _encodeSignature(v_, r_, s_)
         );
 
-        assertTrue(_token.authorizationState(from_, fromNonce_));
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
     }
 
     function test_transferWithAuthorization_rvsSignature() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        assertFalse(_token.authorizationState(from_, fromNonce_));
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _transferAuthorizationDigest);
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getTransferWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
 
         vm.expectEmit();
-        emit IERC3009.AuthorizationUsed(from_, fromNonce_);
+        emit IERC3009.AuthorizationUsed(_alice, _SOME_NONCE);
 
         vm.prank(_charlie);
-        _token.transferWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, r_, _getVS(v_, s_));
+        _token.transferWithAuthorization(
+            _alice,
+            _bob,
+            value_,
+            validAfter_,
+            validBefore_,
+            _SOME_NONCE,
+            r_,
+            _getVS(v_, s_)
+        );
 
-        assertTrue(_token.authorizationState(from_, fromNonce_));
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
     }
 
     function test_transferWithAuthorization_vrsSignature() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        assertFalse(_token.authorizationState(from_, fromNonce_));
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _transferAuthorizationDigest);
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getTransferWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
 
         vm.expectEmit();
-        emit IERC3009.AuthorizationUsed(from_, fromNonce_);
+        emit IERC3009.AuthorizationUsed(_alice, _SOME_NONCE);
 
         vm.prank(_charlie);
-        _token.transferWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.transferWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
 
-        assertTrue(_token.authorizationState(from_, fromNonce_));
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
     }
 
     function test_transferWithAuthorization_invalidParameter() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _transferAuthorizationDigest);
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getTransferWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
 
-        // TODO: should not revert with SignerMismatch error
-        vm.expectRevert();
-
+        vm.expectRevert(IERC712.SignerMismatch.selector);
         vm.prank(_charlie);
-        _token.transferWithAuthorization(from_, to_, value_ * 2, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.transferWithAuthorization(address(0), _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
+
+        vm.expectRevert(IERC712.SignerMismatch.selector);
+        vm.prank(_charlie);
+        _token.transferWithAuthorization(
+            _alice,
+            address(0),
+            value_,
+            validAfter_,
+            validBefore_,
+            _SOME_NONCE,
+            v_,
+            r_,
+            s_
+        );
+
+        vm.expectRevert(IERC712.SignerMismatch.selector);
+        vm.prank(_charlie);
+        _token.transferWithAuthorization(_alice, _bob, value_ + 1, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
+
+        vm.expectRevert(IERC712.SignerMismatch.selector);
+        vm.prank(_charlie);
+        _token.transferWithAuthorization(_alice, _bob, value_, validAfter_ + 1, validBefore_, _SOME_NONCE, v_, r_, s_);
+
+        vm.expectRevert(IERC712.SignerMismatch.selector);
+        vm.prank(_charlie);
+        _token.transferWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_ - 1, _SOME_NONCE, v_, r_, s_);
+
+        vm.expectRevert(IERC712.SignerMismatch.selector);
+        vm.prank(_charlie);
+        _token.transferWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, bytes32(0), v_, r_, s_);
     }
 
     function test_transferWithAuthorization_invalidSigner() external {
-        (
-            address from_,
-            ,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(_bobKey, _transferAuthorizationDigest);
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _bobKey, // Wrong signer.
+            _token.getTransferWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
 
-        vm.expectRevert();
+        vm.expectRevert(IERC712.SignerMismatch.selector);
 
         vm.prank(_charlie);
-        _token.transferWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.transferWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
     }
 
     function test_transferWithAuthorization_authorizationNotYetValid() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = block.timestamp + 1; // Not yet valid.
+        uint256 validBefore_ = type(uint256).max;
 
-        validAfter_ = block.timestamp + 10;
-
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _transferAuthorizationDigest);
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getTransferWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
 
         vm.expectRevert(
             abi.encodeWithSelector(IERC3009.AuthorizationNotYetValid.selector, block.timestamp, validAfter_)
         );
 
         vm.prank(_charlie);
-        _token.transferWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.transferWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
     }
 
     function test_transferWithAuthorization_authorizationExpired() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = block.timestamp - 1; // Already expired.
 
-        validBefore_ = block.timestamp - 10;
-
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _transferAuthorizationDigest);
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getTransferWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
 
         vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationExpired.selector, block.timestamp, validBefore_));
 
         vm.prank(_charlie);
-        _token.transferWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.transferWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
     }
 
     function test_transferWithAuthorization_authorizationAlreadyUsed() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _transferAuthorizationDigest);
-
-        vm.prank(_charlie);
-        _token.transferWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
-
-        vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationAlreadyUsed.selector, _alice, fromNonce_));
-
-        vm.prank(_charlie);
-        _token.transferWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
-    }
-
-    function test_transferWithAuthorization_nonceAlreadyUsed() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
-
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _transferAuthorizationDigest);
-
-        vm.prank(_charlie);
-        _token.transferWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
-
-        (v_, r_, s_) = _signPermit(
-            fromPrivateKey_,
-            _getTransferWithAuthorizationDigest(_token, from_, to_, value_ * 2, validAfter_, validBefore_, fromNonce_)
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getTransferWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
         );
 
-        vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationAlreadyUsed.selector, _alice, fromNonce_));
+        _token.setAuthorizationState(_alice, _SOME_NONCE, true);
+
+        vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationAlreadyUsed.selector, _alice, _SOME_NONCE));
 
         vm.prank(_charlie);
-        _token.transferWithAuthorization(from_, to_, value_ * 2, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.transferWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
     }
 
-    function test_transferWithAuthorization_invalidSignature() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+    function test_transferWithAuthorization_cannotUseReceiveAuthorization() external {
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(
-            fromPrivateKey_,
-            _getReceiveWithAuthorizationDigest(_token, from_, to_, value_, validAfter_, validBefore_, fromNonce_)
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
         );
 
-        // TODO: should not revert with SignerMismatch error
-        vm.expectRevert();
+        vm.expectRevert(IERC712.SignerMismatch.selector);
 
         vm.prank(_charlie);
-        _token.transferWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.transferWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
     }
 
     /* ============ receiveWithAuthorization ============ */
     function test_receiveWithAuthorization_fullSignature() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        assertFalse(_token.authorizationState(from_, fromNonce_));
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(
-            fromPrivateKey_,
-            _getReceiveWithAuthorizationDigest(_token, from_, to_, value_, validAfter_, validBefore_, fromNonce_)
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
         );
 
         vm.expectEmit();
-        emit IERC3009.AuthorizationUsed(from_, fromNonce_);
+        emit IERC3009.AuthorizationUsed(_alice, _SOME_NONCE);
 
         vm.prank(_bob);
         _token.receiveWithAuthorization(
-            from_,
-            to_,
+            _alice,
+            _bob,
             value_,
             validAfter_,
             validBefore_,
-            fromNonce_,
+            _SOME_NONCE,
             abi.encodePacked(r_, s_, v_)
         );
 
-        assertTrue(_token.authorizationState(from_, fromNonce_));
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
     }
 
     function test_receiveWithAuthorization_rvsSignature() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        assertFalse(_token.authorizationState(from_, fromNonce_));
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(
-            fromPrivateKey_,
-            _getReceiveWithAuthorizationDigest(_token, from_, to_, value_, validAfter_, validBefore_, fromNonce_)
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
         );
 
         vm.expectEmit();
-        emit IERC3009.AuthorizationUsed(from_, fromNonce_);
+        emit IERC3009.AuthorizationUsed(_alice, _SOME_NONCE);
 
         vm.prank(_bob);
-        _token.receiveWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, r_, _getVS(v_, s_));
+        _token.receiveWithAuthorization(
+            _alice,
+            _bob,
+            value_,
+            validAfter_,
+            validBefore_,
+            _SOME_NONCE,
+            r_,
+            _getVS(v_, s_)
+        );
 
-        assertTrue(_token.authorizationState(from_, fromNonce_));
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
     }
 
     function test_receiveWithAuthorization_vrsSignature() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        assertFalse(_token.authorizationState(from_, fromNonce_));
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(
-            fromPrivateKey_,
-            _getReceiveWithAuthorizationDigest(_token, from_, to_, value_, validAfter_, validBefore_, fromNonce_)
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
         );
 
         vm.expectEmit();
-        emit IERC3009.AuthorizationUsed(from_, fromNonce_);
+        emit IERC3009.AuthorizationUsed(_alice, _SOME_NONCE);
 
         vm.prank(_bob);
-        _token.receiveWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.receiveWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
 
-        assertTrue(_token.authorizationState(from_, fromNonce_));
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
     }
 
     function test_receiveWithAuthorization_callerMustBePayee() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(
-            fromPrivateKey_,
-            _getReceiveWithAuthorizationDigest(_token, from_, to_, value_, validAfter_, validBefore_, fromNonce_)
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
         );
 
-        vm.expectRevert(abi.encodeWithSelector(IERC3009.CallerMustBePayee.selector, _charlie, to_));
+        vm.expectRevert(abi.encodeWithSelector(IERC3009.CallerMustBePayee.selector, _charlie, _bob));
 
         vm.prank(_charlie);
-        _token.receiveWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.receiveWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
     }
 
     function test_receiveWithAuthorization_invalidParameter() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(
-            fromPrivateKey_,
-            _getReceiveWithAuthorizationDigest(_token, from_, to_, value_, validAfter_, validBefore_, fromNonce_)
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
         );
 
-        // TODO: should not revert with SignerMismatch error
-        vm.expectRevert();
-
+        vm.expectRevert(IERC712.SignerMismatch.selector);
         vm.prank(_bob);
-        _token.receiveWithAuthorization(from_, to_, value_ * 2, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.receiveWithAuthorization(address(0), _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
+
+        vm.expectRevert(IERC712.SignerMismatch.selector);
+        vm.prank(_bob);
+        _token.receiveWithAuthorization(_alice, address(0), value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
+
+        vm.expectRevert(IERC712.SignerMismatch.selector);
+        vm.prank(_bob);
+        _token.receiveWithAuthorization(_alice, _bob, value_ + 1, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
+
+        vm.expectRevert(IERC712.SignerMismatch.selector);
+        vm.prank(_bob);
+        _token.receiveWithAuthorization(_alice, _bob, value_, validAfter_ + 1, validBefore_, _SOME_NONCE, v_, r_, s_);
+
+        vm.expectRevert(IERC712.SignerMismatch.selector);
+        vm.prank(_bob);
+        _token.receiveWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_ - 1, _SOME_NONCE, v_, r_, s_);
+
+        vm.expectRevert(IERC712.SignerMismatch.selector);
+        vm.prank(_bob);
+        _token.receiveWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, bytes32(0), v_, r_, s_);
     }
 
     function test_receiveWithAuthorization_invalidSigner() external {
-        (
-            address from_,
-            ,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(
-            _bobKey,
-            _getReceiveWithAuthorizationDigest(_token, from_, to_, value_, validAfter_, validBefore_, fromNonce_)
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _bobKey, // Wrong signer.
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
         );
 
-        vm.expectRevert();
+        vm.expectRevert(IERC712.SignerMismatch.selector);
 
         vm.prank(_bob);
-        _token.receiveWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.receiveWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
     }
 
     function test_receiveWithAuthorization_authorizationNotYetValid() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = block.timestamp + 10; // Not yet valid.
+        uint256 validBefore_ = type(uint256).max;
 
-        validAfter_ = block.timestamp + 10;
-
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(
-            fromPrivateKey_,
-            _getReceiveWithAuthorizationDigest(_token, from_, to_, value_, validAfter_, validBefore_, fromNonce_)
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
         );
 
         vm.expectRevert(
@@ -521,319 +440,116 @@ contract ERC3009Tests is TestUtils {
         );
 
         vm.prank(_bob);
-        _token.receiveWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.receiveWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
     }
 
     function test_receiveWithAuthorization_authorizationExpired() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = block.timestamp - 10; // Already expired.
 
-        validBefore_ = block.timestamp - 10;
-
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(
-            fromPrivateKey_,
-            _getReceiveWithAuthorizationDigest(_token, from_, to_, value_, validAfter_, validBefore_, fromNonce_)
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
         );
 
         vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationExpired.selector, block.timestamp, validBefore_));
 
         vm.prank(_bob);
-        _token.receiveWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.receiveWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
     }
 
     function test_receiveWithAuthorization_authorizationAlreadyUsed() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(
-            fromPrivateKey_,
-            _getReceiveWithAuthorizationDigest(_token, from_, to_, value_, validAfter_, validBefore_, fromNonce_)
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
         );
 
-        vm.prank(_bob);
-        _token.receiveWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.setAuthorizationState(_alice, _SOME_NONCE, true);
 
-        vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationAlreadyUsed.selector, _alice, fromNonce_));
+        vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationAlreadyUsed.selector, _alice, _SOME_NONCE));
 
         vm.prank(_bob);
-        _token.receiveWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.receiveWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
     }
 
-    function test_receiveWithAuthorization_nonceAlreadyUsed() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+    function test_receiveWithAuthorization_cannotUseTransferAuthorization() external {
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = type(uint256).max;
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _receiveAuthorizationDigest);
-
-        vm.prank(_bob);
-        _token.receiveWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
-
-        (v_, r_, s_) = _signPermit(
-            fromPrivateKey_,
-            _getReceiveWithAuthorizationDigest(_token, from_, to_, value_ * 2, validAfter_, validBefore_, fromNonce_)
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getTransferWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
         );
 
-        vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationAlreadyUsed.selector, _alice, fromNonce_));
+        vm.expectRevert(IERC712.SignerMismatch.selector);
 
         vm.prank(_bob);
-        _token.receiveWithAuthorization(from_, to_, value_ * 2, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
-    }
-
-    function test_receiveWithAuthorization_invalidSignature() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
-
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _transferAuthorizationDigest);
-
-        // TODO: should not revert with SignerMismatch error
-        vm.expectRevert();
-
-        vm.prank(_bob);
-        _token.receiveWithAuthorization(from_, to_, value_, validAfter_, validBefore_, fromNonce_, v_, r_, s_);
+        _token.receiveWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
     }
 
     /* ============ cancelAuthorization ============ */
     function test_cancelAuthorization_cancelTransferAuthorization_fullSignature() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
-        assertFalse(_token.authorizationState(from_, fromNonce_));
-
-        (uint8 transferV_, bytes32 transferR_, bytes32 transferS_) = _signPermit(
-            fromPrivateKey_,
-            _transferAuthorizationDigest
-        );
-
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _cancelAuthorizationDigest);
+        bytes32 digest_ = _token.getCancelAuthorizationDigest({ authorizer_: _alice, nonce_: _SOME_NONCE });
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(_aliceKey, digest_);
 
         vm.expectEmit();
-        emit IERC3009.AuthorizationCanceled(from_, fromNonce_);
+        emit IERC3009.AuthorizationCanceled(_alice, _SOME_NONCE);
 
         vm.prank(_alice);
-        _token.cancelAuthorization(from_, fromNonce_, abi.encodePacked(r_, s_, v_));
+        _token.cancelAuthorization(_alice, _SOME_NONCE, abi.encodePacked(r_, s_, v_));
 
-        assertTrue(_token.authorizationState(from_, fromNonce_));
-
-        vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationAlreadyUsed.selector, _alice, fromNonce_));
-
-        vm.prank(_charlie);
-        _token.transferWithAuthorization(
-            from_,
-            to_,
-            value_,
-            validAfter_,
-            validBefore_,
-            fromNonce_,
-            transferV_,
-            transferR_,
-            transferS_
-        );
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
     }
 
     function test_cancelAuthorization_cancelTransferAuthorization_rvsSignature() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
-        assertFalse(_token.authorizationState(from_, fromNonce_));
-
-        (uint8 transferV_, bytes32 transferR_, bytes32 transferS_) = _signPermit(
-            fromPrivateKey_,
-            _transferAuthorizationDigest
-        );
-
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _cancelAuthorizationDigest);
+        bytes32 digest_ = _token.getCancelAuthorizationDigest({ authorizer_: _alice, nonce_: _SOME_NONCE });
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(_aliceKey, digest_);
 
         vm.expectEmit();
-        emit IERC3009.AuthorizationCanceled(from_, fromNonce_);
+        emit IERC3009.AuthorizationCanceled(_alice, _SOME_NONCE);
 
         vm.prank(_alice);
-        _token.cancelAuthorization(from_, fromNonce_, r_, _getVS(v_, s_));
+        _token.cancelAuthorization(_alice, _SOME_NONCE, r_, _getVS(v_, s_));
 
-        assertTrue(_token.authorizationState(from_, fromNonce_));
-
-        vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationAlreadyUsed.selector, _alice, fromNonce_));
-
-        vm.prank(_charlie);
-        _token.transferWithAuthorization(
-            from_,
-            to_,
-            value_,
-            validAfter_,
-            validBefore_,
-            fromNonce_,
-            transferV_,
-            transferR_,
-            transferS_
-        );
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
     }
 
     function test_cancelAuthorization_cancelTransferAuthorization_vrsSignature() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
-        assertFalse(_token.authorizationState(from_, fromNonce_));
-
-        (uint8 transferV_, bytes32 transferR_, bytes32 transferS_) = _signPermit(
-            fromPrivateKey_,
-            _transferAuthorizationDigest
-        );
-
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _cancelAuthorizationDigest);
+        bytes32 digest_ = _token.getCancelAuthorizationDigest({ authorizer_: _alice, nonce_: _SOME_NONCE });
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(_aliceKey, digest_);
 
         vm.expectEmit();
-        emit IERC3009.AuthorizationCanceled(from_, fromNonce_);
+        emit IERC3009.AuthorizationCanceled(_alice, _SOME_NONCE);
 
         vm.prank(_alice);
-        _token.cancelAuthorization(from_, fromNonce_, v_, r_, s_);
+        _token.cancelAuthorization(_alice, _SOME_NONCE, v_, r_, s_);
 
-        assertTrue(_token.authorizationState(from_, fromNonce_));
-
-        vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationAlreadyUsed.selector, _alice, fromNonce_));
-
-        vm.prank(_charlie);
-        _token.transferWithAuthorization(
-            from_,
-            to_,
-            value_,
-            validAfter_,
-            validBefore_,
-            fromNonce_,
-            transferV_,
-            transferR_,
-            transferS_
-        );
-    }
-
-    function test_cancelAuthorization_cancelReceiveAuthorization() external {
-        (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        ) = _getTransferParams();
-
-        assertFalse(_token.authorizationState(from_, fromNonce_));
-
-        (uint8 receiveV_, bytes32 receiveR_, bytes32 receiveS_) = _signPermit(
-            fromPrivateKey_,
-            _receiveAuthorizationDigest
-        );
-
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _cancelAuthorizationDigest);
-
-        vm.expectEmit();
-        emit IERC3009.AuthorizationCanceled(from_, fromNonce_);
-
-        vm.prank(_alice);
-        _token.cancelAuthorization(from_, fromNonce_, v_, r_, s_);
-
-        assertTrue(_token.authorizationState(from_, fromNonce_));
-
-        vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationAlreadyUsed.selector, _alice, fromNonce_));
-
-        vm.prank(_bob);
-        _token.receiveWithAuthorization(
-            from_,
-            to_,
-            value_,
-            validAfter_,
-            validBefore_,
-            fromNonce_,
-            receiveV_,
-            receiveR_,
-            receiveS_
-        );
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
     }
 
     function test_cancelAuthorization_authorizationAlreadyCanceled() external {
-        (address from_, uint256 fromPrivateKey_, , , , , bytes32 fromNonce_) = _getTransferParams();
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
-        assertFalse(_token.authorizationState(from_, fromNonce_));
+        bytes32 digest_ = _token.getCancelAuthorizationDigest({ authorizer_: _alice, nonce_: _SOME_NONCE });
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(_aliceKey, digest_);
 
-        (uint8 v_, bytes32 r_, bytes32 s_) = _signPermit(fromPrivateKey_, _cancelAuthorizationDigest);
+        _token.setAuthorizationState(_alice, _SOME_NONCE, true);
 
-        _token.setAuthorizationState(_alice, fromNonce_, true);
-        assertTrue(_token.authorizationState(_alice, fromNonce_));
-
-        vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationAlreadyUsed.selector, _alice, fromNonce_));
+        vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationAlreadyUsed.selector, _alice, _SOME_NONCE));
 
         vm.prank(_alice);
-        _token.cancelAuthorization(from_, fromNonce_, v_, r_, s_);
-    }
-
-    function _getTransferParams()
-        internal
-        view
-        returns (
-            address from_,
-            uint256 fromPrivateKey_,
-            address to_,
-            uint256 value_,
-            uint256 validAfter_,
-            uint256 validBefore_,
-            bytes32 fromNonce_
-        )
-    {
-        from_ = _alice;
-        fromPrivateKey_ = _aliceKey;
-        to_ = _bob;
-        value_ = 100e6;
-        validAfter_ = 0;
-        validBefore_ = type(uint256).max;
-
-        // Should actually be a random bytes32 nonce but this is enough for our test case
-        fromNonce_ = bytes32(_token.nonces(from_));
+        _token.cancelAuthorization(_alice, _SOME_NONCE, v_, r_, s_);
     }
 }

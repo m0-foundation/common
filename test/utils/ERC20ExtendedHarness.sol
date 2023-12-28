@@ -2,7 +2,6 @@
 
 pragma solidity 0.8.23;
 
-import { ERC712 } from "../../src/ERC712.sol";
 import { ERC20Extended } from "../../src/ERC20Extended.sol";
 
 contract ERC20ExtendedHarness is ERC20Extended {
@@ -26,6 +25,32 @@ contract ERC20ExtendedHarness is ERC20Extended {
 
     function getDigest(bytes32 internalDigest_) external view returns (bytes32) {
         return _getDigest(internalDigest_);
+    }
+
+    function getTransferWithAuthorizationDigest(
+        address from_,
+        address to_,
+        uint256 value_,
+        uint256 validAfter_,
+        uint256 validBefore_,
+        bytes32 nonce_
+    ) external view returns (bytes32) {
+        return _getTransferWithAuthorizationDigest(from_, to_, value_, validAfter_, validBefore_, nonce_);
+    }
+
+    function getReceiveWithAuthorizationDigest(
+        address from_,
+        address to_,
+        uint256 value_,
+        uint256 validAfter_,
+        uint256 validBefore_,
+        bytes32 nonce_
+    ) external view returns (bytes32) {
+        return _getReceiveWithAuthorizationDigest(from_, to_, value_, validAfter_, validBefore_, nonce_);
+    }
+
+    function getCancelAuthorizationDigest(address authorizer_, bytes32 nonce_) external view returns (bytes32) {
+        return _getCancelAuthorizationDigest(authorizer_, nonce_);
     }
 
     /******************************************************************************************************************\
