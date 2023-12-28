@@ -101,6 +101,39 @@ contract SignatureCheckerTests is TestUtils {
         assertEq(signer_, account_);
     }
 
+    function test_recoverECDSASigner_rvs_invalidSignatureS() external {
+        (SignatureChecker.Error error_, address signer) = _signatureChecker.recoverECDSASigner(
+            0x00,
+            0x00,
+            bytes32(_MAX_S + 1)
+        );
+
+        assertEq(uint8(error_), uint8(SignatureChecker.Error.InvalidSignatureS));
+        assertEq(signer, address(0));
+    }
+
+    function test_recoverECDSASigner_rvs_invalidSignature() external {
+        (SignatureChecker.Error error_, address signer) = _signatureChecker.recoverECDSASigner(0x00, 0x00, 0x00);
+
+        assertEq(uint8(error_), uint8(SignatureChecker.Error.InvalidSignature));
+        assertEq(signer, address(0));
+    }
+
+    function test_recoverECDSASigner_rvs() external {
+        bytes32 digest_ = "TEST_DIGEST";
+        (address account_, uint256 privateKey_) = makeAddrAndKey("account");
+        (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
+
+        (SignatureChecker.Error error_, address signer_) = _signatureChecker.recoverECDSASigner(
+            digest_,
+            r_,
+            _getVS(v_, s_)
+        );
+
+        assertEq(uint8(error_), uint8(SignatureChecker.Error.NoError));
+        assertEq(signer_, account_);
+    }
+
     function test_recoverECDSASigner_bytes_invalidSignatureS() external {
         (SignatureChecker.Error error_, address signer) = _signatureChecker.recoverECDSASigner(
             0x00,
@@ -160,7 +193,6 @@ contract SignatureCheckerTests is TestUtils {
     }
 
     function test_validateECDSASignature_vrs_invalid() external {
-        bytes32 invalidS_ = bytes32(_MAX_S + 1);
         bytes32 digest_ = "TEST_DIGEST";
         (address account_, uint256 privateKey_) = makeAddrAndKey("account");
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
@@ -176,17 +208,61 @@ contract SignatureCheckerTests is TestUtils {
         );
 
         assertNotEq(
-            uint8(_signatureChecker.validateECDSASignature(account_, "digest_", 26, r_, s_)),
+            uint8(_signatureChecker.validateECDSASignature(account_, digest_, 26, r_, s_)),
             uint8(SignatureChecker.Error.NoError)
         );
 
         assertNotEq(
-            uint8(_signatureChecker.validateECDSASignature(account_, "digest_", v_, 0, s_)),
+            uint8(_signatureChecker.validateECDSASignature(account_, digest_, v_, 0, s_)),
             uint8(SignatureChecker.Error.NoError)
         );
 
         assertNotEq(
-            uint8(_signatureChecker.validateECDSASignature(account_, "digest_", v_, r_, invalidS_)),
+            uint8(_signatureChecker.validateECDSASignature(account_, digest_, v_, r_, bytes32(_MAX_S + 1))),
+            uint8(SignatureChecker.Error.NoError)
+        );
+    }
+
+    function test_validateECDSASignature_rvs() external {
+        bytes32 digest_ = "TEST_DIGEST";
+        (address account_, uint256 privateKey_) = makeAddrAndKey("account");
+        (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
+
+        assertEq(
+            uint8(_signatureChecker.validateECDSASignature(account_, digest_, r_, _getVS(v_, s_))),
+            uint8(SignatureChecker.Error.NoError)
+        );
+    }
+
+    function test_validateECDSASignature_rvs_invalid() external {
+        bytes32 digest_ = "TEST_DIGEST";
+        (address account_, uint256 privateKey_) = makeAddrAndKey("account");
+        (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
+
+        bytes32 vs_ = _getVS(v_, s_);
+
+        assertNotEq(
+            uint8(_signatureChecker.validateECDSASignature(address(1), digest_, v_, r_, vs_)),
+            uint8(SignatureChecker.Error.NoError)
+        );
+
+        assertNotEq(
+            uint8(_signatureChecker.validateECDSASignature(account_, "DIFF", r_, vs_)),
+            uint8(SignatureChecker.Error.NoError)
+        );
+
+        assertNotEq(
+            uint8(_signatureChecker.validateECDSASignature(account_, digest_, r_, _getVS(26, s_))),
+            uint8(SignatureChecker.Error.NoError)
+        );
+
+        assertNotEq(
+            uint8(_signatureChecker.validateECDSASignature(account_, digest_, 0, vs_)),
+            uint8(SignatureChecker.Error.NoError)
+        );
+
+        assertNotEq(
+            uint8(_signatureChecker.validateECDSASignature(account_, digest_, r_, _getVS(v_, bytes32(_MAX_S + 1)))),
             uint8(SignatureChecker.Error.NoError)
         );
     }
@@ -197,7 +273,7 @@ contract SignatureCheckerTests is TestUtils {
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
 
         assertEq(
-            uint8(_signatureChecker.validateECDSASignature(account_, digest_, v_, r_, s_)),
+            uint8(_signatureChecker.validateECDSASignature(account_, digest_, r_, _getVS(v_, s_))),
             uint8(SignatureChecker.Error.NoError)
         );
     }
@@ -219,17 +295,17 @@ contract SignatureCheckerTests is TestUtils {
         );
 
         assertNotEq(
-            uint8(_signatureChecker.validateECDSASignature(account_, "digest_", _encodeSignature(26, r_, s_))),
+            uint8(_signatureChecker.validateECDSASignature(account_, digest_, _encodeSignature(26, r_, s_))),
             uint8(SignatureChecker.Error.NoError)
         );
 
         assertNotEq(
-            uint8(_signatureChecker.validateECDSASignature(account_, "digest_", _encodeSignature(v_, 0, s_))),
+            uint8(_signatureChecker.validateECDSASignature(account_, digest_, _encodeSignature(v_, 0, s_))),
             uint8(SignatureChecker.Error.NoError)
         );
 
         assertNotEq(
-            uint8(_signatureChecker.validateECDSASignature(account_, "digest_", _encodeSignature(v_, r_, invalidS_))),
+            uint8(_signatureChecker.validateECDSASignature(account_, digest_, _encodeSignature(v_, r_, invalidS_))),
             uint8(SignatureChecker.Error.NoError)
         );
     }
@@ -264,6 +340,29 @@ contract SignatureCheckerTests is TestUtils {
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
 
         assertTrue(_signatureChecker.isValidECDSASignature(account_, digest_, v_, r_, s_));
+    }
+
+    function test_isValidECDSASignature_rvs_invalid() external {
+        bytes32 digest_ = "TEST_DIGEST";
+        (address account_, uint256 privateKey_) = makeAddrAndKey("account");
+        (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
+
+        bytes32 vs_ = _getVS(v_, s_);
+
+        assertFalse(_signatureChecker.isValidECDSASignature(address(1), digest_, r_, vs_));
+        assertFalse(_signatureChecker.isValidECDSASignature(account_, "DIFF", r_, vs_));
+        assertFalse(_signatureChecker.isValidECDSASignature(account_, digest_, r_, _getVS(26, s_)));
+        assertFalse(_signatureChecker.isValidECDSASignature(account_, digest_, 0, vs_));
+        assertFalse(_signatureChecker.isValidECDSASignature(account_, digest_, r_, _getVS(v_, bytes32(_MAX_S + 1))));
+    }
+
+    function test_isValidECDSASignature_rvs() external {
+        bytes32 digest_ = "TEST_DIGEST";
+        (address account_, uint256 privateKey_) = makeAddrAndKey("account");
+
+        (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
+
+        assertTrue(_signatureChecker.isValidECDSASignature(account_, digest_, r_, _getVS(v_, s_)));
     }
 
     function test_isValidECDSASignature_bytes_invalid() external {
@@ -341,12 +440,18 @@ contract SignatureCheckerTests is TestUtils {
         bytes32 digest_ = "TEST_DIGEST";
         (address account_, uint256 privateKey_) = makeAddrAndKey("account");
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
+        bytes32 vs_ = _getVS(v_, s_);
 
         assertFalse(_signatureChecker.isValidSignature(address(1), digest_, _encodeSignature(v_, r_, s_)));
         assertFalse(_signatureChecker.isValidSignature(account_, "DIFF", _encodeSignature(v_, r_, s_)));
         assertFalse(_signatureChecker.isValidSignature(account_, digest_, _encodeSignature(26, r_, s_)));
         assertFalse(_signatureChecker.isValidSignature(account_, digest_, _encodeSignature(v_, 0, s_)));
         assertFalse(_signatureChecker.isValidSignature(account_, digest_, _encodeSignature(v_, r_, invalidS_)));
+
+        assertFalse(_signatureChecker.isValidSignature(address(1), digest_, _encodeShortSignature(r_, vs_)));
+        assertFalse(_signatureChecker.isValidSignature(account_, "DIFF", _encodeShortSignature(r_, vs_)));
+        assertFalse(_signatureChecker.isValidSignature(account_, digest_, _encodeShortSignature(0, vs_)));
+        assertFalse(_signatureChecker.isValidSignature(account_, digest_, _encodeShortSignature(r_, invalidS_)));
 
         assertFalse(_signatureChecker.isValidSignature(makeAddr("account"), "DIGEST", ""));
         assertFalse(_signatureChecker.isValidSignature(address(new AccountWithFallback()), "DIGEST", ""));
@@ -369,6 +474,7 @@ contract SignatureCheckerTests is TestUtils {
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
 
         assertTrue(_signatureChecker.isValidSignature(account_, digest_, _encodeSignature(v_, r_, s_)));
+        assertTrue(_signatureChecker.isValidSignature(account_, digest_, _encodeShortSignature(r_, _getVS(v_, s_))));
     }
 
     function test_isValidSignature_erc1271() external {

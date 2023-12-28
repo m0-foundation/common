@@ -28,6 +28,15 @@ contract SignatureCheckerHarness {
     function isValidECDSASignature(
         address signer,
         bytes32 digest,
+        bytes32 r,
+        bytes32 vs
+    ) external pure returns (bool isValid) {
+        return SignatureChecker.isValidECDSASignature(signer, digest, r, vs);
+    }
+
+    function isValidECDSASignature(
+        address signer,
+        bytes32 digest,
         uint8 v,
         bytes32 r,
         bytes32 s
@@ -52,6 +61,14 @@ contract SignatureCheckerHarness {
 
     function recoverECDSASigner(
         bytes32 digest,
+        bytes32 r,
+        bytes32 vs
+    ) external pure returns (SignatureChecker.Error error, address signer) {
+        return SignatureChecker.recoverECDSASigner(digest, r, vs);
+    }
+
+    function recoverECDSASigner(
+        bytes32 digest,
         uint8 v,
         bytes32 r,
         bytes32 s
@@ -65,6 +82,15 @@ contract SignatureCheckerHarness {
         bytes memory signature
     ) external pure returns (SignatureChecker.Error error) {
         return SignatureChecker.validateECDSASignature(signer, digest, signature);
+    }
+
+    function validateECDSASignature(
+        address signer,
+        bytes32 digest,
+        bytes32 r,
+        bytes32 vs
+    ) external pure returns (SignatureChecker.Error error) {
+        return SignatureChecker.validateECDSASignature(signer, digest, r, vs);
     }
 
     function validateECDSASignature(

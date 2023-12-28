@@ -1,33 +1,91 @@
-# Common M-Zero Contracts
+# Common M^ZERO Contracts
 
-Install dependencies
+## Overview
+
+Common contracts and libraries used across the various M^ZERO Solidity projects.
+
+## Development
+
+### Installation
+
+You may have to install the following tools to use this repository:
+
+- [Foundry](https://github.com/foundry-rs/foundry) to compile and test contracts
+- [lcov](https://github.com/linux-test-project/lcov) to generate the code coverage report
+- [yarn](https://classic.yarnpkg.com/lang/en/docs/install/) to manage npm dependencies
+- [slither](https://github.com/crytic/slither) to static analyze contracts
+
+Install dependencies:
 
 ```bash
- forge install
+npm i
+forge install
 ```
 
-To compile the contracts
+### Compile
+
+Run the following command to compile the contracts:
 
 ```bash
- forge build
+forge compile
 ```
 
-## Test
+### Coverage
 
-To run all tests
+Forge is used for coverage, run it with:
 
 ```bash
- forge test
+yarn coverage
 ```
 
-Run test that matches a test contract
+You can then consult the report by opening `coverage/index.html`:
 
 ```bash
- forge test --mc <test-contract-name>
+open coverage/index.html
 ```
 
-Test a specific test case
+### Test
+
+To run all tests:
 
 ```bash
- forge test --mt <test-case-name>
+forge test
+```
+
+Run test that matches a test contract:
+
+```bash
+forge test --mc <test-contract-name>
+```
+
+Test a specific test case:
+
+```bash
+forge test --mt <test-case-name>
+```
+
+To run slither:
+
+```bash
+yarn slither
+```
+
+### Code quality
+
+[Prettier](https://prettier.io) is used to format Solidity code. Use it by running:
+
+```bash
+yarn prettier
+```
+
+[Solhint](https://protofire.github.io/solhint/) is used to lint Solidity files. Run it with:
+
+```bash
+yarn solhint
+```
+
+Or to autofix some issues:
+
+```bash
+yarn solhint-fix
 ```
