@@ -153,6 +153,16 @@ library UIntMath {
     }
 
     /**
+     * @notice Compares two uint112 values and returns the lesser one.
+     * @param  a_  Value to check.
+     * @param  b_  Value to check.
+     * @return The lesser value.
+     */
+    function min112(uint112 a_, uint112 b_) internal pure returns (uint112) {
+        return a_ < b_ ? a_ : b_;
+    }
+
+    /**
      * @notice Compares two uint256 values and returns the lesser one.
      * @param  a_  Value to check.
      * @param  b_  Value to check.
