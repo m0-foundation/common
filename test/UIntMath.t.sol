@@ -80,6 +80,11 @@ contract UIntMathTests is Test {
         assertEq(_uintMath.min40(2, 1), 1);
     }
 
+    function test_min112() external {
+        assertEq(_uintMath.min112(1, 2), 1);
+        assertEq(_uintMath.min112(2, 1), 1);
+    }
+
     function test_min240() external {
         assertEq(_uintMath.min240(1, 2), 1);
         assertEq(_uintMath.min240(2, 1), 1);

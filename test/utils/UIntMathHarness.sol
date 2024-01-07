@@ -54,6 +54,10 @@ contract UIntMathHarness {
         return UIntMath.min40(a_, b_);
     }
 
+    function min112(uint112 a_, uint112 b_) external pure returns (uint112) {
+        return UIntMath.min112(a_, b_);
+    }
+
     function min240(uint240 a_, uint240 b_) external pure returns (uint240) {
         return UIntMath.min240(a_, b_);
     }
