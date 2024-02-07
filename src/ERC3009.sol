@@ -244,8 +244,8 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
         uint256 validBefore_,
         bytes32 nonce_
     ) internal {
-        if (block.timestamp < validAfter_) revert AuthorizationNotYetValid(block.timestamp, validAfter_);
-        if (block.timestamp > validBefore_) revert AuthorizationExpired(block.timestamp, validBefore_);
+        if (block.timestamp <= validAfter_) revert AuthorizationNotYetValid(block.timestamp, validAfter_);
+        if (block.timestamp >= validBefore_) revert AuthorizationExpired(block.timestamp, validBefore_);
 
         _revertIfAuthorizationAlreadyUsed(from_, nonce_);
 
