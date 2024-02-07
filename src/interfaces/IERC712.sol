@@ -8,6 +8,12 @@ interface IERC712 {
     /// @notice Revert message when an invalid signature is detected.
     error InvalidSignature();
 
+    /// @notice Revert message when the S portion of a signature is invalid.
+    error InvalidSignatureS();
+
+    /// @notice Revert message when the V portion of a signature is invalid.
+    error InvalidSignatureV();
+
     /// @notice Revert message when a signature with invalid length is detected.
     error InvalidSignatureLength();
 

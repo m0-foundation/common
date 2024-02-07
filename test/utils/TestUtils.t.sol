@@ -5,6 +5,8 @@ pragma solidity 0.8.23;
 import { Test } from "../../lib/forge-std/src/Test.sol";
 
 contract TestUtils is Test {
+    uint256 internal constant _MAX_S = uint256(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0);
+
     /* ============ Permit ============ */
     function _signDigest(
         uint256 signerPrivateKey_,
