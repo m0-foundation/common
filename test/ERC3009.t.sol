@@ -421,7 +421,7 @@ contract ERC3009Tests is TestUtils {
             validAfter_,
             validBefore_,
             _SOME_NONCE,
-            abi.encodePacked(r_, s_, v_)
+            _encodeSignature(v_, r_, s_)
         );
 
         assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
