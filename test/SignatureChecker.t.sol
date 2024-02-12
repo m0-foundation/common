@@ -492,7 +492,7 @@ contract SignatureCheckerTests is TestUtils {
         assertTrue(_signatureChecker.isValidECDSASignature(account_, digest_, _encodeSignature(v_, r_, s_)));
     }
 
-    function testFuzz_isValidECDSASignature_bytes(uint256 digest) external {
+    function testFuzz_isValidECDSASignature_fullSignature(uint256 digest) external {
         bytes32 digest_ = bytes32(digest);
         (address account_, uint256 privateKey_) = makeAddrAndKey(string(abi.encode("account", digest)));
 
