@@ -218,7 +218,7 @@ contract SignatureCheckerTests is TestUtils {
         assertEq(signer_, account_);
     }
 
-    function testFuzz_recoverECDSASigner_bytes(uint256 digest) external {
+    function testFuzz_recoverECDSASigner_fullSignature(uint256 digest) external {
         bytes32 digest_ = bytes32(digest);
         (address account_, uint256 privateKey_) = makeAddrAndKey(string(abi.encode("account", digest)));
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
