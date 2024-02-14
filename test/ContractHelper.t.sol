@@ -63,4 +63,16 @@ contract ContractHelperTests is Test {
         vm.setNonce(address(_voidDeployer), 0xffffff + 1);
         assertEq(_contractHelper.getContractFrom(address(_voidDeployer), 0xffffff + 1), _voidDeployer.deploy());
     }
+
+    function testFuzz_full(uint64 nonce) external {
+        // @dev we want to exclude this unrealistic case, which is not covered by the implementation.
+        vm.assume(nonce <= 0xffffffff);
+        vm.assume(nonce != 0x00);
+
+        // @dev deploy new deployer to change address input as well.
+        VoidDeployer newVoidDeployer = new VoidDeployer{salt: keccak256(abi.encode(nonce))}();
+
+        vm.setNonce(address(newVoidDeployer), nonce);
+        assertEq(_contractHelper.getContractFrom(address(newVoidDeployer), nonce), newVoidDeployer.deploy());
+    }
 }

@@ -97,6 +97,37 @@ contract ERC3009Tests is TestUtils {
         assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
     }
 
+    function testFuzz_transferWithAuthorization_fullSignature(
+        uint256 value_,
+        uint256 validAfter_,
+        uint256 validBefore_
+    ) external {
+        validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
+        validAfter_ = bound(validAfter_, 0, block.timestamp);
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
+
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getTransferWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
+
+        vm.expectEmit();
+        emit IERC3009.AuthorizationUsed(_alice, _SOME_NONCE);
+
+        vm.prank(_charlie);
+        _token.transferWithAuthorization(
+            _alice,
+            _bob,
+            value_,
+            validAfter_,
+            validBefore_,
+            _SOME_NONCE,
+            _encodeSignature(v_, r_, s_)
+        );
+
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
+    }
+
     function test_transferWithAuthorization_rvsSignature() external {
         uint256 value_ = 100;
         uint256 validAfter_ = 0;
@@ -127,10 +158,67 @@ contract ERC3009Tests is TestUtils {
         assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
     }
 
+    function testFuzz_transferWithAuthorization_rvsSignature(
+        uint256 value_,
+        uint256 validAfter_,
+        uint256 validBefore_
+    ) external {
+        validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
+        validAfter_ = bound(validAfter_, 0, block.timestamp);
+
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
+
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getTransferWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
+
+        vm.expectEmit();
+        emit IERC3009.AuthorizationUsed(_alice, _SOME_NONCE);
+
+        vm.prank(_charlie);
+        _token.transferWithAuthorization(
+            _alice,
+            _bob,
+            value_,
+            validAfter_,
+            validBefore_,
+            _SOME_NONCE,
+            r_,
+            _getVS(v_, s_)
+        );
+
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
+    }
+
     function test_transferWithAuthorization_vrsSignature() external {
         uint256 value_ = 100;
         uint256 validAfter_ = 0;
         uint256 validBefore_ = type(uint256).max;
+
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
+
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getTransferWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
+
+        vm.expectEmit();
+        emit IERC3009.AuthorizationUsed(_alice, _SOME_NONCE);
+
+        vm.prank(_charlie);
+        _token.transferWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
+
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
+    }
+
+    function testFuzz_transferWithAuthorization_vrsSignature(
+        uint256 value_,
+        uint256 validAfter_,
+        uint256 validBefore_
+    ) external {
+        validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
+        validAfter_ = bound(validAfter_, 0, block.timestamp);
 
         assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
@@ -307,6 +395,38 @@ contract ERC3009Tests is TestUtils {
         assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
     }
 
+    function testFuzz_receiveWithAuthorization_fullSignature(
+        uint256 value_,
+        uint256 validAfter_,
+        uint256 validBefore_
+    ) external {
+        validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
+        validAfter_ = bound(validAfter_, 0, block.timestamp);
+
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
+
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
+
+        vm.expectEmit();
+        emit IERC3009.AuthorizationUsed(_alice, _SOME_NONCE);
+
+        vm.prank(_bob);
+        _token.receiveWithAuthorization(
+            _alice,
+            _bob,
+            value_,
+            validAfter_,
+            validBefore_,
+            _SOME_NONCE,
+            _encodeSignature(v_, r_, s_)
+        );
+
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
+    }
+
     function test_receiveWithAuthorization_rvsSignature() external {
         uint256 value_ = 100;
         uint256 validAfter_ = 0;
@@ -337,10 +457,67 @@ contract ERC3009Tests is TestUtils {
         assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
     }
 
+    function testFuzz_receiveWithAuthorization_rvsSignature(
+        uint256 value_,
+        uint256 validAfter_,
+        uint256 validBefore_
+    ) external {
+        validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
+        validAfter_ = bound(validAfter_, 0, block.timestamp);
+
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
+
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
+
+        vm.expectEmit();
+        emit IERC3009.AuthorizationUsed(_alice, _SOME_NONCE);
+
+        vm.prank(_bob);
+        _token.receiveWithAuthorization(
+            _alice,
+            _bob,
+            value_,
+            validAfter_,
+            validBefore_,
+            _SOME_NONCE,
+            r_,
+            _getVS(v_, s_)
+        );
+
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
+    }
+
     function test_receiveWithAuthorization_vrsSignature() external {
         uint256 value_ = 100;
         uint256 validAfter_ = 0;
         uint256 validBefore_ = type(uint256).max;
+
+        assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
+
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
+
+        vm.expectEmit();
+        emit IERC3009.AuthorizationUsed(_alice, _SOME_NONCE);
+
+        vm.prank(_bob);
+        _token.receiveWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
+
+        assertTrue(_token.authorizationState(_alice, _SOME_NONCE));
+    }
+
+    function testFuzz_receiveWithAuthorization_vrsSignature(
+        uint256 value_,
+        uint256 validAfter_,
+        uint256 validBefore_
+    ) external {
+        validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
+        validAfter_ = bound(validAfter_, 0, block.timestamp);
 
         assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
