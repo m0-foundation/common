@@ -106,6 +106,9 @@ contract ERC3009Tests is TestUtils {
     ) external {
         validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
         validAfter_ = bound(validAfter_, 0, block.timestamp);
+
+        _token.mint(_alice, value_);
+
         assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
         (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
@@ -170,6 +173,8 @@ contract ERC3009Tests is TestUtils {
         validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
         validAfter_ = bound(validAfter_, 0, block.timestamp);
 
+        _token.mint(_alice, value_);
+
         assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
         (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
@@ -225,6 +230,8 @@ contract ERC3009Tests is TestUtils {
     ) external {
         validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
         validAfter_ = bound(validAfter_, 0, block.timestamp);
+
+        _token.mint(_alice, value_);
 
         assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
@@ -411,6 +418,8 @@ contract ERC3009Tests is TestUtils {
         validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
         validAfter_ = bound(validAfter_, 0, block.timestamp);
 
+        _token.mint(_alice, value_);
+
         assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
         (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
@@ -475,6 +484,8 @@ contract ERC3009Tests is TestUtils {
         validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
         validAfter_ = bound(validAfter_, 0, block.timestamp);
 
+        _token.mint(_alice, value_);
+
         assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
         (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
@@ -530,6 +541,8 @@ contract ERC3009Tests is TestUtils {
     ) external {
         validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
         validAfter_ = bound(validAfter_, 0, block.timestamp);
+
+        _token.mint(_alice, value_);
 
         assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
