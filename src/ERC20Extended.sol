@@ -17,6 +17,7 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
      */
     bytes32 public constant PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
 
+    /// @inheritdoc IERC20
     uint8 public immutable decimals;
 
     /// @inheritdoc IERC20
@@ -43,6 +44,9 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
     /// @inheritdoc IERC20
     function approve(address spender_, uint256 amount_) external returns (bool success_) {
         _approve(msg.sender, spender_, amount_);
+
+        emit Approval(msg.sender, spender_, amount_);
+
         return true;
     }
 
@@ -105,7 +109,7 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
     \******************************************************************************************************************/
 
     function _approve(address account_, address spender_, uint256 amount_) internal virtual {
-        emit Approval(account_, spender_, allowance[account_][spender_] = amount_);
+        allowance[account_][spender_] = amount_;
     }
 
     function _permit(

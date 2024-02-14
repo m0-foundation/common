@@ -20,8 +20,9 @@ block_timestamp = 1_689_934_508
 runs = 256
 
 [profile.default.invariant]
-runs = 256
-depth = 15
+runs = 512
+depth = 25
+fail_on_revert = true
 
 [profile.production]
 evm_version = "shanghai"

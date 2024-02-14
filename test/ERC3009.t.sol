@@ -73,6 +73,8 @@ contract ERC3009Tests is TestUtils {
         uint256 validAfter_ = 0;
         uint256 validBefore_ = type(uint256).max;
 
+        _token.mint(_alice, value_);
+
         assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
         (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
@@ -132,6 +134,8 @@ contract ERC3009Tests is TestUtils {
         uint256 value_ = 100;
         uint256 validAfter_ = 0;
         uint256 validBefore_ = type(uint256).max;
+
+        _token.mint(_alice, value_);
 
         assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
@@ -195,6 +199,8 @@ contract ERC3009Tests is TestUtils {
         uint256 value_ = 100;
         uint256 validAfter_ = 0;
         uint256 validBefore_ = type(uint256).max;
+
+        _token.mint(_alice, value_);
 
         assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
@@ -371,6 +377,8 @@ contract ERC3009Tests is TestUtils {
         uint256 validAfter_ = 0;
         uint256 validBefore_ = type(uint256).max;
 
+        _token.mint(_alice, value_);
+
         assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
         (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
@@ -431,6 +439,8 @@ contract ERC3009Tests is TestUtils {
         uint256 value_ = 100;
         uint256 validAfter_ = 0;
         uint256 validBefore_ = type(uint256).max;
+
+        _token.mint(_alice, value_);
 
         assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 
@@ -494,6 +504,8 @@ contract ERC3009Tests is TestUtils {
         uint256 value_ = 100;
         uint256 validAfter_ = 0;
         uint256 validBefore_ = type(uint256).max;
+
+        _token.mint(_alice, value_);
 
         assertFalse(_token.authorizationState(_alice, _SOME_NONCE));
 

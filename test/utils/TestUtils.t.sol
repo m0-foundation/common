@@ -4,8 +4,6 @@ pragma solidity 0.8.23;
 
 import { Test } from "../../lib/forge-std/src/Test.sol";
 
-import { ERC20ExtendedHarness } from "./ERC20ExtendedHarness.sol";
-
 contract TestUtils is Test {
     /* ============ Permit ============ */
     function _signDigest(

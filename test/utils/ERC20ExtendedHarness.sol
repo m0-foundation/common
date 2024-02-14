@@ -5,11 +5,23 @@ pragma solidity 0.8.23;
 import { ERC20Extended } from "../../src/ERC20Extended.sol";
 
 contract ERC20ExtendedHarness is ERC20Extended {
+    mapping(address => uint256) internal _balanceOf;
+
+    uint256 internal _totalSupply;
+
     constructor(string memory name_, string memory symbol_, uint8 decimals_) ERC20Extended(name_, symbol_, decimals_) {}
 
     /******************************************************************************************************************\
     |                                      External/Public Interactive Functions                                       |
     \******************************************************************************************************************/
+
+    function mint(address recipient_, uint256 amount_) external {
+        _transfer(address(0), recipient_, amount_);
+    }
+
+    function burn(address account_, uint256 amount_) external {
+        _transfer(account_, address(0), amount_);
+    }
 
     function setAuthorizationState(address authorizer_, bytes32 nonce_, bool isNonceUsed_) external {
         authorizationState[authorizer_][nonce_] = isNonceUsed_;
@@ -19,12 +31,26 @@ contract ERC20ExtendedHarness is ERC20Extended {
     |                                       External/Public View/Pure Functions                                        |
     \******************************************************************************************************************/
 
-    function balanceOf(address account_) external view returns (uint256) {}
+    function balanceOf(address account_) external view returns (uint256) {
+        return _balanceOf[account_];
+    }
 
-    function totalSupply() external view returns (uint256) {}
+    function totalSupply() external view returns (uint256) {
+        return _totalSupply;
+    }
 
     function getDigest(bytes32 internalDigest_) external view returns (bytes32) {
         return _getDigest(internalDigest_);
+    }
+
+    function getPermitDigest(
+        address owner_,
+        address spender_,
+        uint256 value_,
+        uint256 nonce_,
+        uint256 deadline_
+    ) external view returns (bytes32) {
+        return _getDigest(keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, value_, nonce_, deadline_)));
     }
 
     function getTransferWithAuthorizationDigest(
@@ -57,5 +83,23 @@ contract ERC20ExtendedHarness is ERC20Extended {
     |                                          Internal Interactive Functions                                          |
     \******************************************************************************************************************/
 
-    function _transfer(address sender_, address recipient_, uint256 amount_) internal override {}
+    function _transfer(address sender_, address recipient_, uint256 amount_) internal override {
+        if (sender_ != address(0)) {
+            _balanceOf[sender_] -= amount_;
+        }
+
+        if (recipient_ != address(0)) {
+            _balanceOf[recipient_] += amount_;
+        }
+
+        if (sender_ == address(0)) {
+            _totalSupply += amount_;
+        }
+
+        if (recipient_ == address(0)) {
+            _totalSupply -= amount_;
+        }
+
+        emit Transfer(sender_, recipient_, amount_);
+    }
 }
