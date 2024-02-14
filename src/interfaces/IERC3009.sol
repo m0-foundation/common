@@ -225,4 +225,13 @@ interface IERC3009 is IStatefulERC712 {
      * @param  s          s of the signature.
      */
     function cancelAuthorization(address authorizer, bytes32 nonce, uint8 v, bytes32 r, bytes32 s) external;
+
+    /// @notice Returns `transferWithAuthorization` typehash.
+    function TRANSFER_WITH_AUTHORIZATION_TYPEHASH() external view returns (bytes32);
+
+    /// @notice Returns `receiveWithAuthorization` typehash.
+    function RECEIVE_WITH_AUTHORIZATION_TYPEHASH() external view returns (bytes32);
+
+    /// @notice Returns `cancelAuthorization` typehash.
+    function CANCEL_AUTHORIZATION_TYPEHASH() external view returns (bytes32);
 }

@@ -46,8 +46,6 @@ contract AccountWithValidFunction {
 }
 
 contract SignatureCheckerTests is TestUtils {
-    uint256 internal constant _MAX_S = uint256(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0);
-
     SignatureCheckerHarness internal _signatureChecker;
 
     function setUp() external {

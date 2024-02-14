@@ -11,15 +11,24 @@ import { StatefulERC712 } from "./StatefulERC712.sol";
 /// @title ERC3009 implementation allowing the transfer of fungible assets via a signed authorization.
 /// @dev Inherits from ERC712 and StatefulERC712.
 abstract contract ERC3009 is IERC3009, StatefulERC712 {
-    // keccak256("TransferWithAuthorization(address from,address to,uint256 value,uint256 validAfter,uint256 validBefore,bytes32 nonce)")
+    /**
+     * @inheritdoc IERC3009
+     * @dev        keccak256("TransferWithAuthorization(address from,address to,uint256 value,uint256 validAfter,uint256 validBefore,bytes32 nonce)")
+     */
     bytes32 public constant TRANSFER_WITH_AUTHORIZATION_TYPEHASH =
         0x7c7c6cdb67a18743f49ec6fa9b35f50d52ed05cbed4cc592e13b44501c1a2267;
 
-    // keccak256("ReceiveWithAuthorization(address from,address to,uint256 value,uint256 validAfter,uint256 validBefore,bytes32 nonce)")
+    /**
+     * @inheritdoc IERC3009
+     * @dev        keccak256("ReceiveWithAuthorization(address from,address to,uint256 value,uint256 validAfter,uint256 validBefore,bytes32 nonce)")
+     */
     bytes32 public constant RECEIVE_WITH_AUTHORIZATION_TYPEHASH =
         0xd099cc98ef71107a616c4f0f941f04c322d8e254fe26b3c6668db87aae413de8;
 
-    // keccak256("CancelAuthorization(address authorizer,bytes32 nonce)")
+    /**
+     * @inheritdoc IERC3009
+     * @dev        keccak256("CancelAuthorization(address authorizer,bytes32 nonce)")
+     */
     bytes32 public constant CANCEL_AUTHORIZATION_TYPEHASH =
         0x158b0a9edf7a828aad02f63cd515c68ef2f50ba807396f6d12842833a1597429;
 
@@ -235,8 +244,8 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
         uint256 validBefore_,
         bytes32 nonce_
     ) internal {
-        if (block.timestamp < validAfter_) revert AuthorizationNotYetValid(block.timestamp, validAfter_);
-        if (block.timestamp > validBefore_) revert AuthorizationExpired(block.timestamp, validBefore_);
+        if (block.timestamp <= validAfter_) revert AuthorizationNotYetValid(block.timestamp, validAfter_);
+        if (block.timestamp >= validBefore_) revert AuthorizationExpired(block.timestamp, validBefore_);
 
         _revertIfAuthorizationAlreadyUsed(from_, nonce_);
 

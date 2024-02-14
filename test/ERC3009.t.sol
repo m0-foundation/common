@@ -104,8 +104,8 @@ contract ERC3009Tests is TestUtils {
         uint256 validAfter_,
         uint256 validBefore_
     ) external {
-        validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
-        validAfter_ = bound(validAfter_, 0, block.timestamp);
+        validBefore_ = bound(validBefore_, block.timestamp + 1, type(uint256).max);
+        validAfter_ = bound(validAfter_, 0, block.timestamp - 1);
 
         _token.mint(_alice, value_);
 
@@ -170,8 +170,8 @@ contract ERC3009Tests is TestUtils {
         uint256 validAfter_,
         uint256 validBefore_
     ) external {
-        validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
-        validAfter_ = bound(validAfter_, 0, block.timestamp);
+        validBefore_ = bound(validBefore_, block.timestamp + 1, type(uint256).max);
+        validAfter_ = bound(validAfter_, 0, block.timestamp - 1);
 
         _token.mint(_alice, value_);
 
@@ -228,8 +228,8 @@ contract ERC3009Tests is TestUtils {
         uint256 validAfter_,
         uint256 validBefore_
     ) external {
-        validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
-        validAfter_ = bound(validAfter_, 0, block.timestamp);
+        validBefore_ = bound(validBefore_, block.timestamp + 1, type(uint256).max);
+        validAfter_ = bound(validAfter_, 0, block.timestamp - 1);
 
         _token.mint(_alice, value_);
 
@@ -328,10 +328,44 @@ contract ERC3009Tests is TestUtils {
         _token.transferWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
     }
 
+    function test_transferWithAuthorization_authorizationNotYetValid_nonInclusive() external {
+        uint256 value_ = 100;
+        uint256 validAfter_ = block.timestamp; // Not yet valid, non-inclusive.
+        uint256 validBefore_ = type(uint256).max;
+
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getTransferWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
+
+        vm.expectRevert(
+            abi.encodeWithSelector(IERC3009.AuthorizationNotYetValid.selector, block.timestamp, validAfter_)
+        );
+
+        vm.prank(_charlie);
+        _token.transferWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
+    }
+
     function test_transferWithAuthorization_authorizationExpired() external {
         uint256 value_ = 100;
         uint256 validAfter_ = 0;
         uint256 validBefore_ = block.timestamp - 1; // Already expired.
+
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getTransferWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
+
+        vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationExpired.selector, block.timestamp, validBefore_));
+
+        vm.prank(_charlie);
+        _token.transferWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
+    }
+
+    function test_transferWithAuthorization_authorizationExpired_nonInclusive() external {
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = block.timestamp; // Already expired, non-inclusive.
 
         (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
             _aliceKey,
@@ -415,8 +449,8 @@ contract ERC3009Tests is TestUtils {
         uint256 validAfter_,
         uint256 validBefore_
     ) external {
-        validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
-        validAfter_ = bound(validAfter_, 0, block.timestamp);
+        validBefore_ = bound(validBefore_, block.timestamp + 1, type(uint256).max);
+        validAfter_ = bound(validAfter_, 0, block.timestamp - 1);
 
         _token.mint(_alice, value_);
 
@@ -481,8 +515,8 @@ contract ERC3009Tests is TestUtils {
         uint256 validAfter_,
         uint256 validBefore_
     ) external {
-        validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
-        validAfter_ = bound(validAfter_, 0, block.timestamp);
+        validBefore_ = bound(validBefore_, block.timestamp + 1, type(uint256).max);
+        validAfter_ = bound(validAfter_, 0, block.timestamp - 1);
 
         _token.mint(_alice, value_);
 
@@ -539,8 +573,8 @@ contract ERC3009Tests is TestUtils {
         uint256 validAfter_,
         uint256 validBefore_
     ) external {
-        validBefore_ = bound(validBefore_, block.timestamp, type(uint256).max);
-        validAfter_ = bound(validAfter_, 0, block.timestamp);
+        validBefore_ = bound(validBefore_, block.timestamp + 1, type(uint256).max);
+        validAfter_ = bound(validAfter_, 0, block.timestamp - 1);
 
         _token.mint(_alice, value_);
 
@@ -645,10 +679,44 @@ contract ERC3009Tests is TestUtils {
         _token.receiveWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
     }
 
+    function test_receiveWithAuthorization_authorizationNotYetValid_nonInclusive() external {
+        uint256 value_ = 100;
+        uint256 validAfter_ = block.timestamp; // Not yet valid, non-inclusive.
+        uint256 validBefore_ = type(uint256).max;
+
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
+
+        vm.expectRevert(
+            abi.encodeWithSelector(IERC3009.AuthorizationNotYetValid.selector, block.timestamp, validAfter_)
+        );
+
+        vm.prank(_bob);
+        _token.receiveWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
+    }
+
     function test_receiveWithAuthorization_authorizationExpired() external {
         uint256 value_ = 100;
         uint256 validAfter_ = 0;
         uint256 validBefore_ = block.timestamp - 10; // Already expired.
+
+        (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
+            _aliceKey,
+            _token.getReceiveWithAuthorizationDigest(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE)
+        );
+
+        vm.expectRevert(abi.encodeWithSelector(IERC3009.AuthorizationExpired.selector, block.timestamp, validBefore_));
+
+        vm.prank(_bob);
+        _token.receiveWithAuthorization(_alice, _bob, value_, validAfter_, validBefore_, _SOME_NONCE, v_, r_, s_);
+    }
+
+    function test_receiveWithAuthorization_authorizationExpired_nonInclusive() external {
+        uint256 value_ = 100;
+        uint256 validAfter_ = 0;
+        uint256 validBefore_ = block.timestamp; // Already expired, non-inclusive.
 
         (uint8 v_, bytes32 r_, bytes32 s_) = _signDigest(
             _aliceKey,

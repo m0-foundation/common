@@ -31,11 +31,11 @@ contract ERC20ExtendedHarness is ERC20Extended {
     |                                       External/Public View/Pure Functions                                        |
     \******************************************************************************************************************/
 
-    function balanceOf(address account_) external view returns (uint256) {
+    function balanceOf(address account_) external view override returns (uint256) {
         return _balanceOf[account_];
     }
 
-    function totalSupply() external view returns (uint256) {
+    function totalSupply() external view override returns (uint256) {
         return _totalSupply;
     }
 

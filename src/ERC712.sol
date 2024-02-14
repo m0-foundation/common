@@ -151,6 +151,8 @@ abstract contract ERC712 is IERC712 {
         if (error_ == SignatureChecker.Error.NoError) return;
         if (error_ == SignatureChecker.Error.InvalidSignature) revert InvalidSignature();
         if (error_ == SignatureChecker.Error.InvalidSignatureLength) revert InvalidSignatureLength();
+        if (error_ == SignatureChecker.Error.InvalidSignatureS) revert InvalidSignatureS();
+        if (error_ == SignatureChecker.Error.InvalidSignatureV) revert InvalidSignatureV();
         if (error_ == SignatureChecker.Error.SignerMismatch) revert SignerMismatch();
 
         revert InvalidSignature();
