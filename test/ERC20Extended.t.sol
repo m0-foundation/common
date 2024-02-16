@@ -238,11 +238,11 @@ contract ERC20ExtendedTests is TestUtils {
         _token.mint(_alice, amount_);
 
         vm.prank(_alice);
-        _token.approve(address(this), 0.9e18);
+        _token.approve(_bob, 0.9e18);
 
         vm.prank(_bob);
 
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(IERC20Extended.ERC20InsufficientAllowance.selector, _bob, 0.9e18, amount_));
         _token.transferFrom(_alice, _bob, amount_);
     }
 
@@ -256,7 +256,7 @@ contract ERC20ExtendedTests is TestUtils {
         vm.prank(_alice);
         _token.approve(address(this), approval_);
 
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(IERC20Extended.ERC20InsufficientAllowance.selector, address(this), approval_, amount_));
         _token.transferFrom(_alice, to_, amount_);
     }
 

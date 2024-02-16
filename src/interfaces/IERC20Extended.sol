@@ -10,6 +10,14 @@ import { IERC3009 } from "./IERC3009.sol";
 /// @dev   The interface as defined by EIP-2612: https://eips.ethereum.org/EIPS/eip-2612
 interface IERC20Extended is IERC20, IERC3009 {
     /**
+     * @notice Revert message when spender's allowance is not sufficient.
+     * @param spender Address that may be allowed to operate on tokens without being their owner.
+     * @param allowance Amount of tokens a `spender` is allowed to operate with.
+     * @param needed Minimum amount required to perform a transfer.
+     */
+    error ERC20InsufficientAllowance(address spender, uint256 allowance, uint256 needed);
+
+    /**
      * @notice Approves `spender` to spend up to `amount` of the token balance of `owner`, via a signature.
      * @param  owner    The address of the account who's token balance is being approved to be spent by `spender`.
      * @param  spender  The address of an account allowed to spend on behalf of `owner`.

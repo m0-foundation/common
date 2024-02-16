@@ -87,7 +87,11 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
         uint256 spenderAllowance_ = allowance[sender_][msg.sender]; // Cache `spenderAllowance_` to stack.
 
         if (spenderAllowance_ != type(uint256).max) {
-            _approve(sender_, msg.sender, spenderAllowance_ - amount_);
+            if (spenderAllowance_ < amount_) revert ERC20InsufficientAllowance(msg.sender, spenderAllowance_, amount_);
+
+            unchecked {
+                _approve(sender_, msg.sender, spenderAllowance_ - amount_);
+            }
         }
 
         _transfer(sender_, recipient_, amount_);
