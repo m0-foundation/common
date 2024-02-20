@@ -4,8 +4,6 @@ pragma solidity 0.8.23;
 
 import { IERC3009 } from "./interfaces/IERC3009.sol";
 
-import { SignatureChecker } from "./libs/SignatureChecker.sol";
-
 import { StatefulERC712 } from "./StatefulERC712.sol";
 
 /// @title ERC3009 implementation allowing the transfer of fungible assets via a signed authorization.
