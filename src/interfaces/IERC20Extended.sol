@@ -11,9 +11,9 @@ import { IERC3009 } from "./IERC3009.sol";
 interface IERC20Extended is IERC20, IERC3009 {
     /**
      * @notice Revert message when spender's allowance is not sufficient.
-     * @param spender Address that may be allowed to operate on tokens without being their owner.
-     * @param allowance Amount of tokens a `spender` is allowed to operate with.
-     * @param needed Minimum amount required to perform a transfer.
+     * @param  spender    Address that may be allowed to operate on tokens without being their owner.
+     * @param  allowance Amount of tokens a `spender` is allowed to operate with.
+     * @param  needed     Minimum amount required to perform a transfer.
      */
     error ERC20InsufficientAllowance(address spender, uint256 allowance, uint256 needed);
 
