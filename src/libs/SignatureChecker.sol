@@ -56,13 +56,9 @@ library SignatureChecker {
      * @param  signer    The address of the account purported to have signed.
      * @param  digest    The hash of the data that was signed.
      * @param  signature A byte array signature.
-     * @return isValid   Whether the signature is valid.
+     * @return           Whether the signature is valid or not.
      */
-    function isValidSignature(
-        address signer,
-        bytes32 digest,
-        bytes memory signature
-    ) internal view returns (bool isValid) {
+    function isValidSignature(address signer, bytes32 digest, bytes memory signature) internal view returns (bool) {
         return isValidECDSASignature(signer, digest, signature) || isValidERC1271Signature(signer, digest, signature);
     }
 
@@ -71,13 +67,13 @@ library SignatureChecker {
      * @param  signer    The address of the account purported to have signed.
      * @param  digest    The hash of the data that was signed.
      * @param  signature A byte array ECDSA/secp256k1 signature (encoded r, s, v).
-     * @return isValid   Whether the signature is valid.
+     * @return           Whether the signature is valid or not.
      */
     function isValidECDSASignature(
         address signer,
         bytes32 digest,
         bytes memory signature
-    ) internal pure returns (bool isValid) {
+    ) internal pure returns (bool) {
         if (signature.length == 64) {
             (bytes32 r, bytes32 vs) = decodeShortECDSASignature(signature);
             return isValidECDSASignature(signer, digest, r, vs);
@@ -92,14 +88,9 @@ library SignatureChecker {
      * @param  digest  The hash of the data that was signed.
      * @param  r       An ECDSA/secp256k1 signature parameter.
      * @param  vs      An ECDSA/secp256k1 short signature parameter.
-     * @return isValid Whether the signature is valid.
+     * @return         Whether the signature is valid or not.
      */
-    function isValidECDSASignature(
-        address signer,
-        bytes32 digest,
-        bytes32 r,
-        bytes32 vs
-    ) internal pure returns (bool isValid) {
+    function isValidECDSASignature(address signer, bytes32 digest, bytes32 r, bytes32 vs) internal pure returns (bool) {
         return validateECDSASignature(signer, digest, r, vs) == Error.NoError;
     }
 
@@ -110,7 +101,7 @@ library SignatureChecker {
      * @param  v       An ECDSA/secp256k1 signature parameter.
      * @param  r       An ECDSA/secp256k1 signature parameter.
      * @param  s       An ECDSA/secp256k1 signature parameter.
-     * @return isValid Whether the signature is valid.
+     * @return         Whether the signature is valid or not.
      */
     function isValidECDSASignature(
         address signer,
@@ -118,7 +109,7 @@ library SignatureChecker {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) internal pure returns (bool isValid) {
+    ) internal pure returns (bool) {
         return validateECDSASignature(signer, digest, v, r, s) == Error.NoError;
     }
 
@@ -127,13 +118,13 @@ library SignatureChecker {
      * @param  signer    The address of the account purported to have signed.
      * @param  digest    The hash of the data that was signed.
      * @param  signature A byte array ERC1271 signature.
-     * @return isValid   Whether the signature is valid.
+     * @return           Whether the signature is valid or not.
      */
     function isValidERC1271Signature(
         address signer,
         bytes32 digest,
         bytes memory signature
-    ) internal view returns (bool isValid) {
+    ) internal view returns (bool) {
         (bool success, bytes memory result) = signer.staticcall(
             abi.encodeCall(IERC1271.isValidSignature, (digest, signature))
         );
@@ -148,13 +139,10 @@ library SignatureChecker {
      * @dev    Returns the signer of an ECDSA/secp256k1 signature for some digest.
      * @param  digest    The hash of the data that was signed.
      * @param  signature A byte array ECDSA/secp256k1 signature.
-     * @return error     An error, if any, that occurred during the signer recovery.
-     * @return signer    The address of the account recovered form the signature (0 if error).
+     * @return           An error, if any, that occurred during the signer recovery.
+     * @return           The address of the account recovered form the signature (0 if error).
      */
-    function recoverECDSASigner(
-        bytes32 digest,
-        bytes memory signature
-    ) internal pure returns (Error error, address signer) {
+    function recoverECDSASigner(bytes32 digest, bytes memory signature) internal pure returns (Error, address) {
         if (signature.length != 65) return (Error.InvalidSignatureLength, address(0));
 
         (uint8 v, bytes32 r, bytes32 s) = decodeECDSASignature(signature);
@@ -168,14 +156,10 @@ library SignatureChecker {
      * @param  digest The hash of the data that was signed.
      * @param  r      An ECDSA/secp256k1 signature parameter.
      * @param  vs     An ECDSA/secp256k1 short signature parameter.
-     * @return error  An error, if any, that occurred during the signer recovery.
-     * @return signer The address of the account recovered form the signature (0 if error).
+     * @return        An error, if any, that occurred during the signer recovery.
+     * @return        The address of the account recovered form the signature (0 if error).
      */
-    function recoverECDSASigner(
-        bytes32 digest,
-        bytes32 r,
-        bytes32 vs
-    ) internal pure returns (Error error, address signer) {
+    function recoverECDSASigner(bytes32 digest, bytes32 r, bytes32 vs) internal pure returns (Error, address) {
         unchecked {
             // We do not check for an overflow here since the shift operation results in 0 or 1.
             uint8 v = uint8((uint256(vs) >> 255) + 27);
@@ -190,7 +174,7 @@ library SignatureChecker {
      * @param  v      An ECDSA/secp256k1 signature parameter.
      * @param  r      An ECDSA/secp256k1 signature parameter.
      * @param  s      An ECDSA/secp256k1 signature parameter.
-     * @return error  An error, if any, that occurred during the signer recovery.
+     * @return        An error, if any, that occurred during the signer recovery.
      * @return signer The address of the account recovered form the signature (0 if error).
      */
     function recoverECDSASigner(
@@ -198,7 +182,7 @@ library SignatureChecker {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) internal pure returns (Error error, address signer) {
+    ) internal pure returns (Error, address signer) {
         // Appendix F in the Ethereum Yellow paper (https://ethereum.github.io/yellowpaper/paper.pdf), defines
         // the valid range for s in (301): 0 < s < secp256k1n ÷ 2 + 1, and for v in (302): v ∈ {27, 28}.
         if (uint256(s) > uint256(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0))
@@ -216,13 +200,13 @@ library SignatureChecker {
      * @param  signer    The address of the account purported to have signed.
      * @param  digest    The hash of the data that was signed.
      * @param  signature A byte array ERC1271 signature.
-     * @return error     An error, if any, that occurred during the signer recovery.
+     * @return           An error, if any, that occurred during the signer recovery.
      */
     function validateECDSASignature(
         address signer,
         bytes32 digest,
         bytes memory signature
-    ) internal pure returns (Error error) {
+    ) internal pure returns (Error) {
         (Error recoverError, address recoveredSigner) = recoverECDSASigner(digest, signature);
 
         return (recoverError == Error.NoError) ? validateRecoveredSigner(signer, recoveredSigner) : recoverError;
@@ -234,14 +218,14 @@ library SignatureChecker {
      * @param  digest The hash of the data that was signed.
      * @param  r      An ECDSA/secp256k1 signature parameter.
      * @param  vs     An ECDSA/secp256k1 short signature parameter.
-     * @return error  An error, if any, that occurred during the signer recovery.
+     * @return        An error, if any, that occurred during the signer recovery.
      */
     function validateECDSASignature(
         address signer,
         bytes32 digest,
         bytes32 r,
         bytes32 vs
-    ) internal pure returns (Error error) {
+    ) internal pure returns (Error) {
         (Error recoverError, address recoveredSigner) = recoverECDSASigner(digest, r, vs);
 
         return (recoverError == Error.NoError) ? validateRecoveredSigner(signer, recoveredSigner) : recoverError;
@@ -254,7 +238,7 @@ library SignatureChecker {
      * @param  v      An ECDSA/secp256k1 signature parameter.
      * @param  r      An ECDSA/secp256k1 signature parameter.
      * @param  s      An ECDSA/secp256k1 signature parameter.
-     * @return error  An error, if any, that occurred during the signer recovery.
+     * @return        An error, if any, that occurred during the signer recovery.
      */
     function validateECDSASignature(
         address signer,
@@ -262,7 +246,7 @@ library SignatureChecker {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) internal pure returns (Error error) {
+    ) internal pure returns (Error) {
         (Error recoverError, address recoveredSigner) = recoverECDSASigner(digest, v, r, s);
 
         return (recoverError == Error.NoError) ? validateRecoveredSigner(signer, recoveredSigner) : recoverError;
@@ -272,9 +256,9 @@ library SignatureChecker {
      * @dev    Returns an error if `signer` is not `recoveredSigner`.
      * @param  signer          The address of the some signer.
      * @param  recoveredSigner The address of the some recoveredSigner.
-     * @return error           An error if `signer` is not `recoveredSigner`.
+     * @return                 An error if `signer` is not `recoveredSigner`.
      */
-    function validateRecoveredSigner(address signer, address recoveredSigner) internal pure returns (Error error) {
+    function validateRecoveredSigner(address signer, address recoveredSigner) internal pure returns (Error) {
         return (signer == recoveredSigner) ? Error.NoError : Error.SignerMismatch;
     }
 }

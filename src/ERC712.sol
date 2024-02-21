@@ -100,8 +100,7 @@ abstract contract ERC712 is IERC712 {
      * @param  expiry_ Timestamp at which the signature expires or max uint256 for no expiry.
      */
     function _revertIfExpired(uint256 expiry_) internal view {
-        if (expiry_ != type(uint256).max && block.timestamp > expiry_)
-            revert SignatureExpired(expiry_, block.timestamp);
+        if (block.timestamp > expiry_) revert SignatureExpired(expiry_, block.timestamp);
     }
 
     /**
