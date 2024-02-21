@@ -4,12 +4,13 @@ pragma solidity 0.8.23;
 
 import { IERC20 } from "./interfaces/IERC20.sol";
 import { IERC20Extended } from "./interfaces/IERC20Extended.sol";
+import { IERC5267 } from "./interfaces/IERC5267.sol";
 
 import { ERC3009 } from "./ERC3009.sol";
 
 /// @title An ERC20 token extended with EIP-2612 permits for signed approvals (via EIP-712 and with EIP-1271
-///        compatibility), and extended with EIP-3009 transfer with authorization (via EIP-712).
-abstract contract ERC20Extended is IERC20Extended, ERC3009 {
+///        and EIP-5267 compatibility), and extended with EIP-3009 transfer with authorization (via EIP-712).
+abstract contract ERC20Extended is IERC20Extended, IERC5267, ERC3009 {
     /**
      * @inheritdoc IERC20Extended
      * @dev Keeping this constant, despite `permit` parameter name differences, to ensure max EIP-2612 compatibility.
@@ -48,6 +49,32 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
         emit Approval(msg.sender, spender_, amount_);
 
         return true;
+    }
+
+    /// @inheritdoc IERC5267
+    function eip712Domain()
+        external
+        view
+        virtual
+        returns (
+            bytes1 fields_,
+            string memory name_,
+            string memory version_,
+            uint256 chainId_,
+            address verifyingContract_,
+            bytes32 salt_,
+            uint256[] memory extensions_
+        )
+    {
+        return (
+            hex"0f", // 01111
+            _name,
+            "1",
+            block.chainid,
+            address(this),
+            bytes32(0),
+            new uint256[](0)
+        );
     }
 
     /// @inheritdoc IERC20Extended
