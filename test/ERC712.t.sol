@@ -4,12 +4,9 @@ pragma solidity 0.8.23;
 
 import { TestUtils } from "./utils/TestUtils.t.sol";
 
-import { SignatureChecker } from "../src/libs/SignatureChecker.sol";
-import { SignatureCheckerHarness } from "./utils/SignatureCheckerHarness.sol";
 import { ERC712Harness } from "./utils/ERC712Harness.sol";
 
 import { IERC712 } from "../src/interfaces/IERC712.sol";
-import { ERC712 } from "../src/ERC712.sol";
 
 contract ERC712Tests is TestUtils {
     ERC712Harness internal _erc712;

@@ -36,6 +36,27 @@ contract ERC20ExtendedTests is TestUtils {
         assertEq(_token.decimals(), _TOKEN_DECIMALS);
     }
 
+    /* ============ eip712Domain ============ */
+    function test_eip712Domain() public {
+        (
+            bytes1 fields_,
+            string memory name_,
+            string memory version_,
+            uint256 chainId_,
+            address verifyingContract_,
+            bytes32 salt_,
+            uint256[] memory extensions_
+        ) = _token.eip712Domain();
+
+        assertEq(fields_, hex"0f");
+        assertEq(name_, _TOKEN_NAME);
+        assertEq(version_, "1");
+        assertEq(chainId_, block.chainid);
+        assertEq(verifyingContract_, address(_token));
+        assertEq(salt_, bytes32(0));
+        assertEq(extensions_, new uint256[](0));
+    }
+
     /* ============ mint ============ */
     function test_mint() public {
         uint256 amount_ = 1e18;

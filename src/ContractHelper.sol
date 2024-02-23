@@ -3,7 +3,7 @@
 pragma solidity 0.8.23;
 
 /**
- * @title A helper contract to get the address of a contract deployed by aan account with a given nonce.
+ * @title A helper contract to get the address of a contract deployed by an account with a given nonce.
  * @dev   See the following sources for very similar implementations:
  *          - https://github.com/foundry-rs/forge-std/blob/914702ae99c92fcc41db5128ae57d24a11be4a39/src/Script.sol
  *          - https://github.com/foundry-rs/forge-std/blob/578968243529db44acffcb802196ccab9b54db88/src/StdUtils.sol#L90
