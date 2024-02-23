@@ -62,11 +62,7 @@ contract SignatureCheckerTests is TestUtils {
         assertEq(s_, bytes32("TEST_S"));
     }
 
-    function testFuzz_decodeECDSASignature(
-        uint256 v,
-        uint256 r,
-        uint256 s
-    ) external {
+    function testFuzz_decodeECDSASignature(uint256 v, uint256 r, uint256 s) external {
         (uint8 v_, bytes32 r_, bytes32 s_) = _signatureChecker.decodeECDSASignature(
             _encodeSignature(uint8(v), bytes32(r), bytes32(s))
         );

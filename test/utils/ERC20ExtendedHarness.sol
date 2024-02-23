@@ -5,9 +5,9 @@ pragma solidity 0.8.23;
 import { ERC20Extended } from "../../src/ERC20Extended.sol";
 
 contract ERC20ExtendedHarness is ERC20Extended {
-    mapping(address => uint256) internal _balanceOf;
+    mapping(address => uint256) public balanceOf;
 
-    uint256 internal _totalSupply;
+    uint256 public totalSupply;
 
     constructor(string memory name_, string memory symbol_, uint8 decimals_) ERC20Extended(name_, symbol_, decimals_) {}
 
@@ -30,14 +30,6 @@ contract ERC20ExtendedHarness is ERC20Extended {
     /******************************************************************************************************************\
     |                                       External/Public View/Pure Functions                                        |
     \******************************************************************************************************************/
-
-    function balanceOf(address account_) external view override returns (uint256) {
-        return _balanceOf[account_];
-    }
-
-    function totalSupply() external view override returns (uint256) {
-        return _totalSupply;
-    }
 
     function getDigest(bytes32 internalDigest_) external view returns (bytes32) {
         return _getDigest(internalDigest_);
@@ -85,19 +77,19 @@ contract ERC20ExtendedHarness is ERC20Extended {
 
     function _transfer(address sender_, address recipient_, uint256 amount_) internal override {
         if (sender_ != address(0)) {
-            _balanceOf[sender_] -= amount_;
+            balanceOf[sender_] -= amount_;
         }
 
         if (recipient_ != address(0)) {
-            _balanceOf[recipient_] += amount_;
+            balanceOf[recipient_] += amount_;
         }
 
         if (sender_ == address(0)) {
-            _totalSupply += amount_;
+            totalSupply += amount_;
         }
 
         if (recipient_ == address(0)) {
-            _totalSupply -= amount_;
+            totalSupply -= amount_;
         }
 
         emit Transfer(sender_, recipient_, amount_);

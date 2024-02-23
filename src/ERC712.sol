@@ -3,12 +3,13 @@
 pragma solidity 0.8.23;
 
 import { IERC712 } from "./interfaces/IERC712.sol";
+import { IERC712Extended } from "./interfaces/IERC712Extended.sol";
 
 import { SignatureChecker } from "./libs/SignatureChecker.sol";
 
-/// @title Typed structured data hashing and signing via EIP-712.
+/// @title Typed structured data hashing and signing via EIP-712, extended by EIP-5267.
 /// @dev   An abstract implementation to satisfy EIP-712: https://eips.ethereum.org/EIPS/eip-712
-abstract contract ERC712 is IERC712 {
+abstract contract ERC712Extended is IERC712Extended {
     // keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")
     bytes32 internal constant _EIP712_DOMAIN_HASH = 0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f;
 
@@ -42,6 +43,32 @@ abstract contract ERC712 is IERC712 {
     /// @inheritdoc IERC712
     function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
         return block.chainid == INITIAL_CHAIN_ID ? INITIAL_DOMAIN_SEPARATOR : _getDomainSeparator();
+    }
+
+    /// @inheritdoc IERC712Extended
+    function eip712Domain()
+        external
+        view
+        virtual
+        returns (
+            bytes1 fields_,
+            string memory name_,
+            string memory version_,
+            uint256 chainId_,
+            address verifyingContract_,
+            bytes32 salt_,
+            uint256[] memory extensions_
+        )
+    {
+        return (
+            hex"0f", // 01111
+            _name,
+            "1",
+            block.chainid,
+            address(this),
+            bytes32(0),
+            new uint256[](0)
+        );
     }
 
     /******************************************************************************************************************\
