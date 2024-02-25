@@ -65,8 +65,4 @@ contract UIntMathHarness {
     function min256(uint256 a_, uint256 b_) external pure returns (uint256) {
         return UIntMath.min256(a_, b_);
     }
-
-    function min40IgnoreZero(uint40 a_, uint40 b_) external pure returns (uint40) {
-        return UIntMath.min40IgnoreZero(a_, b_);
-    }
 }
