@@ -171,14 +171,4 @@ library UIntMath {
     function min256(uint256 a_, uint256 b_) internal pure returns (uint256) {
         return a_ < b_ ? a_ : b_;
     }
-
-    /**
-     * @notice Compares two uint40 values and returns the lesser one while ignoring zero values.
-     * @param  a_  Value to check.
-     * @param  b_  Value to check.
-     * @return The lesser value.
-     */
-    function min40IgnoreZero(uint40 a_, uint40 b_) internal pure returns (uint40) {
-        return a_ == 0 ? b_ : (b_ == 0 ? a_ : min40(a_, b_));
-    }
 }

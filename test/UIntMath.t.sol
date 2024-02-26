@@ -94,12 +94,4 @@ contract UIntMathTests is Test {
         assertEq(_uintMath.min256(1, 2), 1);
         assertEq(_uintMath.min256(2, 1), 1);
     }
-
-    function test_min40IgnoreZero() external {
-        assertEq(_uintMath.min40IgnoreZero(0, 0), 0);
-        assertEq(_uintMath.min40IgnoreZero(0, 1), 1);
-        assertEq(_uintMath.min40IgnoreZero(1, 0), 1);
-        assertEq(_uintMath.min40IgnoreZero(1, 2), 1);
-        assertEq(_uintMath.min40IgnoreZero(2, 1), 1);
-    }
 }
