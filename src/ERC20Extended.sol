@@ -45,9 +45,6 @@ abstract contract ERC20Extended is IERC20Extended, IERC5267, ERC3009 {
     /// @inheritdoc IERC20
     function approve(address spender_, uint256 amount_) external returns (bool success_) {
         _approve(msg.sender, spender_, amount_);
-
-        emit Approval(msg.sender, spender_, amount_);
-
         return true;
     }
 
@@ -117,7 +114,7 @@ abstract contract ERC20Extended is IERC20Extended, IERC5267, ERC3009 {
             if (spenderAllowance_ < amount_) revert ERC20InsufficientAllowance(msg.sender, spenderAllowance_, amount_);
 
             unchecked {
-                _approve(sender_, msg.sender, spenderAllowance_ - amount_);
+                _setAllowance(sender_, msg.sender, spenderAllowance_ - amount_);
             }
         }
 
@@ -145,10 +142,35 @@ abstract contract ERC20Extended is IERC20Extended, IERC5267, ERC3009 {
     |                                          Internal Interactive Functions                                          |
     \******************************************************************************************************************/
 
+    /**
+     * @notice Approve `spender_` to spend `amount_` of tokens from `account_`.
+     * @param  account_ The address approving the allowance.
+     * @param  spender_ The address approved to spend the tokens.
+     * @param  amount_  The amount of tokens being approved for spending.
+     */
     function _approve(address account_, address spender_, uint256 amount_) internal virtual {
+        _setAllowance(account_, spender_, amount_);
+        emit Approval(account_, spender_, amount_);
+    }
+
+    /**
+     * @notice Set the `amount_` of tokens `spender_` is allowed to spend from `account_`.
+     * @param  account_ The address for which the allowance is set.
+     * @param  spender_ The address allowed to spend the tokens.
+     * @param  amount_  The amount of tokens being allowed for spending.
+     */
+    function _setAllowance(address account_, address spender_, uint256 amount_) internal virtual {
         allowance[account_][spender_] = amount_;
     }
 
+    /**
+     * @notice ERC-2612 permit extension for EIP-20 signed approvals.
+     * @param  owner_    The address of the account approving the allowance.
+     * @param  spender_  The address of the account being allowed to spend the tokens.
+     * @param  amount_   The amount of tokens being approved for spending.
+     * @param  deadline_ The deadline by which the signature must be used.
+     * @return digest_   The EIP-712 digest of the permit.
+     */
     function _permit(
         address owner_,
         address spender_,

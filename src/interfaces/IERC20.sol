@@ -31,6 +31,7 @@ interface IERC20 {
 
     /**
      * @notice Allows a calling account to approve `spender` to spend up to `amount` of its token balance.
+     * @dev    MUST emit an `Approval` event.
      * @param  spender The address of the account being allowed to spend up to the allowed amount.
      * @param  amount  The amount of the allowance being approved.
      * @return Whether or not the approval was successful.
