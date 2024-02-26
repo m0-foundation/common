@@ -128,7 +128,7 @@ abstract contract ERC20Extended is IERC20Extended, IERC5267, ERC3009 {
     \******************************************************************************************************************/
 
     /// @inheritdoc IERC20
-    function balanceOf(address account_) external view virtual returns (uint256) {}
+    function balanceOf(address account_) external view virtual returns (uint256);
 
     /// @inheritdoc IERC20
     function name() external view returns (string memory name_) {
