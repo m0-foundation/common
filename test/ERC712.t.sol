@@ -4,11 +4,14 @@ pragma solidity 0.8.23;
 
 import { TestUtils } from "./utils/TestUtils.t.sol";
 
+import { ERC1271WalletMock, ERC1271MaliciousWalletMock } from "./utils/ERC1271WalletMock.sol";
 import { ERC712Harness } from "./utils/ERC712Harness.sol";
 
 import { IERC712 } from "../src/interfaces/IERC712.sol";
 
 contract ERC712Tests is TestUtils {
+    ERC1271MaliciousWalletMock internal _erc1271MaliciousWallet;
+    ERC1271WalletMock internal _erc1271Wallet;
     ERC712Harness internal _erc712;
 
     string internal _name = "ERC712Contract";
@@ -29,6 +32,8 @@ contract ERC712Tests is TestUtils {
         (_owner, _ownerKey) = makeAddrAndKey("owner");
         (_spender, _spenderKey) = makeAddrAndKey("spender");
 
+        _erc1271MaliciousWallet = new ERC1271MaliciousWalletMock();
+        _erc1271Wallet = new ERC1271WalletMock(_owner);
         _erc712 = new ERC712Harness(_name);
         _permitDigest = _erc712.getPermitHash(
             ERC712Harness.Permit({ owner: _owner, spender: _spender, value: 1e18, nonce: 0, deadline: 1 days })
@@ -112,19 +117,51 @@ contract ERC712Tests is TestUtils {
     function test_revertIfInvalidSignature_validSignature() external {
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(_ownerKey, _permitDigest);
 
+        assertTrue(
+            _erc712.revertIfInvalidSignature(address(_erc1271Wallet), _permitDigest, _encodeSignature(v_, r_, s_))
+        );
+
         assertTrue(_erc712.revertIfInvalidSignature(_owner, _permitDigest, _encodeSignature(v_, r_, s_)));
         assertTrue(_erc712.revertIfInvalidSignature(_owner, _permitDigest, r_, _getVS(v_, s_)));
         assertTrue(_erc712.revertIfInvalidSignature(_owner, _permitDigest, v_, r_, s_));
     }
 
-    function test_revertIfInvalidSignature_invalidSignature() external {
+    function test_revertIfInvalidSignature_invalidERC1271Signature() external {
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(_ownerKey, _permitDigest);
 
-        vm.expectRevert(IERC712.InvalidSignature.selector);
-        _erc712.revertIfInvalidSignature(address(1), _permitDigest, _encodeSignature(v_, r_, s_));
+        vm.expectRevert(IERC712.SignerMismatch.selector);
+        _erc712.revertIfInvalidSignature(address(_erc1271Wallet), "DIFF", _encodeSignature(v_, r_, s_));
+
+        vm.expectRevert(IERC712.SignerMismatch.selector);
+        _erc712.revertIfInvalidSignature(address(_erc1271MaliciousWallet), _permitDigest, _encodeSignature(v_, r_, s_));
+
+        vm.expectRevert(IERC712.InvalidSignatureV.selector);
+        _erc712.revertIfInvalidSignature(address(_erc1271Wallet), _permitDigest, _encodeSignature(_invalidV, r_, s_));
 
         vm.expectRevert(IERC712.InvalidSignature.selector);
-        _erc712.revertIfInvalidSignature(address(1), _permitDigest, _encodeShortSignature(r_, _getVS(v_, s_)));
+        _erc712.revertIfInvalidSignature(address(_erc1271Wallet), _permitDigest, _encodeSignature(v_, 0, s_));
+
+        vm.expectRevert(IERC712.InvalidSignatureS.selector);
+        _erc712.revertIfInvalidSignature(address(_erc1271Wallet), _permitDigest, _encodeSignature(v_, r_, _invalidS));
+    }
+
+    function test_revertIfInvalidSignature_invalidECDSASignature() external {
+        (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(_ownerKey, _permitDigest);
+
+        vm.expectRevert(IERC712.SignerMismatch.selector);
+        _erc712.revertIfInvalidSignature(address(1), _permitDigest, _encodeSignature(v_, r_, s_));
+
+        vm.expectRevert(IERC712.SignerMismatch.selector);
+        _erc712.revertIfInvalidSignature(_owner, "DIFF", _encodeSignature(v_, r_, s_));
+
+        vm.expectRevert(IERC712.InvalidSignatureV.selector);
+        _erc712.revertIfInvalidSignature(_owner, _permitDigest, _encodeSignature(_invalidV, r_, s_));
+
+        vm.expectRevert(IERC712.InvalidSignature.selector);
+        _erc712.revertIfInvalidSignature(_owner, _permitDigest, _encodeSignature(v_, 0, s_));
+
+        vm.expectRevert(IERC712.InvalidSignatureS.selector);
+        _erc712.revertIfInvalidSignature(_owner, _permitDigest, _encodeSignature(v_, r_, _invalidS));
     }
 
     function test_revertIfInvalidSignature_invalidRVS() external {
