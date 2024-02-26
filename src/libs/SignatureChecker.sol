@@ -95,25 +95,6 @@ library SignatureChecker {
     }
 
     /**
-     * @dev    Returns whether an ECDSA/secp256k1 signature is valid for a signer and digest.
-     * @param  signer  The address of the account purported to have signed.
-     * @param  digest  The hash of the data that was signed.
-     * @param  v       An ECDSA/secp256k1 signature parameter.
-     * @param  r       An ECDSA/secp256k1 signature parameter.
-     * @param  s       An ECDSA/secp256k1 signature parameter.
-     * @return         Whether the signature is valid or not.
-     */
-    function isValidECDSASignature(
-        address signer,
-        bytes32 digest,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) internal pure returns (bool) {
-        return validateECDSASignature(signer, digest, v, r, s) == Error.NoError;
-    }
-
-    /**
      * @dev    Returns whether an ERC1271 signature is valid for a signer and digest.
      * @param  signer    The address of the account purported to have signed.
      * @param  digest    The hash of the data that was signed.

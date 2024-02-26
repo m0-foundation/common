@@ -62,11 +62,7 @@ contract SignatureCheckerTests is TestUtils {
         assertEq(s_, bytes32("TEST_S"));
     }
 
-    function testFuzz_decodeECDSASignature(
-        uint256 v,
-        uint256 r,
-        uint256 s
-    ) external {
+    function testFuzz_decodeECDSASignature(uint256 v, uint256 r, uint256 s) external {
         (uint8 v_, bytes32 r_, bytes32 s_) = _signatureChecker.decodeECDSASignature(
             _encodeSignature(uint8(v), bytes32(r), bytes32(s))
         );
@@ -404,36 +400,6 @@ contract SignatureCheckerTests is TestUtils {
             uint8(_signatureChecker.validateECDSASignature(account_, digest_, _encodeSignature(v_, r_, s_))),
             uint8(SignatureChecker.Error.NoError)
         );
-    }
-
-    function test_isValidECDSASignature_vrs_invalid() external {
-        bytes32 digest_ = "TEST_DIGEST";
-        (address account_, uint256 privateKey_) = makeAddrAndKey("account");
-        (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
-
-        assertFalse(_signatureChecker.isValidECDSASignature(address(1), digest_, v_, r_, s_));
-        assertFalse(_signatureChecker.isValidECDSASignature(account_, "DIFF", v_, r_, s_));
-        assertFalse(_signatureChecker.isValidECDSASignature(account_, digest_, 26, r_, s_));
-        assertFalse(_signatureChecker.isValidECDSASignature(account_, digest_, v_, 0, s_));
-        assertFalse(_signatureChecker.isValidECDSASignature(account_, digest_, v_, r_, bytes32(_MAX_S + 1)));
-    }
-
-    function test_isValidECDSASignature_vrs() external {
-        bytes32 digest_ = "TEST_DIGEST";
-        (address account_, uint256 privateKey_) = makeAddrAndKey("account");
-
-        (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
-
-        assertTrue(_signatureChecker.isValidECDSASignature(account_, digest_, v_, r_, s_));
-    }
-
-    function testFuzz_isValidECDSASignature_vrs(uint256 digest) external {
-        bytes32 digest_ = bytes32(digest);
-        (address account_, uint256 privateKey_) = makeAddrAndKey(string(abi.encode("account", digest)));
-
-        (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(privateKey_, digest_);
-
-        assertTrue(_signatureChecker.isValidECDSASignature(account_, digest_, v_, r_, s_));
     }
 
     function test_isValidECDSASignature_rvs_invalid() external {
