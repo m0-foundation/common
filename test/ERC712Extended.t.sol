@@ -30,36 +30,34 @@ contract ERC712Tests is TestUtils {
         (_spender, _spenderKey) = makeAddrAndKey("spender");
 
         _erc712 = new ERC712ExtendedHarness(_name);
-        _permitDigest = _erc712.getPermitHash(
-            ERC712ExtendedHarness.Permit({ owner: _owner, spender: _spender, value: 1e18, nonce: 0, deadline: 1 days })
-        );
+        _permitDigest = _getPermitHash(_owner, _spender, 1e18, 0, 1 days);
     }
 
     /* ============ constructor ============ */
     function test_constructor() external {
         assertEq(_erc712.name(), _name);
-        assertEq(_erc712.DOMAIN_SEPARATOR(), _erc712.computeDomainSeparator(_name, block.chainid));
+        assertEq(_erc712.DOMAIN_SEPARATOR(), _computeDomainSeparator(_name, block.chainid, address(_erc712)));
     }
 
     /* ============ DOMAIN_SEPARATOR ============ */
     function test_domainSeparator() external {
-        assertEq(_erc712.DOMAIN_SEPARATOR(), _erc712.computeDomainSeparator(_name, block.chainid));
+        assertEq(_erc712.DOMAIN_SEPARATOR(), _computeDomainSeparator(_name, block.chainid, address(_erc712)));
 
         vm.chainId(_powChainId);
 
         assertEq(block.chainid, _powChainId);
-        assertEq(_erc712.DOMAIN_SEPARATOR(), _erc712.computeDomainSeparator(_name, _powChainId));
+        assertEq(_erc712.DOMAIN_SEPARATOR(), _computeDomainSeparator(_name, _powChainId, address(_erc712)));
     }
 
     function test_getDomainSeparator() external {
         assertEq(_erc712.getDomainSeparator(), _erc712.DOMAIN_SEPARATOR());
-        assertEq(_erc712.getDomainSeparator(), _erc712.computeDomainSeparator(_name, block.chainid));
+        assertEq(_erc712.getDomainSeparator(), _computeDomainSeparator(_name, block.chainid, address(_erc712)));
 
         vm.chainId(_powChainId);
 
         assertEq(block.chainid, _powChainId);
         assertEq(_erc712.getDomainSeparator(), _erc712.DOMAIN_SEPARATOR());
-        assertEq(_erc712.getDomainSeparator(), _erc712.computeDomainSeparator(_name, _powChainId));
+        assertEq(_erc712.getDomainSeparator(), _computeDomainSeparator(_name, _powChainId, address(_erc712)));
     }
 
     /* ============ digest ============ */
@@ -93,12 +91,12 @@ contract ERC712Tests is TestUtils {
     }
 
     /* ============ revertIfExpired ============ */
-    function test_revertIfExpired_maxExpiry() external {
-        assertTrue(_erc712.revertIfExpired(type(uint256).max));
+    function test_revertIfExpired_maxExpiry() external view {
+        _erc712.revertIfExpired(type(uint256).max);
     }
 
-    function test_revertIfExpired_expiryUnreached() external {
-        assertTrue(_erc712.revertIfExpired(block.timestamp + 1));
+    function test_revertIfExpired_expiryUnreached() external view {
+        _erc712.revertIfExpired(block.timestamp + 1);
     }
 
     function test_revertIfExpired_signatureExpired() external {
@@ -112,9 +110,9 @@ contract ERC712Tests is TestUtils {
     function test_revertIfInvalidSignature_validSignature() external {
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(_ownerKey, _permitDigest);
 
-        assertTrue(_erc712.revertIfInvalidSignature(_owner, _permitDigest, _encodeSignature(v_, r_, s_)));
-        assertTrue(_erc712.revertIfInvalidSignature(_owner, _permitDigest, r_, _getVS(v_, s_)));
-        assertTrue(_erc712.revertIfInvalidSignature(_owner, _permitDigest, v_, r_, s_));
+        _erc712.revertIfInvalidSignature(_owner, _permitDigest, _encodeSignature(v_, r_, s_));
+        _erc712.revertIfInvalidSignature(_owner, _permitDigest, r_, _getVS(v_, s_));
+        _erc712.revertIfInvalidSignature(_owner, _permitDigest, v_, r_, s_);
     }
 
     function test_revertIfInvalidSignature_invalidSignature() external {
@@ -185,5 +183,35 @@ contract ERC712Tests is TestUtils {
         assertEq(verifyingContract_, address(_erc712));
         assertEq(salt_, bytes32(0));
         assertEq(extensions_, new uint256[](0));
+    }
+
+    function _computeDomainSeparator(
+        string memory name_,
+        uint256 chainId_,
+        address contract_
+    ) internal view returns (bytes32) {
+        return
+            keccak256(
+                abi.encode(
+                    keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+                    keccak256(bytes(name_)),
+                    keccak256("1"),
+                    chainId_,
+                    contract_
+                )
+            );
+    }
+
+    function _getPermitHash(
+        address owner_,
+        address spender_,
+        uint256 value_,
+        uint256 nonce_,
+        uint256 deadline_
+    ) internal pure returns (bytes32) {
+        // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
+        bytes32 PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
+
+        return keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, value_, nonce_, deadline_));
     }
 }
