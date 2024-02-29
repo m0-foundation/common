@@ -35,16 +35,6 @@ contract SignatureCheckerHarness {
         return SignatureChecker.isValidECDSASignature(signer, digest, r, vs);
     }
 
-    function isValidECDSASignature(
-        address signer,
-        bytes32 digest,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external pure returns (bool isValid) {
-        return SignatureChecker.isValidECDSASignature(signer, digest, v, r, s);
-    }
-
     function isValidERC1271Signature(
         address signer,
         bytes32 digest,

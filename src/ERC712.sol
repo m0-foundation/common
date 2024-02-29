@@ -105,12 +105,23 @@ abstract contract ERC712 is IERC712 {
 
     /**
      * @notice Revert if the signature is invalid.
+     * @dev    We first validate if the signature is a valid ECDSA signature
+     *         and return early if it is the case.
+     *         Then, we validate if it is a valid ERC-1271 signature,
+     *         and return early if it is the case.
+     *         If not, we revert with the error from the ECDSA signature validation.
      * @param  signer_    The signer of the signature.
      * @param  digest_    The digest that was signed.
      * @param  signature_ The signature.
      */
     function _revertIfInvalidSignature(address signer_, bytes32 digest_, bytes memory signature_) internal view {
-        if (!SignatureChecker.isValidSignature(signer_, digest_, signature_)) revert InvalidSignature();
+        SignatureChecker.Error error_ = SignatureChecker.validateECDSASignature(signer_, digest_, signature_);
+
+        if (error_ == SignatureChecker.Error.NoError) return;
+
+        if (SignatureChecker.isValidERC1271Signature(signer_, digest_, signature_)) return;
+
+        _revertIfError(error_);
     }
 
     /**
