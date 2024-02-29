@@ -9,7 +9,7 @@ import { ERC712ExtendedHarness } from "./utils/ERC712ExtendedHarness.sol";
 
 import { IERC712 } from "../src/interfaces/IERC712.sol";
 
-contract ERC712Tests is TestUtils {
+contract ERC712ExtendedTests is TestUtils {
     ERC1271MaliciousWalletMock internal _erc1271MaliciousWallet;
     ERC1271WalletMock internal _erc1271Wallet;
     ERC712ExtendedHarness internal _erc712;
