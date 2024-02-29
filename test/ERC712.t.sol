@@ -6,6 +6,7 @@ import { TestUtils } from "./utils/TestUtils.t.sol";
 
 import { ERC1271WalletMock, ERC1271MaliciousWalletMock } from "./utils/ERC1271WalletMock.sol";
 import { ERC712Harness } from "./utils/ERC712Harness.sol";
+import { ERC712ExtendedHarness } from "./utils/ERC712ExtendedHarness.sol";
 
 import { IERC712 } from "../src/interfaces/IERC712.sol";
 
@@ -13,6 +14,7 @@ contract ERC712Tests is TestUtils {
     ERC1271MaliciousWalletMock internal _erc1271MaliciousWallet;
     ERC1271WalletMock internal _erc1271Wallet;
     ERC712Harness internal _erc712;
+    ERC712ExtendedHarness internal _ERC712Extended;
 
     string internal _name = "ERC712Contract";
 
@@ -35,6 +37,7 @@ contract ERC712Tests is TestUtils {
         _erc1271MaliciousWallet = new ERC1271MaliciousWalletMock();
         _erc1271Wallet = new ERC1271WalletMock(_owner);
         _erc712 = new ERC712Harness(_name);
+        _ERC712Extended = new ERC712ExtendedHarness(_name);
         _permitDigest = _erc712.getPermitHash(
             ERC712Harness.Permit({ owner: _owner, spender: _spender, value: 1e18, nonce: 0, deadline: 1 days })
         );
@@ -201,5 +204,26 @@ contract ERC712Tests is TestUtils {
 
         vm.expectRevert(IERC712.InvalidSignatureS.selector);
         _erc712.revertIfInvalidSignature(_owner, _permitDigest, v_, r_, _invalidS);
+    }
+
+    /* ============ eip712Domain ============ */
+    function test_eip712Domain() external {
+        (
+            bytes1 fields_,
+            string memory name_,
+            string memory version_,
+            uint256 chainId_,
+            address verifyingContract_,
+            bytes32 salt_,
+            uint256[] memory extensions_
+        ) = _ERC712Extended.eip712Domain();
+
+        assertEq(fields_, hex"0f");
+        assertEq(name_, _name);
+        assertEq(version_, "1");
+        assertEq(chainId_, block.chainid);
+        assertEq(verifyingContract_, address(_ERC712Extended));
+        assertEq(salt_, bytes32(0));
+        assertEq(extensions_, new uint256[](0));
     }
 }
