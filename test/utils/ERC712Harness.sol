@@ -2,9 +2,9 @@
 
 pragma solidity 0.8.23;
 
-import { ERC712 } from "../../src/ERC712.sol";
+import { ERC712Extended } from "../../src/ERC712.sol";
 
-contract ERC712Harness is ERC712 {
+contract ERC712Harness is ERC712Extended {
     // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
     bytes32 public constant PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
 
@@ -16,7 +16,7 @@ contract ERC712Harness is ERC712 {
         uint256 deadline;
     }
 
-    constructor(string memory name_) ERC712(name_) {}
+    constructor(string memory name_) ERC712Extended(name_) {}
 
     function name() external view returns (string memory) {
         return _name;

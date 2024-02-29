@@ -2,8 +2,11 @@
 
 pragma solidity 0.8.23;
 
-/// @title Extension for EIP-712 to retrieve the EIP-712 domain.
-interface IERC5267 {
+import { IERC712 } from "./IERC712.sol";
+
+/// @title EIP-712 extended by EIP-5267.
+/// @dev   The additional interface as defined by EIP-5267: https://eips.ethereum.org/EIPS/eip-5267
+interface IERC712Extended is IERC712 {
     /// @notice MAY be emitted to signal that the domain could have changed.
     event EIP712DomainChanged();
 

@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.23;
 
-import { ERC712Extended } from "../../src/ERC712Extended.sol";
+import { ERC712Extended } from "../../src/ERC712.sol";
 
 contract ERC712ExtendedHarness is ERC712Extended {
     constructor(string memory name_) ERC712Extended(name_) {}
