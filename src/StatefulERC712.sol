@@ -4,7 +4,7 @@ pragma solidity 0.8.23;
 
 import { IStatefulERC712 } from "./interfaces/IStatefulERC712.sol";
 
-import { ERC712Extended } from "./ERC712.sol";
+import { ERC712Extended } from "./ERC712Extended.sol";
 
 /// @title Stateful Extension for EIP-712 typed structured data hashing and signing with nonces.
 /// @dev   An abstract implementation to satisfy stateful EIP-712 with nonces.
