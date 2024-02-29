@@ -326,7 +326,7 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
      * @param  nonce_      Nonce of the authorization.
      */
     function _cancelAuthorization(address authorizer_, bytes32 nonce_) internal {
-        if (authorizationState[authorizer_][nonce_]) revert AuthorizationAlreadyUsed(authorizer_, nonce_);
+        _revertIfAuthorizationAlreadyUsed(authorizer_, nonce_);
 
         authorizationState[authorizer_][nonce_] = true;
 
