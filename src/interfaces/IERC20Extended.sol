@@ -18,6 +18,12 @@ interface IERC20Extended is IERC20, IERC3009 {
     error InsufficientAllowance(address spender, uint256 allowance, uint256 needed);
 
     /**
+     * @notice Revert message emitted when the recipient of a token is invalid.
+     * @param  recipient Address of the invalid recipient.
+     */
+    error InvalidRecipient(address recipient);
+
+    /**
      * @notice Approves `spender` to spend up to `amount` of the token balance of `owner`, via a signature.
      * @param  owner    The address of the account who's token balance is being approved to be spent by `spender`.
      * @param  spender  The address of an account allowed to spend on behalf of `owner`.
