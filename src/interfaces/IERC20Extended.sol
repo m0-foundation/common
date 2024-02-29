@@ -18,6 +18,12 @@ interface IERC20Extended is IERC20, IERC3009 {
     error InsufficientAllowance(address spender, uint256 allowance, uint256 needed);
 
     /**
+     * @notice Revert message emitted when the transferred amount is insufficient.
+     * @param  amount Amount transferred.
+     */
+    error InsufficientAmount(uint256 amount);
+
+    /**
      * @notice Revert message emitted when the recipient of a token is invalid.
      * @param  recipient Address of the invalid recipient.
      */
