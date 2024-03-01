@@ -7,15 +7,27 @@ import { IERC3009 } from "./IERC3009.sol";
 
 /// @title An ERC20 token extended with EIP-2612 permits for signed approvals (via EIP-712 and with EIP-1271
 //         compatibility), and extended with EIP-3009 transfer with authorization (via EIP-712).
-/// @dev   The interface as defined by EIP-2612: https://eips.ethereum.org/EIPS/eip-2612
+/// @dev   The additional interface as defined by EIP-2612: https://eips.ethereum.org/EIPS/eip-2612
 interface IERC20Extended is IERC20, IERC3009 {
     /**
      * @notice Revert message when spender's allowance is not sufficient.
      * @param  spender    Address that may be allowed to operate on tokens without being their owner.
-     * @param  allowance Amount of tokens a `spender` is allowed to operate with.
+     * @param  allowance  Amount of tokens a `spender` is allowed to operate with.
      * @param  needed     Minimum amount required to perform a transfer.
      */
-    error ERC20InsufficientAllowance(address spender, uint256 allowance, uint256 needed);
+    error InsufficientAllowance(address spender, uint256 allowance, uint256 needed);
+
+    /**
+     * @notice Revert message emitted when the transferred amount is insufficient.
+     * @param  amount Amount transferred.
+     */
+    error InsufficientAmount(uint256 amount);
+
+    /**
+     * @notice Revert message emitted when the recipient of a token is invalid.
+     * @param  recipient Address of the invalid recipient.
+     */
+    error InvalidRecipient(address recipient);
 
     /**
      * @notice Approves `spender` to spend up to `amount` of the token balance of `owner`, via a signature.

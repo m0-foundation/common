@@ -2,10 +2,10 @@
 
 pragma solidity 0.8.23;
 
-import { IERC712 } from "./IERC712.sol";
+import { IERC712Extended } from "./IERC712Extended.sol";
 
 /// @title Stateful Extension for EIP-712 typed structured data hashing and signing with nonces.
-interface IStatefulERC712 is IERC712 {
+interface IStatefulERC712 is IERC712Extended {
     /**
      * @notice Revert message when a signing account's nonce is not the expected current nonce.
      * @param  nonce         The nonce used in the signature.

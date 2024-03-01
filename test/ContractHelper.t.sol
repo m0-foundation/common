@@ -70,7 +70,7 @@ contract ContractHelperTests is Test {
         vm.assume(nonce != 0x00);
 
         // @dev deploy new deployer to change address input as well.
-        VoidDeployer newVoidDeployer = new VoidDeployer{salt: keccak256(abi.encode(nonce))}();
+        VoidDeployer newVoidDeployer = new VoidDeployer{ salt: keccak256(abi.encode(nonce)) }();
 
         vm.setNonce(address(newVoidDeployer), nonce);
         assertEq(_contractHelper.getContractFrom(address(newVoidDeployer), nonce), newVoidDeployer.deploy());
