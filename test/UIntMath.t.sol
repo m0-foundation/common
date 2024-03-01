@@ -61,6 +61,10 @@ contract UIntMathTests is Test {
         assertEq(_uintMath.bound112(uint256(type(uint112).max) + 1), type(uint112).max);
     }
 
+    function test_bound128() external {
+        assertEq(_uintMath.bound128(uint256(type(uint128).max) + 1), type(uint128).max);
+    }
+
     function test_bound240() external {
         assertEq(_uintMath.bound240(uint256(type(uint240).max) + 1), type(uint240).max);
     }

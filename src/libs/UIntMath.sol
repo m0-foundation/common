@@ -104,6 +104,15 @@ library UIntMath {
     }
 
     /**
+     * @notice Limits a given uint256 value to the maximum uint128 value.
+     * @param  n The value to check.
+     * @return The value limited to within uint128 bounds.
+     */
+    function bound128(uint256 n) internal pure returns (uint128) {
+        return uint128(min256(n, uint256(type(uint128).max)));
+    }
+
+    /**
      * @notice Limits a given uint256 value to the maximum uint240 value.
      * @param  n The value to check.
      * @return The value limited to within uint240 bounds.

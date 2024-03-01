@@ -38,6 +38,10 @@ contract UIntMathHarness {
         return UIntMath.bound112(n);
     }
 
+    function bound128(uint256 n) external pure returns (uint128) {
+        return UIntMath.bound128(n);
+    }
+
     function bound240(uint256 n) external pure returns (uint240) {
         return UIntMath.bound240(n);
     }
