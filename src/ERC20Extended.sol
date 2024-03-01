@@ -146,14 +146,14 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
     ) internal virtual returns (bytes32 digest_) {
         _revertIfExpired(deadline_);
 
-        uint256 nonce_ = nonces[owner_]; // Cache `nonce_` to stack.
-
-        unchecked {
-            nonces[owner_] = nonce_ + 1; // Nonce realistically cannot overflow.
-        }
-
         _approve(owner_, spender_, amount_);
 
-        return _getDigest(keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, amount_, nonce_, deadline_)));
+        unchecked {
+            // Nonce realistically cannot overflow.
+            return
+                _getDigest(
+                    keccak256(abi.encode(PERMIT_TYPEHASH, owner_, spender_, amount_, nonces[owner_]++, deadline_))
+                );
+        }
     }
 }
