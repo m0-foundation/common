@@ -76,7 +76,7 @@ abstract contract ERC712Extended is IERC712Extended {
     \******************************************************************************************************************/
 
     /**
-     * @notice Computes the EIP-712 domain separator.
+     * @dev    Computes the EIP-712 domain separator.
      * @return The EIP-712 domain separator.
      */
     function _getDomainSeparator() internal view returns (bytes32) {
@@ -93,7 +93,7 @@ abstract contract ERC712Extended is IERC712Extended {
     }
 
     /**
-     * @notice Returns the digest to be signed, via EIP-712, given an internal digest (i.e. hash struct).
+     * @dev    Returns the digest to be signed, via EIP-712, given an internal digest (i.e. hash struct).
      * @param  internalDigest_ The internal digest.
      * @return The digest to be signed.
      */
@@ -102,7 +102,7 @@ abstract contract ERC712Extended is IERC712Extended {
     }
 
     /**
-     * @notice Returns the signer of a signed digest, via EIP-712, and reverts if the signature is invalid.
+     * @dev    Returns the signer of a signed digest, via EIP-712, and reverts if the signature is invalid.
      * @param  digest_ The digest that was signed.
      * @param  v_      v of the signature.
      * @param  r_      r of the signature.
@@ -123,23 +123,21 @@ abstract contract ERC712Extended is IERC712Extended {
     }
 
     /**
-     * @notice Revert if the signature is expired.
-     * @param  expiry_ Timestamp at which the signature expires or max uint256 for no expiry.
+     * @dev   Revert if the signature is expired.
+     * @param expiry_ Timestamp at which the signature expires or max uint256 for no expiry.
      */
     function _revertIfExpired(uint256 expiry_) internal view {
         if (block.timestamp > expiry_) revert SignatureExpired(expiry_, block.timestamp);
     }
 
     /**
-     * @notice Revert if the signature is invalid.
-     * @dev    We first validate if the signature is a valid ECDSA signature
-     *         and return early if it is the case.
-     *         Then, we validate if it is a valid ERC-1271 signature,
-     *         and return early if it is the case.
-     *         If not, we revert with the error from the ECDSA signature validation.
-     * @param  signer_    The signer of the signature.
-     * @param  digest_    The digest that was signed.
-     * @param  signature_ The signature.
+     * @dev   Revert if the signature is invalid.
+     * @dev   We first validate if the signature is a valid ECDSA signature and return early if it is the case.
+     *        Then, we validate if it is a valid ERC-1271 signature, and return early if it is the case.
+     *        If not, we revert with the error from the ECDSA signature validation.
+     * @param signer_    The signer of the signature.
+     * @param digest_    The digest that was signed.
+     * @param signature_ The signature.
      */
     function _revertIfInvalidSignature(address signer_, bytes32 digest_, bytes memory signature_) internal view {
         SignatureChecker.Error error_ = SignatureChecker.validateECDSASignature(signer_, digest_, signature_);
@@ -152,23 +150,23 @@ abstract contract ERC712Extended is IERC712Extended {
     }
 
     /**
-     * @notice Revert if the signature is invalid.
-     * @param  signer_ The signer of the signature.
-     * @param  digest_ The digest that was signed.
-     * @param  r_      An ECDSA/secp256k1 signature parameter.
-     * @param  vs_     An ECDSA/secp256k1 short signature parameter.
+     * @dev   Revert if the signature is invalid.
+     * @param signer_ The signer of the signature.
+     * @param digest_ The digest that was signed.
+     * @param r_      An ECDSA/secp256k1 signature parameter.
+     * @param vs_     An ECDSA/secp256k1 short signature parameter.
      */
     function _revertIfInvalidSignature(address signer_, bytes32 digest_, bytes32 r_, bytes32 vs_) internal pure {
         _revertIfError(SignatureChecker.validateECDSASignature(signer_, digest_, r_, vs_));
     }
 
     /**
-     * @notice Revert if the signature is invalid.
-     * @param  signer_ The signer of the signature.
-     * @param  digest_ The digest that was signed.
-     * @param  v_      v of the signature.
-     * @param  r_      r of the signature.
-     * @param  s_      s of the signature.
+     * @dev   Revert if the signature is invalid.
+     * @param signer_ The signer of the signature.
+     * @param digest_ The digest that was signed.
+     * @param v_      v of the signature.
+     * @param r_      r of the signature.
+     * @param s_      s of the signature.
      */
     function _revertIfInvalidSignature(
         address signer_,
@@ -181,8 +179,8 @@ abstract contract ERC712Extended is IERC712Extended {
     }
 
     /**
-     * @notice Revert if error.
-     * @param  error_ The SignatureChecker Error enum.
+     * @dev   Revert if error.
+     * @param error_ The SignatureChecker Error enum.
      */
     function _revertIfError(SignatureChecker.Error error_) private pure {
         if (error_ == SignatureChecker.Error.NoError) return;

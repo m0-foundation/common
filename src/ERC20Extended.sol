@@ -57,8 +57,7 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
         bytes32 r_,
         bytes32 s_
     ) external {
-        // NOTE: `_permit` returns the digest.
-        _revertIfInvalidSignature(owner_, _permit(owner_, spender_, value_, deadline_), v_, r_, s_);
+        _revertIfInvalidSignature(owner_, _permitAndGetDigest(owner_, spender_, value_, deadline_), v_, r_, s_);
     }
 
     /// @inheritdoc IERC20Extended
@@ -69,8 +68,7 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
         uint256 deadline_,
         bytes memory signature_
     ) external {
-        // NOTE: `_permit` returns the digest.
-        _revertIfInvalidSignature(owner_, _permit(owner_, spender_, value_, deadline_), signature_);
+        _revertIfInvalidSignature(owner_, _permitAndGetDigest(owner_, spender_, value_, deadline_), signature_);
     }
 
     /// @inheritdoc IERC20
@@ -110,7 +108,7 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
     \******************************************************************************************************************/
 
     /**
-     * @notice Approve `spender_` to spend `amount_` of tokens from `account_`.
+     * @dev Approve `spender_` to spend `amount_` of tokens from `account_`.
      * @param  account_ The address approving the allowance.
      * @param  spender_ The address approved to spend the tokens.
      * @param  amount_  The amount of tokens being approved for spending.
@@ -121,7 +119,7 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
     }
 
     /**
-     * @notice Set the `amount_` of tokens `spender_` is allowed to spend from `account_`.
+     * @dev Set the `amount_` of tokens `spender_` is allowed to spend from `account_`.
      * @param  account_ The address for which the allowance is set.
      * @param  spender_ The address allowed to spend the tokens.
      * @param  amount_  The amount of tokens being allowed for spending.
@@ -131,14 +129,14 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
     }
 
     /**
-     * @notice ERC-2612 permit extension for EIP-20 signed approvals.
+     * @dev    Performs the approval based on the permit info, validates the deadline, and returns the digest.
      * @param  owner_    The address of the account approving the allowance.
      * @param  spender_  The address of the account being allowed to spend the tokens.
      * @param  amount_   The amount of tokens being approved for spending.
      * @param  deadline_ The deadline by which the signature must be used.
      * @return digest_   The EIP-712 digest of the permit.
      */
-    function _permit(
+    function _permitAndGetDigest(
         address owner_,
         address spender_,
         uint256 amount_,
