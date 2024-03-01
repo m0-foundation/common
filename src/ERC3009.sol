@@ -35,7 +35,7 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
 
     /**
      * @notice Construct the ERC3009 contract.
-     * @param  name_     The name of the contract.
+     * @param  name_ The name of the contract.
      */
     constructor(string memory name_) StatefulERC712(name_) {}
 
@@ -192,7 +192,7 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
     \******************************************************************************************************************/
 
     /**
-     * @notice Returns the internal EIP-712 digest of a transferWithAuthorization call.
+     * @dev    Returns the internal EIP-712 digest of a transferWithAuthorization call.
      * @param  from_        Payer's address (Authorizer).
      * @param  to_          Payee's address.
      * @param  value_       Amount to be transferred.
@@ -226,13 +226,13 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
     }
 
     /**
-     * @notice Common transfer function used by `transferWithAuthorization` and `_receiveWithAuthorization`.
-     * @param  from_        Payer's address (Authorizer).
-     * @param  to_          Payee's address.
-     * @param  value_       Amount to be transferred.
-     * @param  validAfter_  The time after which this is valid (unix time).
-     * @param  validBefore_ The time before which this is valid (unix time).
-     * @param  nonce_       Unique nonce.
+     * @dev   Common transfer function used by `transferWithAuthorization` and `_receiveWithAuthorization`.
+     * @param from_        Payer's address (Authorizer).
+     * @param to_          Payee's address.
+     * @param value_       Amount to be transferred.
+     * @param validAfter_  The time after which this is valid (unix time).
+     * @param validBefore_ The time before which this is valid (unix time).
+     * @param nonce_       Unique nonce.
      */
     function _transferWithAuthorization(
         address from_,
@@ -255,7 +255,7 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
     }
 
     /**
-     * @notice Returns the internal EIP-712 digest of a receiveWithAuthorization call.
+     * @dev    Returns the internal EIP-712 digest of a receiveWithAuthorization call.
      * @param  from_        Payer's address (Authorizer).
      * @param  to_          Payee's address.
      * @param  value_       Amount to be transferred.
@@ -289,13 +289,13 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
     }
 
     /**
-     * @notice Common receive function used by `receiveWithAuthorization`.
-     * @param  from_        Payer's address (Authorizer).
-     * @param  to_          Payee's address.
-     * @param  value_       Amount to be transferred.
-     * @param  validAfter_  The time after which this is valid (unix time).
-     * @param  validBefore_ The time before which this is valid (unix time).
-     * @param  nonce_       Unique nonce.
+     * @dev   Common receive function used by `receiveWithAuthorization`.
+     * @param from_        Payer's address (Authorizer).
+     * @param to_          Payee's address.
+     * @param value_       Amount to be transferred.
+     * @param validAfter_  The time after which this is valid (unix time).
+     * @param validBefore_ The time before which this is valid (unix time).
+     * @param nonce_       Unique nonce.
      */
     function _receiveWithAuthorization(
         address from_,
@@ -311,7 +311,7 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
     }
 
     /**
-     * @notice Returns the internal EIP-712 digest of a cancelAuthorization call.
+     * @dev    Returns the internal EIP-712 digest of a cancelAuthorization call.
      * @param  authorizer_ Authorizer's address.
      * @param  nonce_      Nonce of the authorization.
      * @return The internal EIP-712 digest.
@@ -321,9 +321,9 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
     }
 
     /**
-     * @notice Common cancel function used by `cancelAuthorization`.
-     * @param  authorizer_ Authorizer's address.
-     * @param  nonce_      Nonce of the authorization.
+     * @dev   Common cancel function used by `cancelAuthorization`.
+     * @param authorizer_ Authorizer's address.
+     * @param nonce_      Nonce of the authorization.
      */
     function _cancelAuthorization(address authorizer_, bytes32 nonce_) internal {
         _revertIfAuthorizationAlreadyUsed(authorizer_, nonce_);
@@ -334,19 +334,19 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
     }
 
     /**
-     * @notice Reverts if the authorization is already used.
-     * @param  authorizer_ The authorizer's address.
-     * @param  nonce_      The nonce of the authorization.
+     * @dev   Reverts if the authorization is already used.
+     * @param authorizer_ The authorizer's address.
+     * @param nonce_      The nonce of the authorization.
      */
     function _revertIfAuthorizationAlreadyUsed(address authorizer_, bytes32 nonce_) internal view {
         if (authorizationState[authorizer_][nonce_]) revert AuthorizationAlreadyUsed(authorizer_, nonce_);
     }
 
     /**
-     * @notice ERC20 transfer function that needs to be overridden by the inheriting contract.
-     * @param  sender_    The sender's address.
-     * @param  recipient_ The recipient's address.
-     * @param  amount_    The amount to be transferred.
+     * @dev   Internal ERC20 transfer function that needs to be implemented by the inheriting contract.
+     * @param sender_    The sender's address.
+     * @param recipient_ The recipient's address.
+     * @param amount_    The amount to be transferred.
      */
     function _transfer(address sender_, address recipient_, uint256 amount_) internal virtual;
 }
