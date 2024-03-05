@@ -18,7 +18,7 @@ You may have to install the following tools to use this repository:
 Install dependencies:
 
 ```bash
-npm i
+yarn
 forge install
 ```
 
