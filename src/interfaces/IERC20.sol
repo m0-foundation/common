@@ -2,12 +2,13 @@
 
 pragma solidity 0.8.23;
 
-/// @title ERC20 Token Standard.
-/// @dev   The interface as defined by EIP-20: https://eips.ethereum.org/EIPS/eip-20
+/**
+ * @title  ERC20 Token Standard.
+ * @author M^0 Labs
+ * @dev    The interface as defined by EIP-20: https://eips.ethereum.org/EIPS/eip-20
+ */
 interface IERC20 {
-    /******************************************************************************************************************\
-    |                                                      Events                                                      |
-    \******************************************************************************************************************/
+    /* ============ Events ============ */
 
     /**
      * @notice Emitted when `spender` has been approved for `amount` of the token balance of `account`.
@@ -25,9 +26,7 @@ interface IERC20 {
      */
     event Transfer(address indexed sender, address indexed recipient, uint256 amount);
 
-    /******************************************************************************************************************\
-    |                                             Interactive Functions                                                |
-    \******************************************************************************************************************/
+    /* ============ Interactive Functions ============ */
 
     /**
      * @notice Allows a calling account to approve `spender` to spend up to `amount` of its token balance.
@@ -55,9 +54,7 @@ interface IERC20 {
      */
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
 
-    /******************************************************************************************************************\
-    |                                              View/Pure Functions                                                 |
-    \******************************************************************************************************************/
+    /* ============ View/Pure Functions ============ */
 
     /**
      * @notice Returns the allowance `spender` is allowed to spend on behalf of `account`.

@@ -5,10 +5,15 @@ pragma solidity 0.8.23;
 import { IERC20 } from "./IERC20.sol";
 import { IERC3009 } from "./IERC3009.sol";
 
-/// @title An ERC20 token extended with EIP-2612 permits for signed approvals (via EIP-712 and with EIP-1271
-//         compatibility), and extended with EIP-3009 transfer with authorization (via EIP-712).
-/// @dev   The additional interface as defined by EIP-2612: https://eips.ethereum.org/EIPS/eip-2612
+/**
+ * @title  An ERC20 token extended with EIP-2612 permits for signed approvals (via EIP-712
+ *         and with EIP-1271 compatibility), and extended with EIP-3009 transfer with authorization (via EIP-712).
+ * @author M^0 Labs
+ * @dev    The additional interface as defined by EIP-2612: https://eips.ethereum.org/EIPS/eip-2612
+ */
 interface IERC20Extended is IERC20, IERC3009 {
+    /* ============ Custom Errors ============ */
+
     /**
      * @notice Revert message when spender's allowance is not sufficient.
      * @param  spender    Address that may be allowed to operate on tokens without being their owner.
@@ -28,6 +33,8 @@ interface IERC20Extended is IERC20, IERC3009 {
      * @param  recipient Address of the invalid recipient.
      */
     error InvalidRecipient(address recipient);
+
+    /* ============ Interactive Functions ============ */
 
     /**
      * @notice Approves `spender` to spend up to `amount` of the token balance of `owner`, via a signature.
@@ -58,6 +65,8 @@ interface IERC20Extended is IERC20, IERC3009 {
      * @param  signature An arbitrary signature (EIP-712).
      */
     function permit(address owner, address spender, uint256 value, uint256 deadline, bytes memory signature) external;
+
+    /* ============ View/Pure Functions ============ */
 
     /// @notice Returns the EIP712 typehash used in the encoding of the digest for the permit function.
     function PERMIT_TYPEHASH() external view returns (bytes32 typehash);

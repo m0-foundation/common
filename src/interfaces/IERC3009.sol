@@ -4,9 +4,14 @@ pragma solidity 0.8.23;
 
 import { IStatefulERC712 } from "./IStatefulERC712.sol";
 
-/// @title Transfer via signed authorization following EIP-3009 standard.
-/// @dev   The interface as defined by EIP-3009: https://eips.ethereum.org/EIPS/eip-3009
+/**
+ * @title  Transfer via signed authorization following EIP-3009 standard.
+ * @author M^0 Labs
+ * @dev    The interface as defined by EIP-3009: https://eips.ethereum.org/EIPS/eip-3009
+ */
 interface IERC3009 is IStatefulERC712 {
+    /* ============ Events ============ */
+
     /**
      * @notice Emitted when an authorization has been used.
      * @param  authorizer Authorizer's address.
@@ -20,6 +25,8 @@ interface IERC3009 is IStatefulERC712 {
      * @param  nonce      Nonce of the canceled authorization.
      */
     event AuthorizationCanceled(address indexed authorizer, bytes32 indexed nonce);
+
+    /* ============ Custom Errors ============ */
 
     /**
      * @notice Emitted when an authorization has already been used.
@@ -49,14 +56,7 @@ interface IERC3009 is IStatefulERC712 {
      */
     error CallerMustBePayee(address caller, address payee);
 
-    /**
-     * @notice Returns the state of an authorization.
-     * @dev    Nonces are randomly generated 32-byte data unique to the authorizer's address
-     * @param  authorizer Authorizer's address.
-     * @param  nonce      Nonce of the authorization.
-     * @return True if the nonce is used.
-     */
-    function authorizationState(address authorizer, bytes32 nonce) external view returns (bool);
+    /* ============ Interactive Functions ============ */
 
     /**
      * @notice Execute a transfer with a signed authorization.
@@ -225,6 +225,17 @@ interface IERC3009 is IStatefulERC712 {
      * @param  s          s of the signature.
      */
     function cancelAuthorization(address authorizer, bytes32 nonce, uint8 v, bytes32 r, bytes32 s) external;
+
+    /* ============ View/Pure Functions ============ */
+
+    /**
+     * @notice Returns the state of an authorization.
+     * @dev    Nonces are randomly generated 32-byte data unique to the authorizer's address
+     * @param  authorizer Authorizer's address.
+     * @param  nonce      Nonce of the authorization.
+     * @return True if the nonce is used.
+     */
+    function authorizationState(address authorizer, bytes32 nonce) external view returns (bool);
 
     /// @notice Returns `transferWithAuthorization` typehash.
     function TRANSFER_WITH_AUTHORIZATION_TYPEHASH() external view returns (bytes32);

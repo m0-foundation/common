@@ -7,9 +7,14 @@ import { IERC712Extended } from "./interfaces/IERC712Extended.sol";
 
 import { SignatureChecker } from "./libs/SignatureChecker.sol";
 
-/// @title Typed structured data hashing and signing via EIP-712, extended by EIP-5267.
-/// @dev   An abstract implementation to satisfy EIP-712: https://eips.ethereum.org/EIPS/eip-712
+/**
+ * @title  Typed structured data hashing and signing via EIP-712, extended by EIP-5267.
+ * @author M^0 Labs
+ * @dev    An abstract implementation to satisfy EIP-712: https://eips.ethereum.org/EIPS/eip-712
+ */
 abstract contract ERC712Extended is IERC712Extended {
+    /* ============ Variables ============ */
+
     // keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")
     bytes32 internal constant _EIP712_DOMAIN_HASH = 0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f;
 
@@ -17,13 +22,15 @@ abstract contract ERC712Extended is IERC712Extended {
     bytes32 internal constant _EIP712_VERSION_HASH = 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
 
     /// @dev Initial Chain ID set at deployment.
-    uint256 internal immutable INITIAL_CHAIN_ID;
+    uint256 internal immutable _INITIAL_CHAIN_ID;
 
     /// @dev Initial EIP-712 domain separator set at deployment.
-    bytes32 internal immutable INITIAL_DOMAIN_SEPARATOR;
+    bytes32 internal immutable _INITIAL_DOMAIN_SEPARATOR;
 
     /// @dev The name of the contract.
     string internal _name;
+
+    /* ============ Constructor ============ */
 
     /**
      * @notice Constructs the EIP-712 domain separator.
@@ -32,18 +39,11 @@ abstract contract ERC712Extended is IERC712Extended {
     constructor(string memory name_) {
         _name = name_;
 
-        INITIAL_CHAIN_ID = block.chainid;
-        INITIAL_DOMAIN_SEPARATOR = _getDomainSeparator();
+        _INITIAL_CHAIN_ID = block.chainid;
+        _INITIAL_DOMAIN_SEPARATOR = _getDomainSeparator();
     }
 
-    /******************************************************************************************************************\
-    |                                             Public View/Pure Functions                                           |
-    \******************************************************************************************************************/
-
-    /// @inheritdoc IERC712
-    function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
-        return block.chainid == INITIAL_CHAIN_ID ? INITIAL_DOMAIN_SEPARATOR : _getDomainSeparator();
-    }
+    /* ============ View/Pure Functions ============ */
 
     /// @inheritdoc IERC712Extended
     function eip712Domain()
@@ -71,9 +71,12 @@ abstract contract ERC712Extended is IERC712Extended {
         );
     }
 
-    /******************************************************************************************************************\
-    |                                           Internal View/Pure Functions                                           |
-    \******************************************************************************************************************/
+    /// @inheritdoc IERC712
+    function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
+        return block.chainid == _INITIAL_CHAIN_ID ? _INITIAL_DOMAIN_SEPARATOR : _getDomainSeparator();
+    }
+
+    /* ============ Internal View/Pure Functions ============ */
 
     /**
      * @dev    Computes the EIP-712 domain separator.
@@ -102,27 +105,6 @@ abstract contract ERC712Extended is IERC712Extended {
     }
 
     /**
-     * @dev    Returns the signer of a signed digest, via EIP-712, and reverts if the signature is invalid.
-     * @param  digest_ The digest that was signed.
-     * @param  v_      v of the signature.
-     * @param  r_      r of the signature.
-     * @param  s_      s of the signature.
-     * @return signer_ The signer of the digest.
-     */
-    function _getSignerAndRevertIfInvalidSignature(
-        bytes32 digest_,
-        uint8 v_,
-        bytes32 r_,
-        bytes32 s_
-    ) internal pure returns (address signer_) {
-        SignatureChecker.Error error_;
-
-        (error_, signer_) = SignatureChecker.recoverECDSASigner(digest_, v_, r_, s_);
-
-        _revertIfError(error_);
-    }
-
-    /**
      * @dev   Revert if the signature is expired.
      * @param expiry_ Timestamp at which the signature expires or max uint256 for no expiry.
      */
@@ -145,6 +127,27 @@ abstract contract ERC712Extended is IERC712Extended {
         if (error_ == SignatureChecker.Error.NoError) return;
 
         if (SignatureChecker.isValidERC1271Signature(signer_, digest_, signature_)) return;
+
+        _revertIfError(error_);
+    }
+
+    /**
+     * @dev    Returns the signer of a signed digest, via EIP-712, and reverts if the signature is invalid.
+     * @param  digest_ The digest that was signed.
+     * @param  v_      v of the signature.
+     * @param  r_      r of the signature.
+     * @param  s_      s of the signature.
+     * @return signer_ The signer of the digest.
+     */
+    function _getSignerAndRevertIfInvalidSignature(
+        bytes32 digest_,
+        uint8 v_,
+        bytes32 r_,
+        bytes32 s_
+    ) internal pure returns (address signer_) {
+        SignatureChecker.Error error_;
+
+        (error_, signer_) = SignatureChecker.recoverECDSASigner(digest_, v_, r_, s_);
 
         _revertIfError(error_);
     }

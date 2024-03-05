@@ -3,10 +3,12 @@
 pragma solidity 0.8.23;
 
 /**
- * @title Library to perform safe math operations on uint types
+ * @title  Library to perform safe math operations on uint types
  * @author M^0 Labs
  */
 library UIntMath {
+    /* ============ Custom Errors ============ */
+
     /// @notice Emitted when a passed value is greater than the maximum value of uint16.
     error InvalidUInt16();
 
@@ -25,8 +27,11 @@ library UIntMath {
     /// @notice Emitted when a passed value is greater than the maximum value of uint240.
     error InvalidUInt240();
 
+    /* ============ Internal View/Pure Functions ============ */
+
     /**
-     * @notice Casts a given uint256 value to a uint16, ensuring that it is less than or equal to the maximum uint16 value.
+     * @notice Casts a given uint256 value to a uint16,
+     *         ensuring that it is less than or equal to the maximum uint16 value.
      * @param  n The value to check.
      * @return The value casted to uint16.
      */
@@ -36,7 +41,8 @@ library UIntMath {
     }
 
     /**
-     * @notice Casts a given uint256 value to a uint40, ensuring that it is less than or equal to the maximum uint40 value.
+     * @notice Casts a given uint256 value to a uint40,
+     *         ensuring that it is less than or equal to the maximum uint40 value.
      * @param  n The value to check.
      * @return The value casted to uint40.
      */
@@ -46,7 +52,8 @@ library UIntMath {
     }
 
     /**
-     * @notice Casts a given uint256 value to a uint48, ensuring that it is less than or equal to the maximum uint48 value.
+     * @notice Casts a given uint256 value to a uint48,
+     *         ensuring that it is less than or equal to the maximum uint48 value.
      * @param  n The value to check.
      * @return The value casted to uint48.
      */
@@ -56,7 +63,8 @@ library UIntMath {
     }
 
     /**
-     * @notice Casts a given uint256 value to a uint112, ensuring that it is less than or equal to the maximum uint112 value.
+     * @notice Casts a given uint256 value to a uint112,
+     *         ensuring that it is less than or equal to the maximum uint112 value.
      * @param  n The value to check.
      * @return The value casted to uint112.
      */
@@ -66,7 +74,8 @@ library UIntMath {
     }
 
     /**
-     * @notice Casts a given uint256 value to a uint128, ensuring that it is less than or equal to the maximum uint128 value.
+     * @notice Casts a given uint256 value to a uint128,
+     *         ensuring that it is less than or equal to the maximum uint128 value.
      * @param  n The value to check.
      * @return The value casted to uint128.
      */
@@ -76,7 +85,8 @@ library UIntMath {
     }
 
     /**
-     * @notice Casts a given uint256 value to a uint240, ensuring that it is less than or equal to the maximum uint240 value.
+     * @notice Casts a given uint256 value to a uint240,
+     *         ensuring that it is less than or equal to the maximum uint240 value.
      * @param  n The value to check.
      * @return The value casted to uint240.
      */
