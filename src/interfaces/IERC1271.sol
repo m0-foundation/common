@@ -2,8 +2,11 @@
 
 pragma solidity 0.8.23;
 
-/// @title Standard Signature Validation Method for Contracts via EIP-1271.
-/// @dev   The interface as defined by EIP-1271: https://eips.ethereum.org/EIPS/eip-1271
+/**
+ * @title  Standard Signature Validation Method for Contracts via EIP-1271.
+ * @author M^0 Labs
+ * @dev    The interface as defined by EIP-1271: https://eips.ethereum.org/EIPS/eip-1271
+ */
 interface IERC1271 {
     /**
      * @dev    Returns a specific magic value if the provided signature is valid for the provided digest.

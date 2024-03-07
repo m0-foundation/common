@@ -1,8 +1,8 @@
-# Common M^ZERO Contracts
+# Common M^0 contracts
 
 ## Overview
 
-Common contracts and libraries used across the various M^ZERO Solidity projects.
+Common contracts and libraries used across the various M^0 Solidity projects.
 
 ## Development
 
@@ -10,7 +10,7 @@ Common contracts and libraries used across the various M^ZERO Solidity projects.
 
 You may have to install the following tools to use this repository:
 
-- [Foundry](https://github.com/foundry-rs/foundry) to compile and test contracts
+- [foundry](https://github.com/foundry-rs/foundry) to compile and test contracts
 - [lcov](https://github.com/linux-test-project/lcov) to generate the code coverage report
 - [yarn](https://classic.yarnpkg.com/lang/en/docs/install/) to manage npm dependencies
 - [slither](https://github.com/crytic/slither) to static analyze contracts
@@ -18,7 +18,7 @@ You may have to install the following tools to use this repository:
 Install dependencies:
 
 ```bash
-npm i
+yarn
 forge install
 ```
 
@@ -89,3 +89,13 @@ Or to autofix some issues:
 ```bash
 yarn solhint-fix
 ```
+
+### Documentation
+
+Forge is used to generate the documentation. Run it with:
+
+```bash
+yarn doc
+```
+
+The command will generate the documentation in the `docs` folder and spinup a local server on port `4000` to view the documentation.

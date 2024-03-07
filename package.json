@@ -1,12 +1,13 @@
 {
   "name": "@mzero-labs/common",
   "version": "1.0.0",
-  "description": "Common contracts",
+  "description": "Common M^0 contracts",
   "main": "index.js",
-  "author": "mZero Labs <contact@m0.xyz>",
+  "author": "M^0 Labs <contact@m0.xyz>",
   "license": "GPL-3.0",
   "scripts": {
     "coverage": "forge coverage --report lcov && lcov --extract lcov.info -o lcov.info 'src/*' && genhtml lcov.info -o coverage",
+    "doc": "forge doc --serve --port 4000",
     "prettier": "prettier --write 'src/**/*.sol' 'test/**/*.sol'",
     "slither": "forge build --build-info --skip '*/test/**' --skip '*/script/**' --force && slither --compile-force-framework foundry --ignore-compile --config-file slither.config.json --fail-high .",
     "solhint": "solhint -f stylish 'src/**/*.sol'",

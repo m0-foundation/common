@@ -7,9 +7,14 @@ import { IERC20Extended } from "./interfaces/IERC20Extended.sol";
 
 import { ERC3009 } from "./ERC3009.sol";
 
-/// @title An ERC20 token extended with EIP-2612 permits for signed approvals (via EIP-712 and with EIP-1271
-///        and EIP-5267 compatibility), and extended with EIP-3009 transfer with authorization (via EIP-712).
+/**
+ * @title  An ERC20 token extended with EIP-2612 permits for signed approvals (via EIP-712 and with EIP-1271
+ *         and EIP-5267 compatibility), and extended with EIP-3009 transfer with authorization (via EIP-712).
+ * @author M^0 Labs
+ */
 abstract contract ERC20Extended is IERC20Extended, ERC3009 {
+    /* ============ Variables ============ */
+
     /**
      * @inheritdoc IERC20Extended
      * @dev Keeping this constant, despite `permit` parameter name differences, to ensure max EIP-2612 compatibility.
@@ -26,6 +31,8 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
     /// @inheritdoc IERC20
     mapping(address account => mapping(address spender => uint256 allowance)) public allowance;
 
+    /* ============ Constructor ============ */
+
     /**
      * @notice Constructs the ERC20Extended contract.
      * @param  name_     The name of the token.
@@ -37,9 +44,7 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
         decimals = decimals_;
     }
 
-    /******************************************************************************************************************\
-    |                                      External/Public Interactive Functions                                       |
-    \******************************************************************************************************************/
+    /* ============ Interactive Functions ============ */
 
     /// @inheritdoc IERC20
     function approve(address spender_, uint256 amount_) external returns (bool success_) {
@@ -94,18 +99,14 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
         return true;
     }
 
-    /******************************************************************************************************************\
-    |                                       External/Public View/Pure Functions                                        |
-    \******************************************************************************************************************/
+    /* ============ View/Pure Functions ============ */
 
     /// @inheritdoc IERC20
     function name() external view returns (string memory name_) {
         return _name;
     }
 
-    /******************************************************************************************************************\
-    |                                          Internal Interactive Functions                                          |
-    \******************************************************************************************************************/
+    /* ============ Internal Interactive Functions ============ */
 
     /**
      * @dev Approve `spender_` to spend `amount_` of tokens from `account_`.

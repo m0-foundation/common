@@ -4,8 +4,22 @@ pragma solidity 0.8.23;
 
 import { IERC1271 } from "../interfaces/IERC1271.sol";
 
-/// @title A library to handle ECDSA/secp256k1 and ERC1271 signatures, individually or in arbitrarily in combination.
+/**
+ * @title  A library to handle ECDSA/secp256k1 and ERC1271 signatures, individually or in arbitrarily in combination.
+ * @author M^0 Labs
+ */
 library SignatureChecker {
+    /* ============ Enums ============ */
+
+    /**
+     * @notice An enum representing the possible errors that can be emitted during signature validation.
+     * @param  NoError                No error occurred during signature validation.
+     * @param  InvalidSignature       The signature is invalid.
+     * @param  InvalidSignatureLength The signature length is invalid.
+     * @param  InvalidSignatureS      The signature parameter S is invalid.
+     * @param  InvalidSignatureV      The signature parameter V is invalid.
+     * @param  SignerMismatch         The signer does not match the recovered signer.
+     */
     enum Error {
         NoError,
         InvalidSignature,
@@ -13,6 +27,44 @@ library SignatureChecker {
         InvalidSignatureS,
         InvalidSignatureV,
         SignerMismatch
+    }
+
+    /* ============ Internal View/Pure Functions ============ */
+
+    /**
+     * @dev    Returns whether a signature is valid (ECDSA/secp256k1 or ERC1271) for a signer and digest.
+     * @dev    Signatures must not be used as unique identifiers since the `ecrecover` EVM opcode
+     *         allows for malleable (non-unique) signatures.
+     *         See https://github.com/OpenZeppelin/openzeppelin-contracts/security/advisories/GHSA-4h98-2769-gh6h
+     * @param  signer    The address of the account purported to have signed.
+     * @param  digest    The hash of the data that was signed.
+     * @param  signature A byte array signature.
+     * @return           Whether the signature is valid or not.
+     */
+    function isValidSignature(address signer, bytes32 digest, bytes memory signature) internal view returns (bool) {
+        return isValidECDSASignature(signer, digest, signature) || isValidERC1271Signature(signer, digest, signature);
+    }
+
+    /**
+     * @dev    Returns whether an ERC1271 signature is valid for a signer and digest.
+     * @param  signer    The address of the account purported to have signed.
+     * @param  digest    The hash of the data that was signed.
+     * @param  signature A byte array ERC1271 signature.
+     * @return           Whether the signature is valid or not.
+     */
+    function isValidERC1271Signature(
+        address signer,
+        bytes32 digest,
+        bytes memory signature
+    ) internal view returns (bool) {
+        (bool success, bytes memory result) = signer.staticcall(
+            abi.encodeCall(IERC1271.isValidSignature, (digest, signature))
+        );
+
+        return
+            success &&
+            result.length >= 32 &&
+            abi.decode(result, (bytes32)) == bytes32(IERC1271.isValidSignature.selector);
     }
 
     /**
@@ -49,20 +101,6 @@ library SignatureChecker {
     }
 
     /**
-     * @dev    Returns whether a signature is valid (ECDSA/secp256k1 or ERC1271) for a signer and digest.
-     * @dev    Signatures must not be used as unique identifiers since the `ecrecover` EVM opcode
-     *         allows for malleable (non-unique) signatures.
-     *         See https://github.com/OpenZeppelin/openzeppelin-contracts/security/advisories/GHSA-4h98-2769-gh6h
-     * @param  signer    The address of the account purported to have signed.
-     * @param  digest    The hash of the data that was signed.
-     * @param  signature A byte array signature.
-     * @return           Whether the signature is valid or not.
-     */
-    function isValidSignature(address signer, bytes32 digest, bytes memory signature) internal view returns (bool) {
-        return isValidECDSASignature(signer, digest, signature) || isValidERC1271Signature(signer, digest, signature);
-    }
-
-    /**
      * @dev    Returns whether an ECDSA/secp256k1 signature is valid for a signer and digest.
      * @param  signer    The address of the account purported to have signed.
      * @param  digest    The hash of the data that was signed.
@@ -92,28 +130,6 @@ library SignatureChecker {
      */
     function isValidECDSASignature(address signer, bytes32 digest, bytes32 r, bytes32 vs) internal pure returns (bool) {
         return validateECDSASignature(signer, digest, r, vs) == Error.NoError;
-    }
-
-    /**
-     * @dev    Returns whether an ERC1271 signature is valid for a signer and digest.
-     * @param  signer    The address of the account purported to have signed.
-     * @param  digest    The hash of the data that was signed.
-     * @param  signature A byte array ERC1271 signature.
-     * @return           Whether the signature is valid or not.
-     */
-    function isValidERC1271Signature(
-        address signer,
-        bytes32 digest,
-        bytes memory signature
-    ) internal view returns (bool) {
-        (bool success, bytes memory result) = signer.staticcall(
-            abi.encodeCall(IERC1271.isValidSignature, (digest, signature))
-        );
-
-        return
-            success &&
-            result.length >= 32 &&
-            abi.decode(result, (bytes32)) == bytes32(IERC1271.isValidSignature.selector);
     }
 
     /**
