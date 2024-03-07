@@ -13,18 +13,18 @@ interface IERC3009 is IStatefulERC712 {
     /* ============ Events ============ */
 
     /**
-     * @notice Emitted when an authorization has been used.
-     * @param  authorizer Authorizer's address.
-     * @param  nonce      Nonce of the used authorization.
-     */
-    event AuthorizationUsed(address indexed authorizer, bytes32 indexed nonce);
-
-    /**
      * @notice Emitted when an authorization has been canceled.
      * @param  authorizer Authorizer's address.
      * @param  nonce      Nonce of the canceled authorization.
      */
     event AuthorizationCanceled(address indexed authorizer, bytes32 indexed nonce);
+
+    /**
+     * @notice Emitted when an authorization has been used.
+     * @param  authorizer Authorizer's address.
+     * @param  nonce      Nonce of the used authorization.
+     */
+    event AuthorizationUsed(address indexed authorizer, bytes32 indexed nonce);
 
     /* ============ Custom Errors ============ */
 
@@ -36,18 +36,18 @@ interface IERC3009 is IStatefulERC712 {
     error AuthorizationAlreadyUsed(address authorizer, bytes32 nonce);
 
     /**
-     * @notice Emitted when an authorization is not yet valid.
-     * @param  timestamp  Timestamp at which the transaction was submitted.
-     * @param  validAfter Timestamp after which the authorization will be valid.
-     */
-    error AuthorizationNotYetValid(uint256 timestamp, uint256 validAfter);
-
-    /**
      * @notice Emitted when an authorization is expired.
      * @param  timestamp   Timestamp at which the transaction was submitted.
      * @param  validBefore Timestamp before which the authorization would have been valid.
      */
     error AuthorizationExpired(uint256 timestamp, uint256 validBefore);
+
+    /**
+     * @notice Emitted when an authorization is not yet valid.
+     * @param  timestamp  Timestamp at which the transaction was submitted.
+     * @param  validAfter Timestamp after which the authorization will be valid.
+     */
+    error AuthorizationNotYetValid(uint256 timestamp, uint256 validAfter);
 
     /**
      * @notice Emitted when the caller of `receiveWithAuthorization` is not the payee.
