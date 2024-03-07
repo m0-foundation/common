@@ -11,6 +11,15 @@ import { IERC1271 } from "../interfaces/IERC1271.sol";
 library SignatureChecker {
     /* ============ Enums ============ */
 
+    /**
+     * @notice An enum representing the possible errors that can be emitted during signature validation.
+     * @param  NoError                No error occurred during signature validation.
+     * @param  InvalidSignature       The signature is invalid.
+     * @param  InvalidSignatureLength The signature length is invalid.
+     * @param  InvalidSignatureS      The signature parameter S is invalid.
+     * @param  InvalidSignatureV      The signature parameter V is invalid.
+     * @param  SignerMismatch         The signer does not match the recovered signer.
+     */
     enum Error {
         NoError,
         InvalidSignature,

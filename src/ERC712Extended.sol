@@ -15,10 +15,10 @@ import { SignatureChecker } from "./libs/SignatureChecker.sol";
 abstract contract ERC712Extended is IERC712Extended {
     /* ============ Variables ============ */
 
-    // keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")
+    /// @dev keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")
     bytes32 internal constant _EIP712_DOMAIN_HASH = 0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f;
 
-    // keccak256("1")
+    /// @dev keccak256("1")
     bytes32 internal constant _EIP712_VERSION_HASH = 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
 
     /// @dev Initial Chain ID set at deployment.
