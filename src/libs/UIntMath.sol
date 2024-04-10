@@ -132,6 +132,16 @@ library UIntMath {
     }
 
     /**
+     * @notice Compares two uint32 values and returns the larger one.
+     * @param  a_  Value to check.
+     * @param  b_  Value to check.
+     * @return The larger value.
+     */
+    function max32(uint32 a_, uint32 b_) internal pure returns (uint32) {
+        return a_ > b_ ? a_ : b_;
+    }
+
+    /**
      * @notice Compares two uint40 values and returns the larger one.
      * @param  a_  Value to check.
      * @param  b_  Value to check.

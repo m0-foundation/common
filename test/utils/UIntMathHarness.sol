@@ -46,6 +46,10 @@ contract UIntMathHarness {
         return UIntMath.bound240(n);
     }
 
+    function max32(uint32 a_, uint32 b_) external pure returns (uint32) {
+        return UIntMath.max32(a_, b_);
+    }
+
     function max40(uint40 a_, uint40 b_) external pure returns (uint40) {
         return UIntMath.max40(a_, b_);
     }
