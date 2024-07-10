@@ -39,7 +39,7 @@ contract ERC712ExtendedTests is TestUtils {
     }
 
     /* ============ constructor ============ */
-    function test_constructor() external {
+    function test_constructor() external view {
         assertEq(_erc712.DOMAIN_SEPARATOR(), _computeDomainSeparator(_name, block.chainid, address(_erc712)));
     }
 
@@ -65,7 +65,7 @@ contract ERC712ExtendedTests is TestUtils {
     }
 
     /* ============ digest ============ */
-    function test_digest() external {
+    function test_digest() external view {
         assertEq(
             _erc712.getDigest(_permitDigest),
             keccak256(abi.encodePacked("\x19\x01", _erc712.DOMAIN_SEPARATOR(), _permitDigest))
@@ -73,7 +73,7 @@ contract ERC712ExtendedTests is TestUtils {
     }
 
     /* ============ getSignerAndRevertIfInvalidSignature ============ */
-    function test_getSigner() external {
+    function test_getSigner() external view {
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(_ownerKey, _permitDigest);
 
         assertEq(_erc712.getSignerAndRevertIfInvalidSignature(_permitDigest, v_, r_, s_), address(_owner));
@@ -198,7 +198,7 @@ contract ERC712ExtendedTests is TestUtils {
     }
 
     /* ============ eip712Domain ============ */
-    function test_eip712Domain() external {
+    function test_eip712Domain() external view {
         (
             bytes1 fields_,
             string memory name_,

@@ -30,14 +30,14 @@ contract ERC20ExtendedTests is TestUtils {
     }
 
     /* ============ constructor ============ */
-    function test_constructor() public {
+    function test_constructor() external view {
         assertEq(_token.name(), _TOKEN_NAME);
         assertEq(_token.symbol(), _TOKEN_SYMBOL);
         assertEq(_token.decimals(), _TOKEN_DECIMALS);
     }
 
     /* ============ eip712Domain ============ */
-    function test_eip712Domain() public {
+    function test_eip712Domain() external view {
         (
             bytes1 fields_,
             string memory name_,
@@ -58,7 +58,7 @@ contract ERC20ExtendedTests is TestUtils {
     }
 
     /* ============ mint ============ */
-    function test_mint() public {
+    function test_mint() external {
         uint256 amount_ = 1e18;
 
         vm.expectEmit();
@@ -70,7 +70,7 @@ contract ERC20ExtendedTests is TestUtils {
         assertEq(_token.balanceOf(_alice), amount_);
     }
 
-    function testFuzz_mint(address from_, uint256 amount_) public {
+    function testFuzz_mint(address from_, uint256 amount_) external {
         vm.assume(from_ != address(0));
 
         amount_ = bound(amount_, 1, type(uint256).max);
@@ -82,7 +82,7 @@ contract ERC20ExtendedTests is TestUtils {
     }
 
     /* ============ burn ============ */
-    function test_burn() public {
+    function test_burn() external {
         uint256 mintAmount_ = 1e18;
         uint256 burnAmount_ = 0.9e18;
 
@@ -97,7 +97,7 @@ contract ERC20ExtendedTests is TestUtils {
         assertEq(_token.balanceOf(_alice), mintAmount_ - burnAmount_);
     }
 
-    function testFuzz_burn(address from_, uint256 mintAmount_, uint256 burnAmount_) public {
+    function testFuzz_burn(address from_, uint256 mintAmount_, uint256 burnAmount_) external {
         vm.assume(from_ != address(0));
         vm.assume(mintAmount_ != 0);
 
@@ -110,7 +110,7 @@ contract ERC20ExtendedTests is TestUtils {
         assertEq(_token.balanceOf(from_), mintAmount_ - burnAmount_);
     }
 
-    function testFuzz_burn_insufficientBalance(address from_, uint256 mintAmount_, uint256 burnAmount_) public {
+    function testFuzz_burn_insufficientBalance(address from_, uint256 mintAmount_, uint256 burnAmount_) external {
         vm.assume(from_ != address(0));
         vm.assume(mintAmount_ != 0);
         vm.assume(mintAmount_ != type(uint256).max);
@@ -124,7 +124,7 @@ contract ERC20ExtendedTests is TestUtils {
     }
 
     /* ============ approve ============ */
-    function test_approve() public {
+    function test_approve() external {
         uint256 amount_ = 1e18;
 
         vm.expectEmit();
@@ -135,14 +135,14 @@ contract ERC20ExtendedTests is TestUtils {
         assertEq(_token.allowance(address(this), _alice), amount_);
     }
 
-    function testFuzz_approve(address to_, uint256 amount_) public {
+    function testFuzz_approve(address to_, uint256 amount_) external {
         assertTrue(_token.approve(to_, amount_));
 
         assertEq(_token.allowance(address(this), to_), amount_);
     }
 
     /* ============ transfer ============ */
-    function test_transfer() public {
+    function test_transfer() external {
         uint256 amount_ = 1e18;
 
         _token.mint(address(this), amount_);
@@ -157,7 +157,7 @@ contract ERC20ExtendedTests is TestUtils {
         assertEq(_token.balanceOf(_alice), amount_);
     }
 
-    function testFuzz_transfer(address from_, uint256 amount_) public {
+    function testFuzz_transfer(address from_, uint256 amount_) external {
         vm.assume(from_ != address(0));
         vm.assume(amount_ != 0);
 
@@ -174,14 +174,14 @@ contract ERC20ExtendedTests is TestUtils {
         }
     }
 
-    function test_transfer_insufficientBalance() public {
+    function test_transfer_insufficientBalance() external {
         _token.mint(address(this), 0.9e18);
 
         vm.expectRevert();
         _token.transfer(_alice, 1e18);
     }
 
-    function testFuzz_transfer_insufficientBalance(address to_, uint256 mintAmount_, uint256 sendAmount_) public {
+    function testFuzz_transfer_insufficientBalance(address to_, uint256 mintAmount_, uint256 sendAmount_) external {
         vm.assume(mintAmount_ != type(uint256).max);
 
         sendAmount_ = bound(sendAmount_, mintAmount_ + 1, type(uint256).max);
@@ -193,7 +193,7 @@ contract ERC20ExtendedTests is TestUtils {
     }
 
     /* ============ transferFrom ============ */
-    function test_transferFrom() public {
+    function test_transferFrom() external {
         uint256 amount_ = 1e18;
 
         _token.mint(_alice, amount_);
@@ -210,7 +210,7 @@ contract ERC20ExtendedTests is TestUtils {
         assertEq(_token.balanceOf(_bob), amount_);
     }
 
-    function testFuzz_transferFrom(address to_, uint256 approval_, uint256 amount_) public {
+    function testFuzz_transferFrom(address to_, uint256 approval_, uint256 amount_) external {
         vm.assume(to_ != address(0));
 
         amount_ = bound(amount_, 0, approval_);
@@ -236,7 +236,7 @@ contract ERC20ExtendedTests is TestUtils {
         }
     }
 
-    function test_transferFrom_infiniteApprove() public {
+    function test_transferFrom_infiniteApprove() external {
         uint256 amount_ = 1e18;
 
         _token.mint(_alice, amount_);
@@ -253,7 +253,7 @@ contract ERC20ExtendedTests is TestUtils {
         assertEq(_token.balanceOf(_bob), amount_);
     }
 
-    function test_transferFrom_insufficientAllowance() public {
+    function test_transferFrom_insufficientAllowance() external {
         uint256 amount_ = 1e18;
 
         _token.mint(_alice, amount_);
@@ -267,7 +267,7 @@ contract ERC20ExtendedTests is TestUtils {
         _token.transferFrom(_alice, _bob, amount_);
     }
 
-    function testFuzz_transferFrom_insufficientAllowance(address to_, uint256 approval_, uint256 amount_) public {
+    function testFuzz_transferFrom_insufficientAllowance(address to_, uint256 approval_, uint256 amount_) external {
         vm.assume(approval_ != type(uint256).max);
 
         amount_ = bound(amount_, approval_ + 1, type(uint256).max);
@@ -283,7 +283,7 @@ contract ERC20ExtendedTests is TestUtils {
         _token.transferFrom(_alice, to_, amount_);
     }
 
-    function test_transferFrom_insufficientBalance() public {
+    function test_transferFrom_insufficientBalance() external {
         uint256 amount_ = 1e18;
 
         _token.mint(_alice, 0.9e18);
@@ -295,7 +295,7 @@ contract ERC20ExtendedTests is TestUtils {
         _token.transferFrom(_alice, _bob, amount_);
     }
 
-    function testFuzz_transferFrom_insufficientBalance(address to_, uint256 mintAmount_, uint256 sendAmount_) public {
+    function testFuzz_transferFrom_insufficientBalance(address to_, uint256 mintAmount_, uint256 sendAmount_) external {
         vm.assume(mintAmount_ != type(uint256).max);
 
         sendAmount_ = bound(sendAmount_, mintAmount_ + 1, type(uint256).max);
@@ -310,7 +310,7 @@ contract ERC20ExtendedTests is TestUtils {
     }
 
     /* ============ permit ============ */
-    function test_permit() public {
+    function test_permit() external {
         uint256 amount_ = 1e18;
 
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(
@@ -327,7 +327,7 @@ contract ERC20ExtendedTests is TestUtils {
         assertEq(_token.nonces(_alice), 1);
     }
 
-    function testFuzz_permit(uint248 key_, address to_, uint256 amount_, uint256 deadline_) public {
+    function testFuzz_permit(uint248 key_, address to_, uint256 amount_, uint256 deadline_) external {
         uint256 privateKey_ = key_;
 
         if (deadline_ < block.timestamp) deadline_ = block.timestamp;
@@ -349,7 +349,7 @@ contract ERC20ExtendedTests is TestUtils {
         assertEq(_token.nonces(owner_), 1);
     }
 
-    function test_permit_badNonce() public {
+    function test_permit_badNonce() external {
         uint256 amount_ = 1e18;
 
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(
@@ -367,7 +367,7 @@ contract ERC20ExtendedTests is TestUtils {
         uint256 amount_,
         uint256 deadline_,
         uint256 nonce_
-    ) public {
+    ) external {
         if (deadline_ < block.timestamp) deadline_ = block.timestamp;
         if (privateKey_ == 0) privateKey_ = 1;
         if (nonce_ == 0) nonce_ = 1;
@@ -386,7 +386,7 @@ contract ERC20ExtendedTests is TestUtils {
         _token.permit(owner_, to_, amount_, deadline_, v_, r_, s_);
     }
 
-    function test_permit_badDeadline() public {
+    function test_permit_badDeadline() external {
         uint256 amount_ = 1e18;
 
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(
@@ -398,7 +398,12 @@ contract ERC20ExtendedTests is TestUtils {
         _token.permit(_alice, _bob, amount_, block.timestamp + 1, v_, r_, s_);
     }
 
-    function testFuzz_permit_badDeadline(uint256 privateKey_, address to_, uint256 amount_, uint256 deadline_) public {
+    function testFuzz_permit_badDeadline(
+        uint256 privateKey_,
+        address to_,
+        uint256 amount_,
+        uint256 deadline_
+    ) external {
         if (deadline_ < block.timestamp) deadline_ = block.timestamp;
         if (privateKey_ == 0) privateKey_ = 1;
 
@@ -418,7 +423,7 @@ contract ERC20ExtendedTests is TestUtils {
         _token.permit(owner_, to_, amount_, deadline_ + 1, v_, r_, s_);
     }
 
-    function test_permit_pastDeadline() public {
+    function test_permit_pastDeadline() external {
         uint256 amount_ = 1e18;
         uint256 oldTimestamp_ = block.timestamp;
         uint256 newTimestamp_ = oldTimestamp_ + 1;
@@ -434,7 +439,12 @@ contract ERC20ExtendedTests is TestUtils {
         _token.permit(_alice, _bob, amount_, oldTimestamp_, v_, r_, s_);
     }
 
-    function testFuzz_permit_pastDeadline(uint256 privateKey_, address to_, uint256 amount_, uint256 deadline_) public {
+    function testFuzz_permit_pastDeadline(
+        uint256 privateKey_,
+        address to_,
+        uint256 amount_,
+        uint256 deadline_
+    ) external {
         deadline_ = bound(deadline_, 0, block.timestamp - 1);
         if (privateKey_ == 0) privateKey_ = 1;
 
@@ -452,7 +462,7 @@ contract ERC20ExtendedTests is TestUtils {
         _token.permit(owner_, to_, amount_, deadline_, v_, r_, s_);
     }
 
-    function test_permit_replay() public {
+    function test_permit_replay() external {
         uint256 amount_ = 1e18;
 
         (uint8 v_, bytes32 r_, bytes32 s_) = vm.sign(
@@ -466,7 +476,7 @@ contract ERC20ExtendedTests is TestUtils {
         _token.permit(_alice, _bob, amount_, block.timestamp, v_, r_, s_);
     }
 
-    function testFuzz_permit_replay(uint256 privateKey_, address to_, uint256 amount_, uint256 deadline_) public {
+    function testFuzz_permit_replay(uint256 privateKey_, address to_, uint256 amount_, uint256 deadline_) external {
         if (deadline_ < block.timestamp) deadline_ = block.timestamp;
         if (privateKey_ == 0) privateKey_ = 1;
 

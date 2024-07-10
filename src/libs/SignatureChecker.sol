@@ -57,14 +57,14 @@ library SignatureChecker {
         bytes32 digest,
         bytes memory signature
     ) internal view returns (bool) {
-        (bool success, bytes memory result) = signer.staticcall(
+        (bool success_, bytes memory result_) = signer.staticcall(
             abi.encodeCall(IERC1271.isValidSignature, (digest, signature))
         );
 
         return
-            success &&
-            result.length >= 32 &&
-            abi.decode(result, (bytes32)) == bytes32(IERC1271.isValidSignature.selector);
+            success_ &&
+            result_.length >= 32 &&
+            abi.decode(result_, (bytes32)) == bytes32(IERC1271.isValidSignature.selector);
     }
 
     /**
@@ -122,11 +122,11 @@ library SignatureChecker {
 
     /**
      * @dev    Returns whether an ECDSA/secp256k1 short signature is valid for a signer and digest.
-     * @param  signer  The address of the account purported to have signed.
-     * @param  digest  The hash of the data that was signed.
-     * @param  r       An ECDSA/secp256k1 signature parameter.
-     * @param  vs      An ECDSA/secp256k1 short signature parameter.
-     * @return         Whether the signature is valid or not.
+     * @param  signer The address of the account purported to have signed.
+     * @param  digest The hash of the data that was signed.
+     * @param  r      An ECDSA/secp256k1 signature parameter.
+     * @param  vs     An ECDSA/secp256k1 short signature parameter.
+     * @return        Whether the signature is valid or not.
      */
     function isValidECDSASignature(address signer, bytes32 digest, bytes32 r, bytes32 vs) internal pure returns (bool) {
         return validateECDSASignature(signer, digest, r, vs) == Error.NoError;

@@ -21,51 +21,51 @@ pragma solidity >=0.8.20 <0.9.0;
  */
 library ContractHelper {
     /**
-     * @notice Returns the expected address of a contract deployed by `account_` with transaction count `nonce_`.
-     * @param  account_  The address of the account deploying a contract.
-     * @param  nonce_    The nonce used in the deployment transaction.
-     * @return contract_ The expected address of the deployed contract.
+     * @notice Returns the expected address of a contract deployed by `account` with transaction count `nonce`.
+     * @param  account The address of the account deploying a contract.
+     * @param  nonce   The nonce used in the deployment transaction.
+     * @return The expected address of the deployed contract.
      */
-    function getContractFrom(address account_, uint256 nonce_) internal pure returns (address contract_) {
+    function getContractFrom(address account, uint256 nonce) internal pure returns (address) {
         return
             address(
                 uint160(
                     uint256(
                         keccak256(
-                            nonce_ == 0x00
-                                ? abi.encodePacked(bytes1(0xd6), bytes1(0x94), account_, bytes1(0x80))
-                                : nonce_ <= 0x7f
-                                    ? abi.encodePacked(bytes1(0xd6), bytes1(0x94), account_, uint8(nonce_))
-                                    : nonce_ <= 0xff
+                            nonce == 0x00
+                                ? abi.encodePacked(bytes1(0xd6), bytes1(0x94), account, bytes1(0x80))
+                                : nonce <= 0x7f
+                                    ? abi.encodePacked(bytes1(0xd6), bytes1(0x94), account, uint8(nonce))
+                                    : nonce <= 0xff
                                         ? abi.encodePacked(
                                             bytes1(0xd7),
                                             bytes1(0x94),
-                                            account_,
+                                            account,
                                             bytes1(0x81),
-                                            uint8(nonce_)
+                                            uint8(nonce)
                                         )
-                                        : nonce_ <= 0xffff
+                                        : nonce <= 0xffff
                                             ? abi.encodePacked(
                                                 bytes1(0xd8),
                                                 bytes1(0x94),
-                                                account_,
+                                                account,
                                                 bytes1(0x82),
-                                                uint16(nonce_)
+                                                uint16(nonce)
                                             )
-                                            : nonce_ <= 0xffffff
+                                            : nonce <= 0xffffff
                                                 ? abi.encodePacked(
                                                     bytes1(0xd9),
                                                     bytes1(0x94),
-                                                    account_,
+                                                    account,
                                                     bytes1(0x83),
-                                                    uint24(nonce_)
+                                                    uint24(nonce)
                                                 )
                                                 : abi.encodePacked(
                                                     bytes1(0xda),
                                                     bytes1(0x94),
-                                                    account_,
+                                                    account,
                                                     bytes1(0x84),
-                                                    uint32(nonce_)
+                                                    uint32(nonce)
                                                 )
                         )
                     )

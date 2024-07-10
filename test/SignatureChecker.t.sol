@@ -52,7 +52,7 @@ contract SignatureCheckerTests is TestUtils {
         _signatureChecker = new SignatureCheckerHarness();
     }
 
-    function test_decodeECDSASignature() external {
+    function test_decodeECDSASignature() external view {
         (uint8 v_, bytes32 r_, bytes32 s_) = _signatureChecker.decodeECDSASignature(
             _encodeSignature(18, "TEST_R", "TEST_S")
         );
@@ -62,7 +62,7 @@ contract SignatureCheckerTests is TestUtils {
         assertEq(s_, bytes32("TEST_S"));
     }
 
-    function testFuzz_decodeECDSASignature(uint256 v, uint256 r, uint256 s) external {
+    function testFuzz_decodeECDSASignature(uint256 v, uint256 r, uint256 s) external view {
         (uint8 v_, bytes32 r_, bytes32 s_) = _signatureChecker.decodeECDSASignature(
             _encodeSignature(uint8(v), bytes32(r), bytes32(s))
         );
@@ -72,7 +72,7 @@ contract SignatureCheckerTests is TestUtils {
         assertEq(s_, bytes32(s));
     }
 
-    function test_recoverECDSASigner_vrs_invalidSignatureS() external {
+    function test_recoverECDSASigner_vrs_invalidSignatureS() external view {
         (SignatureChecker.Error error_, address signer) = _signatureChecker.recoverECDSASigner(
             0x00,
             0x00,
@@ -84,14 +84,14 @@ contract SignatureCheckerTests is TestUtils {
         assertEq(signer, address(0));
     }
 
-    function test_recoverECDSASigner_vrs_invalidSignatureV() external {
+    function test_recoverECDSASigner_vrs_invalidSignatureV() external view {
         (SignatureChecker.Error error_, address signer) = _signatureChecker.recoverECDSASigner(0x00, 26, 0x00, 0x00);
 
         assertEq(uint8(error_), uint8(SignatureChecker.Error.InvalidSignatureV));
         assertEq(signer, address(0));
     }
 
-    function test_recoverECDSASigner_vrs_invalidSignature() external {
+    function test_recoverECDSASigner_vrs_invalidSignature() external view {
         (SignatureChecker.Error error_, address signer) = _signatureChecker.recoverECDSASigner(0x00, 27, 0x00, 0x00);
 
         assertEq(uint8(error_), uint8(SignatureChecker.Error.InvalidSignature));
@@ -120,7 +120,7 @@ contract SignatureCheckerTests is TestUtils {
         assertEq(signer_, account_);
     }
 
-    function test_recoverECDSASigner_rvs_invalidSignatureS() external {
+    function test_recoverECDSASigner_rvs_invalidSignatureS() external view {
         (SignatureChecker.Error error_, address signer) = _signatureChecker.recoverECDSASigner(
             0x00,
             0x00,
@@ -131,7 +131,7 @@ contract SignatureCheckerTests is TestUtils {
         assertEq(signer, address(0));
     }
 
-    function test_recoverECDSASigner_rvs_invalidSignature() external {
+    function test_recoverECDSASigner_rvs_invalidSignature() external view {
         (SignatureChecker.Error error_, address signer) = _signatureChecker.recoverECDSASigner(0x00, 0x00, 0x00);
 
         assertEq(uint8(error_), uint8(SignatureChecker.Error.InvalidSignature));
@@ -168,7 +168,7 @@ contract SignatureCheckerTests is TestUtils {
         assertEq(signer_, account_);
     }
 
-    function test_recoverECDSASigner_bytes_invalidSignatureS() external {
+    function test_recoverECDSASigner_bytes_invalidSignatureS() external view {
         (SignatureChecker.Error error_, address signer) = _signatureChecker.recoverECDSASigner(
             0x00,
             _encodeSignature(0x00, 0x00, bytes32(_MAX_S + 1))
@@ -178,7 +178,7 @@ contract SignatureCheckerTests is TestUtils {
         assertEq(signer, address(0));
     }
 
-    function test_recoverECDSASigner_bytes_invalidSignatureV() external {
+    function test_recoverECDSASigner_bytes_invalidSignatureV() external view {
         (SignatureChecker.Error error_, address signer) = _signatureChecker.recoverECDSASigner(
             0x00,
             _encodeSignature(26, 0x00, 0x00)
@@ -188,7 +188,7 @@ contract SignatureCheckerTests is TestUtils {
         assertEq(signer, address(0));
     }
 
-    function test_recoverECDSASigner_bytes_invalidSignature() external {
+    function test_recoverECDSASigner_bytes_invalidSignature() external view {
         (SignatureChecker.Error error_, address signer) = _signatureChecker.recoverECDSASigner(
             0x00,
             _encodeSignature(27, 0x00, 0x00)
@@ -226,14 +226,14 @@ contract SignatureCheckerTests is TestUtils {
         assertEq(signer_, account_);
     }
 
-    function test_validateRecoveredSigner_mismatch() external {
+    function test_validateRecoveredSigner_mismatch() external view {
         assertEq(
             uint8(_signatureChecker.validateRecoveredSigner(address(0), address(1))),
             uint8(SignatureChecker.Error.SignerMismatch)
         );
     }
 
-    function test_validateRecoveredSigner() external {
+    function test_validateRecoveredSigner() external view {
         assertEq(
             uint8(_signatureChecker.validateRecoveredSigner(address(1), address(1))),
             uint8(SignatureChecker.Error.NoError)

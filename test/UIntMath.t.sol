@@ -53,53 +53,53 @@ contract UIntMathTests is Test {
         _uintMath.safe240(uint256(type(uint240).max) + 1);
     }
 
-    function test_bound32() external {
+    function test_bound32() external view {
         assertEq(_uintMath.bound32(uint256(type(uint32).max) + 1), type(uint32).max);
     }
 
-    function test_bound112() external {
+    function test_bound112() external view {
         assertEq(_uintMath.bound112(uint256(type(uint112).max) + 1), type(uint112).max);
     }
 
-    function test_bound128() external {
+    function test_bound128() external view {
         assertEq(_uintMath.bound128(uint256(type(uint128).max) + 1), type(uint128).max);
     }
 
-    function test_bound240() external {
+    function test_bound240() external view {
         assertEq(_uintMath.bound240(uint256(type(uint240).max) + 1), type(uint240).max);
     }
 
-    function test_max32() external {
+    function test_max32() external view {
         assertEq(_uintMath.max32(1, 2), 2);
         assertEq(_uintMath.max32(2, 1), 2);
     }
 
-    function test_max40() external {
+    function test_max40() external view {
         assertEq(_uintMath.max40(1, 2), 2);
         assertEq(_uintMath.max40(2, 1), 2);
     }
 
-    function test_min32() external {
+    function test_min32() external view {
         assertEq(_uintMath.min32(1, 2), 1);
         assertEq(_uintMath.min32(2, 1), 1);
     }
 
-    function test_min40() external {
+    function test_min40() external view {
         assertEq(_uintMath.min40(1, 2), 1);
         assertEq(_uintMath.min40(2, 1), 1);
     }
 
-    function test_min112() external {
+    function test_min112() external view {
         assertEq(_uintMath.min112(1, 2), 1);
         assertEq(_uintMath.min112(2, 1), 1);
     }
 
-    function test_min240() external {
+    function test_min240() external view {
         assertEq(_uintMath.min240(1, 2), 1);
         assertEq(_uintMath.min240(2, 1), 1);
     }
 
-    function test_min256() external {
+    function test_min256() external view {
         assertEq(_uintMath.min256(1, 2), 1);
         assertEq(_uintMath.min256(2, 1), 1);
     }
