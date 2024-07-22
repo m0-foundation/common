@@ -37,7 +37,7 @@ contract ERC20ExtendedHandler is CommonBase, StdCheats, StdUtils {
         _token.approve(to_, amount_);
     }
 
-    function transferfrom(address from_, address to_, uint256 amount_) public {
+    function transferFrom(address from_, address to_, uint256 amount_) public {
         if (from_ == address(0) || to_ == address(0)) return;
 
         amount_ = bound(amount_, 0, _token.balanceOf(from_));
@@ -87,7 +87,7 @@ contract ERC20ExtendedInvariantTests is TestUtils {
         selectors[0] = ERC20ExtendedHandler.mint.selector;
         selectors[1] = ERC20ExtendedHandler.burn.selector;
         selectors[2] = ERC20ExtendedHandler.approve.selector;
-        selectors[3] = ERC20ExtendedHandler.transferfrom.selector;
+        selectors[3] = ERC20ExtendedHandler.transferFrom.selector;
         selectors[4] = ERC20ExtendedHandler.transfer.selector;
 
         targetSelector(FuzzSelector({ addr: address(_handler), selectors: selectors }));

@@ -30,7 +30,7 @@ contract ERC3009Tests is TestUtils {
         _token = new ERC20ExtendedHarness("ERC3009 Token", "ERC3009_TKN", 0);
     }
 
-    /* ============ Typehashes ============ */
+    /* ============ TypeHashes ============ */
     function test_transferWithAuthorizationTypehash() external {
         assertEq(
             _token.TRANSFER_WITH_AUTHORIZATION_TYPEHASH(),

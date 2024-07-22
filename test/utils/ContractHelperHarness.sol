@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.23;
 
-import { ContractHelper } from "../../src/ContractHelper.sol";
+import { ContractHelper } from "../../src/libs/ContractHelper.sol";
 
 /// @title ContractHelper harness used to correctly display test coverage.
 contract ContractHelperHarness {

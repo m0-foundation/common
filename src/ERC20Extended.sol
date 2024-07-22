@@ -5,6 +5,8 @@ pragma solidity 0.8.23;
 import { IERC20 } from "./interfaces/IERC20.sol";
 import { IERC20Extended } from "./interfaces/IERC20Extended.sol";
 
+import { Bytes32String } from "./libs/Bytes32String.sol";
+
 import { ERC3009 } from "./ERC3009.sol";
 
 /**
@@ -25,8 +27,8 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
     /// @inheritdoc IERC20
     uint8 public immutable decimals;
 
-    /// @inheritdoc IERC20
-    string public symbol;
+    /// @dev The symbol of the token (stored as a bytes32 instead of a string in order to be immutable).
+    bytes32 internal immutable _symbol;
 
     /// @inheritdoc IERC20
     mapping(address account => mapping(address spender => uint256 allowance)) public allowance;
@@ -40,7 +42,7 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
      * @param  decimals_ The number of decimals the token uses.
      */
     constructor(string memory name_, string memory symbol_, uint8 decimals_) ERC3009(name_) {
-        symbol = symbol_;
+        _symbol = Bytes32String.toBytes32(symbol_);
         decimals = decimals_;
     }
 
@@ -102,8 +104,13 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
     /* ============ View/Pure Functions ============ */
 
     /// @inheritdoc IERC20
-    function name() external view returns (string memory name_) {
-        return _name;
+    function name() external view returns (string memory) {
+        return Bytes32String.toString(_name);
+    }
+
+    /// @inheritdoc IERC20
+    function symbol() external view returns (string memory) {
+        return Bytes32String.toString(_symbol);
     }
 
     /* ============ Internal Interactive Functions ============ */
