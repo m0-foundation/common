@@ -38,11 +38,8 @@ abstract contract ERC3009 is IERC3009, StatefulERC712 {
 
     /* ============ Constructor ============ */
 
-    /**
-     * @notice Construct the ERC3009 contract.
-     * @param  name_ The name of the contract.
-     */
-    constructor(string memory name_) StatefulERC712(name_) {}
+    /// @notice Construct the ERC3009 contract.
+    constructor() StatefulERC712() {}
 
     /* ============ Interactive Functions ============ */
 

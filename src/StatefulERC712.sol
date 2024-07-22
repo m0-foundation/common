@@ -15,9 +15,6 @@ abstract contract StatefulERC712 is IStatefulERC712, ERC712Extended {
     /// @inheritdoc IStatefulERC712
     mapping(address account => uint256 nonce) public nonces; // Nonces for all signatures.
 
-    /**
-     * @notice Construct the StatefulERC712 contract.
-     * @param  name_ The name of the contract.
-     */
-    constructor(string memory name_) ERC712Extended(name_) {}
+    /// @notice Construct the StatefulERC712 contract.
+    constructor() ERC712Extended() {}
 }

@@ -27,18 +27,10 @@ abstract contract ERC712Extended is IERC712Extended {
     /// @dev Initial EIP-712 domain separator set at deployment.
     bytes32 internal immutable _INITIAL_DOMAIN_SEPARATOR;
 
-    /// @dev The name of the contract.
-    string internal _name;
-
     /* ============ Constructor ============ */
 
-    /**
-     * @notice Constructs the EIP-712 domain separator.
-     * @param  name_ The name of the contract.
-     */
-    constructor(string memory name_) {
-        _name = name_;
-
+    /// @notice Constructs the EIP-712 domain separator.
+    constructor() {
         _INITIAL_CHAIN_ID = block.chainid;
         _INITIAL_DOMAIN_SEPARATOR = _getDomainSeparator();
     }
@@ -62,7 +54,7 @@ abstract contract ERC712Extended is IERC712Extended {
     {
         return (
             hex"0f", // 01111
-            _name,
+            _name(),
             "1",
             block.chainid,
             address(this),
@@ -87,7 +79,7 @@ abstract contract ERC712Extended is IERC712Extended {
             keccak256(
                 abi.encode(
                     _EIP712_DOMAIN_HASH,
-                    keccak256(bytes(_name)),
+                    keccak256(bytes(_name())),
                     _EIP712_VERSION_HASH,
                     block.chainid,
                     address(this)
@@ -103,6 +95,9 @@ abstract contract ERC712Extended is IERC712Extended {
     function _getDigest(bytes32 internalDigest_) internal view returns (bytes32) {
         return keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), internalDigest_));
     }
+
+    /// @dev  Returns the name of the contract.
+    function _name() internal view virtual returns (string memory name_);
 
     /**
      * @dev   Revert if the signature is expired.

@@ -10,10 +10,6 @@ import { ERC20ExtendedHarness } from "./utils/ERC20ExtendedHarness.sol";
 import { TestUtils } from "./utils/TestUtils.t.sol";
 
 contract ERC20ExtendedTests is TestUtils {
-    string internal constant _TOKEN_NAME = "ERC20Extended Token";
-    string internal constant _TOKEN_SYMBOL = "ERC20E_TKN";
-    uint8 internal constant _TOKEN_DECIMALS = 18;
-
     address internal _alice;
     uint256 internal _aliceKey;
 
@@ -26,14 +22,14 @@ contract ERC20ExtendedTests is TestUtils {
         (_alice, _aliceKey) = makeAddrAndKey("alice");
         (_bob, _bobKey) = makeAddrAndKey("bob");
 
-        _token = new ERC20ExtendedHarness(_TOKEN_NAME, _TOKEN_SYMBOL, _TOKEN_DECIMALS);
+        _token = new ERC20ExtendedHarness(18);
     }
 
     /* ============ constructor ============ */
     function test_constructor() public {
-        assertEq(_token.name(), _TOKEN_NAME);
-        assertEq(_token.symbol(), _TOKEN_SYMBOL);
-        assertEq(_token.decimals(), _TOKEN_DECIMALS);
+        assertEq(_token.name(), "Name");
+        assertEq(_token.symbol(), "Symbol");
+        assertEq(_token.decimals(), 18);
     }
 
     /* ============ eip712Domain ============ */
@@ -49,7 +45,7 @@ contract ERC20ExtendedTests is TestUtils {
         ) = _token.eip712Domain();
 
         assertEq(fields_, hex"0f");
-        assertEq(name_, _TOKEN_NAME);
+        assertEq(name_, "Name");
         assertEq(version_, "1");
         assertEq(chainId_, block.chainid);
         assertEq(verifyingContract_, address(_token));

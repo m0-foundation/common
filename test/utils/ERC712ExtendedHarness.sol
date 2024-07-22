@@ -5,11 +5,7 @@ pragma solidity 0.8.23;
 import { ERC712Extended } from "../../src/ERC712Extended.sol";
 
 contract ERC712ExtendedHarness is ERC712Extended {
-    constructor(string memory name_) ERC712Extended(name_) {}
-
-    function name() external view returns (string memory) {
-        return _name;
-    }
+    constructor() ERC712Extended() {}
 
     function getDomainSeparator() external view returns (bytes32) {
         return _getDomainSeparator();
@@ -48,5 +44,9 @@ contract ERC712ExtendedHarness is ERC712Extended {
         bytes32 s_
     ) external pure {
         _revertIfInvalidSignature(signer_, digest_, v_, r_, s_);
+    }
+
+    function _name() internal pure override returns (string memory) {
+        return "Name";
     }
 }

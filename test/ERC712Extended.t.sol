@@ -14,8 +14,6 @@ contract ERC712ExtendedTests is TestUtils {
     ERC1271WalletMock internal _erc1271Wallet;
     ERC712ExtendedHarness internal _erc712;
 
-    string internal _name = "ERC712Contract";
-
     address internal _owner;
     uint256 internal _ownerKey;
 
@@ -34,35 +32,34 @@ contract ERC712ExtendedTests is TestUtils {
 
         _erc1271MaliciousWallet = new ERC1271MaliciousWalletMock();
         _erc1271Wallet = new ERC1271WalletMock(_owner);
-        _erc712 = new ERC712ExtendedHarness(_name);
+        _erc712 = new ERC712ExtendedHarness();
         _permitDigest = _getPermitHash(_owner, _spender, 1e18, 0, 1 days);
     }
 
     /* ============ constructor ============ */
     function test_constructor() external {
-        assertEq(_erc712.name(), _name);
-        assertEq(_erc712.DOMAIN_SEPARATOR(), _computeDomainSeparator(_name, block.chainid, address(_erc712)));
+        assertEq(_erc712.DOMAIN_SEPARATOR(), _computeDomainSeparator("Name", block.chainid, address(_erc712)));
     }
 
     /* ============ DOMAIN_SEPARATOR ============ */
     function test_domainSeparator() external {
-        assertEq(_erc712.DOMAIN_SEPARATOR(), _computeDomainSeparator(_name, block.chainid, address(_erc712)));
+        assertEq(_erc712.DOMAIN_SEPARATOR(), _computeDomainSeparator("Name", block.chainid, address(_erc712)));
 
         vm.chainId(_powChainId);
 
         assertEq(block.chainid, _powChainId);
-        assertEq(_erc712.DOMAIN_SEPARATOR(), _computeDomainSeparator(_name, _powChainId, address(_erc712)));
+        assertEq(_erc712.DOMAIN_SEPARATOR(), _computeDomainSeparator("Name", _powChainId, address(_erc712)));
     }
 
     function test_getDomainSeparator() external {
         assertEq(_erc712.getDomainSeparator(), _erc712.DOMAIN_SEPARATOR());
-        assertEq(_erc712.getDomainSeparator(), _computeDomainSeparator(_name, block.chainid, address(_erc712)));
+        assertEq(_erc712.getDomainSeparator(), _computeDomainSeparator("Name", block.chainid, address(_erc712)));
 
         vm.chainId(_powChainId);
 
         assertEq(block.chainid, _powChainId);
         assertEq(_erc712.getDomainSeparator(), _erc712.DOMAIN_SEPARATOR());
-        assertEq(_erc712.getDomainSeparator(), _computeDomainSeparator(_name, _powChainId, address(_erc712)));
+        assertEq(_erc712.getDomainSeparator(), _computeDomainSeparator("Name", _powChainId, address(_erc712)));
     }
 
     /* ============ digest ============ */
@@ -211,7 +208,7 @@ contract ERC712ExtendedTests is TestUtils {
         ) = _erc712.eip712Domain();
 
         assertEq(fields_, hex"0f");
-        assertEq(name_, _name);
+        assertEq(name_, "Name");
         assertEq(version_, "1");
         assertEq(chainId_, block.chainid);
         assertEq(verifyingContract_, address(_erc712));

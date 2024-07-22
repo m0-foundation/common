@@ -9,11 +9,9 @@ contract ERC20ExtendedHarness is ERC20Extended {
 
     uint256 public totalSupply;
 
-    constructor(string memory name_, string memory symbol_, uint8 decimals_) ERC20Extended(name_, symbol_, decimals_) {}
+    constructor(uint8 decimals_) ERC20Extended(decimals_) {}
 
-    /******************************************************************************************************************\
-    |                                      External/Public Interactive Functions                                       |
-    \******************************************************************************************************************/
+    /* ============ Interactive Functions ============ */
 
     function mint(address recipient_, uint256 amount_) external {
         _transfer(address(0), recipient_, amount_);
@@ -27,9 +25,7 @@ contract ERC20ExtendedHarness is ERC20Extended {
         authorizationState[authorizer_][nonce_] = isNonceUsed_;
     }
 
-    /******************************************************************************************************************\
-    |                                       External/Public View/Pure Functions                                        |
-    \******************************************************************************************************************/
+    /* ============ View/Pure Functions ============ */
 
     function getDigest(bytes32 internalDigest_) external view returns (bytes32) {
         return _getDigest(internalDigest_);
@@ -71,9 +67,7 @@ contract ERC20ExtendedHarness is ERC20Extended {
         return _getCancelAuthorizationDigest(authorizer_, nonce_);
     }
 
-    /******************************************************************************************************************\
-    |                                          Internal Interactive Functions                                          |
-    \******************************************************************************************************************/
+    /* ============ Internal Interactive Functions ============ */
 
     function _transfer(address sender_, address recipient_, uint256 amount_) internal override {
         if (sender_ != address(0)) {
@@ -93,5 +87,15 @@ contract ERC20ExtendedHarness is ERC20Extended {
         }
 
         emit Transfer(sender_, recipient_, amount_);
+    }
+
+    /* ============ Internal View/Pure Functions ============ */
+
+    function _name() internal pure override returns (string memory) {
+        return "Name";
+    }
+
+    function _symbol() internal pure override returns (string memory) {
+        return "Symbol";
     }
 }

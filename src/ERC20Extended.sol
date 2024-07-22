@@ -26,21 +26,15 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
     uint8 public immutable decimals;
 
     /// @inheritdoc IERC20
-    string public symbol;
-
-    /// @inheritdoc IERC20
     mapping(address account => mapping(address spender => uint256 allowance)) public allowance;
 
     /* ============ Constructor ============ */
 
     /**
      * @notice Constructs the ERC20Extended contract.
-     * @param  name_     The name of the token.
-     * @param  symbol_   The symbol of the token.
      * @param  decimals_ The number of decimals the token uses.
      */
-    constructor(string memory name_, string memory symbol_, uint8 decimals_) ERC3009(name_) {
-        symbol = symbol_;
+    constructor(uint8 decimals_) ERC3009() {
         decimals = decimals_;
     }
 
@@ -103,7 +97,12 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
 
     /// @inheritdoc IERC20
     function name() external view returns (string memory name_) {
-        return _name;
+        return _name();
+    }
+
+    /// @inheritdoc IERC20
+    function symbol() external view returns (string memory symbol_) {
+        return _symbol();
     }
 
     /* ============ Internal Interactive Functions ============ */
@@ -155,4 +154,9 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
                 );
         }
     }
+
+    /* ============ Internal View/Pure Functions ============ */
+
+    /// @dev Returns the symbol of the token.
+    function _symbol() internal view virtual returns (string memory symbol_);
 }
