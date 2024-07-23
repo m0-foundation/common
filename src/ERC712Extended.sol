@@ -6,6 +6,7 @@ import { IERC712 } from "./interfaces/IERC712.sol";
 import { IERC712Extended } from "./interfaces/IERC712Extended.sol";
 
 import { SignatureChecker } from "./libs/SignatureChecker.sol";
+import { Bytes32String } from "./libs/Bytes32String.sol";
 
 /**
  * @title  Typed structured data hashing and signing via EIP-712, extended by EIP-5267.
@@ -27,8 +28,8 @@ abstract contract ERC712Extended is IERC712Extended {
     /// @dev Initial EIP-712 domain separator set at deployment.
     bytes32 internal immutable _INITIAL_DOMAIN_SEPARATOR;
 
-    /// @dev The name of the contract.
-    string internal _name;
+    /// @dev The name of the contract (stored as a bytes32 instead of a string in order to be immutable).
+    bytes32 internal immutable _name;
 
     /* ============ Constructor ============ */
 
@@ -37,7 +38,7 @@ abstract contract ERC712Extended is IERC712Extended {
      * @param  name_ The name of the contract.
      */
     constructor(string memory name_) {
-        _name = name_;
+        _name = Bytes32String.toBytes32(name_);
 
         _INITIAL_CHAIN_ID = block.chainid;
         _INITIAL_DOMAIN_SEPARATOR = _getDomainSeparator();
@@ -62,7 +63,7 @@ abstract contract ERC712Extended is IERC712Extended {
     {
         return (
             hex"0f", // 01111
-            _name,
+            Bytes32String.toString(_name),
             "1",
             block.chainid,
             address(this),
@@ -87,7 +88,7 @@ abstract contract ERC712Extended is IERC712Extended {
             keccak256(
                 abi.encode(
                     _EIP712_DOMAIN_HASH,
-                    keccak256(bytes(_name)),
+                    keccak256(bytes(Bytes32String.toString(_name))),
                     _EIP712_VERSION_HASH,
                     block.chainid,
                     address(this)

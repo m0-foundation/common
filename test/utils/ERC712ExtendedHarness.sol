@@ -7,10 +7,6 @@ import { ERC712Extended } from "../../src/ERC712Extended.sol";
 contract ERC712ExtendedHarness is ERC712Extended {
     constructor(string memory name_) ERC712Extended(name_) {}
 
-    function name() external view returns (string memory) {
-        return _name;
-    }
-
     function getDomainSeparator() external view returns (bytes32) {
         return _getDomainSeparator();
     }

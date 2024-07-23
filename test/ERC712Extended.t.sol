@@ -40,7 +40,6 @@ contract ERC712ExtendedTests is TestUtils {
 
     /* ============ constructor ============ */
     function test_constructor() external {
-        assertEq(_erc712.name(), _name);
         assertEq(_erc712.DOMAIN_SEPARATOR(), _computeDomainSeparator(_name, block.chainid, address(_erc712)));
     }
 
