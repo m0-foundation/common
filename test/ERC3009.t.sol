@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity 0.8.23;
+pragma solidity 0.8.26;
 
 import { IERC3009 } from "../src/interfaces/IERC3009.sol";
 import { IERC712 } from "../src/interfaces/IERC712.sol";

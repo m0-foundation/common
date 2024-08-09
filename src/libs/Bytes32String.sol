@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.8.23;
+pragma solidity 0.8.26;
 
 /**
  * @title  A library to convert between string and bytes32 (assuming 32 characters or less).

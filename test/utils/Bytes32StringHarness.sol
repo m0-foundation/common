@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.8.23;
+pragma solidity 0.8.26;
 
 import { Bytes32String } from "../../src/libs/Bytes32String.sol";
 
