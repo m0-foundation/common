@@ -152,6 +152,16 @@ library UIntMath {
     }
 
     /**
+     * @notice Compares two uint240 values and returns the larger one.
+     * @param  a_  Value to check.
+     * @param  b_  Value to check.
+     * @return The larger value.
+     */
+    function max240(uint240 a_, uint240 b_) internal pure returns (uint240) {
+        return a_ > b_ ? a_ : b_;
+    }
+
+    /**
      * @notice Compares two uint32 values and returns the lesser one.
      * @param  a_  Value to check.
      * @param  b_  Value to check.
