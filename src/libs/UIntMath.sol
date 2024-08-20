@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.8.23;
+pragma solidity 0.8.26;
 
 /**
  * @title  Library to perform safe math operations on uint types

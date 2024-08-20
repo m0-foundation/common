@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.8.23;
+pragma solidity 0.8.26;
 
 import { IERC712 } from "./interfaces/IERC712.sol";
 import { IERC712Extended } from "./interfaces/IERC712Extended.sol";
 
-import { SignatureChecker } from "./libs/SignatureChecker.sol";
 import { Bytes32String } from "./libs/Bytes32String.sol";
+import { SignatureChecker } from "./libs/SignatureChecker.sol";
 
 /**
  * @title  Typed structured data hashing and signing via EIP-712, extended by EIP-5267.

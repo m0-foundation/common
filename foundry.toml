@@ -9,7 +9,7 @@ cache_path = "cache"
 broadcast = "broadcast"
 gas_reports = ["*"]
 gas_reports_ignore = []
-solc-version = "0.8.23"
+solc-version = "0.8.26"
 optimizer = false
 verbosity = 3
 ignored_error_codes = []
@@ -25,7 +25,7 @@ depth = 25
 fail_on_revert = true
 
 [profile.production]
-evm_version = "shanghai"
+evm_version = "cancun"
 optimizer = true
 optimizer_runs = 999999
 build_info = true

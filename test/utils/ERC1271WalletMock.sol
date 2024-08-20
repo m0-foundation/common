@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity 0.8.23;
+pragma solidity 0.8.26;
 
 import { IERC1271 } from "../../src/interfaces/IERC1271.sol";
 import { SignatureChecker } from "../../src/libs/SignatureChecker.sol";
