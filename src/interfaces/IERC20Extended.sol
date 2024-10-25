@@ -41,7 +41,7 @@ interface IERC20Extended is IERC20, IERC3009 {
      * @param  owner    The address of the account who's token balance is being approved to be spent by `spender`.
      * @param  spender  The address of an account allowed to spend on behalf of `owner`.
      * @param  value    The amount of the allowance being approved.
-     * @param  deadline The last block number where the signature is still valid.
+     * @param  deadline The last timestamp where the signature is still valid.
      * @param  v        An ECDSA secp256k1 signature parameter (EIP-2612 via EIP-712).
      * @param  r        An ECDSA secp256k1 signature parameter (EIP-2612 via EIP-712).
      * @param  s        An ECDSA secp256k1 signature parameter (EIP-2612 via EIP-712).
@@ -61,7 +61,7 @@ interface IERC20Extended is IERC20, IERC3009 {
      * @param  owner     The address of the account who's token balance is being approved to be spent by `spender`.
      * @param  spender   The address of an account allowed to spend on behalf of `owner`.
      * @param  value     The amount of the allowance being approved.
-     * @param  deadline  The last block number where the signature is still valid.
+     * @param  deadline  The last timestamp where the signature is still valid.
      * @param  signature An arbitrary signature (EIP-712).
      */
     function permit(address owner, address spender, uint256 value, uint256 deadline, bytes memory signature) external;
