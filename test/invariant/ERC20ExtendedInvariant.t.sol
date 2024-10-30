@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity 0.8.26;
+pragma solidity >=0.8.20 <0.9.0;
 
 import { CommonBase } from "../../lib/forge-std/src/Base.sol";
 import { StdCheats } from "../../lib/forge-std/src/StdCheats.sol";
