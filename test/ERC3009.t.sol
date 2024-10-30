@@ -31,7 +31,7 @@ contract ERC3009Tests is TestUtils {
     }
 
     /* ============ TypeHashes ============ */
-    function test_transferWithAuthorizationTypehash() external {
+    function test_transferWithAuthorizationTypehash() external view {
         assertEq(
             _token.TRANSFER_WITH_AUTHORIZATION_TYPEHASH(),
             keccak256(
@@ -40,7 +40,7 @@ contract ERC3009Tests is TestUtils {
         );
     }
 
-    function test_receiveWithAuthorizationTypehash() external {
+    function test_receiveWithAuthorizationTypehash() external view {
         assertEq(
             _token.RECEIVE_WITH_AUTHORIZATION_TYPEHASH(),
             keccak256(
@@ -49,7 +49,7 @@ contract ERC3009Tests is TestUtils {
         );
     }
 
-    function test_cancelAuthorizationTypehash() external {
+    function test_cancelAuthorizationTypehash() external view {
         assertEq(
             _token.CANCEL_AUTHORIZATION_TYPEHASH(),
             keccak256("CancelAuthorization(address authorizer,bytes32 nonce)")

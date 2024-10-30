@@ -7,23 +7,23 @@ pragma solidity >=0.8.20 <0.9.0;
  * @author M^0 Labs
  */
 library Bytes32String {
-    function toBytes32(string memory input_) internal pure returns (bytes32) {
-        return bytes32(abi.encodePacked(input_));
+    function toBytes32(string memory input) internal pure returns (bytes32) {
+        return bytes32(abi.encodePacked(input));
     }
 
-    function toString(bytes32 input_) internal pure returns (string memory) {
-        uint256 length_;
+    function toString(bytes32 input) internal pure returns (string memory) {
+        uint256 length;
 
-        while (length_ < 32 && uint8(input_[length_]) != 0) {
-            ++length_;
+        while (length < 32 && uint8(input[length]) != 0) {
+            ++length;
         }
 
-        bytes memory name_ = new bytes(length_);
+        bytes memory name = new bytes(length);
 
-        for (uint256 index_; index_ < length_; ++index_) {
-            name_[index_] = input_[index_];
+        for (uint256 index; index < length; ++index) {
+            name[index] = input[index];
         }
 
-        return string(name_);
+        return string(name);
     }
 }

@@ -13,7 +13,7 @@ contract Bytes32StringTests is Test {
         _bytes32String = new Bytes32StringHarness();
     }
 
-    function test_full() external {
+    function test_full() external view {
         assertEq(_bytes32String.toString(_bytes32String.toBytes32("")), "");
         assertEq(_bytes32String.toString(_bytes32String.toBytes32("T")), "T");
         assertEq(_bytes32String.toString(_bytes32String.toBytes32("Te")), "Te");
@@ -93,7 +93,7 @@ contract Bytes32StringTests is Test {
         );
     }
 
-    function testFuzz_full(string memory input_) external {
+    function testFuzz_full(string memory input_) external view {
         assertEq(_bytes32String.toString(_bytes32String.toBytes32(input_)), _truncate32(input_));
     }
 

@@ -30,9 +30,8 @@ library UIntMath {
     /* ============ Internal View/Pure Functions ============ */
 
     /**
-     * @notice Casts a given uint256 value to a uint16,
-     *         ensuring that it is less than or equal to the maximum uint16 value.
-     * @param  n The value to check.
+     * @notice Casts a uint256 value to a uint16, ensuring that it is less than or equal to the maximum uint16 value.
+     * @param  n The value to cast.
      * @return The value casted to uint16.
      */
     function safe16(uint256 n) internal pure returns (uint16) {
@@ -41,9 +40,8 @@ library UIntMath {
     }
 
     /**
-     * @notice Casts a given uint256 value to a uint40,
-     *         ensuring that it is less than or equal to the maximum uint40 value.
-     * @param  n The value to check.
+     * @notice Casts a uint256 value to a uint40, ensuring that it is less than or equal to the maximum uint40 value.
+     * @param  n The value to cast.
      * @return The value casted to uint40.
      */
     function safe40(uint256 n) internal pure returns (uint40) {
@@ -52,9 +50,8 @@ library UIntMath {
     }
 
     /**
-     * @notice Casts a given uint256 value to a uint48,
-     *         ensuring that it is less than or equal to the maximum uint48 value.
-     * @param  n The value to check.
+     * @notice Casts a uint256 value to a uint48, ensuring that it is less than or equal to the maximum uint48 value.
+     * @param  n The value to cast.
      * @return The value casted to uint48.
      */
     function safe48(uint256 n) internal pure returns (uint48) {
@@ -63,9 +60,8 @@ library UIntMath {
     }
 
     /**
-     * @notice Casts a given uint256 value to a uint112,
-     *         ensuring that it is less than or equal to the maximum uint112 value.
-     * @param  n The value to check.
+     * @notice Casts a uint256 value to a uint112, ensuring that it is less than or equal to the maximum uint112 value.
+     * @param  n The value to cast.
      * @return The value casted to uint112.
      */
     function safe112(uint256 n) internal pure returns (uint112) {
@@ -74,9 +70,8 @@ library UIntMath {
     }
 
     /**
-     * @notice Casts a given uint256 value to a uint128,
-     *         ensuring that it is less than or equal to the maximum uint128 value.
-     * @param  n The value to check.
+     * @notice Casts a uint256 value to a uint128, ensuring that it is less than or equal to the maximum uint128 value.
+     * @param  n The value to cast.
      * @return The value casted to uint128.
      */
     function safe128(uint256 n) internal pure returns (uint128) {
@@ -85,9 +80,8 @@ library UIntMath {
     }
 
     /**
-     * @notice Casts a given uint256 value to a uint240,
-     *         ensuring that it is less than or equal to the maximum uint240 value.
-     * @param  n The value to check.
+     * @notice Casts a uint256 value to a uint240, ensuring that it is less than or equal to the maximum uint240 value.
+     * @param  n The value to cast.
      * @return The value casted to uint240.
      */
     function safe240(uint256 n) internal pure returns (uint240) {
@@ -96,8 +90,8 @@ library UIntMath {
     }
 
     /**
-     * @notice Limits a given uint256 value to the maximum uint32 value.
-     * @param  n The value to check.
+     * @notice Limits a uint256 value to the maximum uint32 value.
+     * @param  n The value to bound.
      * @return The value limited to within uint32 bounds.
      */
     function bound32(uint256 n) internal pure returns (uint32) {
@@ -105,8 +99,8 @@ library UIntMath {
     }
 
     /**
-     * @notice Limits a given uint256 value to the maximum uint112 value.
-     * @param  n The value to check.
+     * @notice Limits a uint256 value to the maximum uint112 value.
+     * @param  n The value to bound.
      * @return The value limited to within uint112 bounds.
      */
     function bound112(uint256 n) internal pure returns (uint112) {
@@ -114,8 +108,8 @@ library UIntMath {
     }
 
     /**
-     * @notice Limits a given uint256 value to the maximum uint128 value.
-     * @param  n The value to check.
+     * @notice Limits a uint256 value to the maximum uint128 value.
+     * @param  n The value to bound.
      * @return The value limited to within uint128 bounds.
      */
     function bound128(uint256 n) internal pure returns (uint128) {
@@ -123,8 +117,8 @@ library UIntMath {
     }
 
     /**
-     * @notice Limits a given uint256 value to the maximum uint240 value.
-     * @param  n The value to check.
+     * @notice Limits a uint256 value to the maximum uint240 value.
+     * @param  n The value to bound.
      * @return The value limited to within uint240 bounds.
      */
     function bound240(uint256 n) internal pure returns (uint240) {
@@ -133,71 +127,71 @@ library UIntMath {
 
     /**
      * @notice Compares two uint32 values and returns the larger one.
-     * @param  a_  Value to check.
-     * @param  b_  Value to check.
+     * @param  a Value to compare.
+     * @param  b Value to compare.
      * @return The larger value.
      */
-    function max32(uint32 a_, uint32 b_) internal pure returns (uint32) {
-        return a_ > b_ ? a_ : b_;
+    function max32(uint32 a, uint32 b) internal pure returns (uint32) {
+        return a > b ? a : b;
     }
 
     /**
      * @notice Compares two uint40 values and returns the larger one.
-     * @param  a_  Value to check.
-     * @param  b_  Value to check.
+     * @param  a Value to compare.
+     * @param  b Value to compare.
      * @return The larger value.
      */
-    function max40(uint40 a_, uint40 b_) internal pure returns (uint40) {
-        return a_ > b_ ? a_ : b_;
+    function max40(uint40 a, uint40 b) internal pure returns (uint40) {
+        return a > b ? a : b;
     }
 
     /**
      * @notice Compares two uint32 values and returns the lesser one.
-     * @param  a_  Value to check.
-     * @param  b_  Value to check.
+     * @param  a Value to compare.
+     * @param  b Value to compare.
      * @return The lesser value.
      */
-    function min32(uint32 a_, uint32 b_) internal pure returns (uint32) {
-        return a_ < b_ ? a_ : b_;
+    function min32(uint32 a, uint32 b) internal pure returns (uint32) {
+        return a < b ? a : b;
     }
 
     /**
      * @notice Compares two uint40 values and returns the lesser one.
-     * @param  a_  Value to check.
-     * @param  b_  Value to check.
+     * @param  a Value to compare.
+     * @param  b Value to compare.
      * @return The lesser value.
      */
-    function min40(uint40 a_, uint40 b_) internal pure returns (uint40) {
-        return a_ < b_ ? a_ : b_;
+    function min40(uint40 a, uint40 b) internal pure returns (uint40) {
+        return a < b ? a : b;
     }
 
     /**
      * @notice Compares two uint240 values and returns the lesser one.
-     * @param  a_  Value to check.
-     * @param  b_  Value to check.
+     * @param  a Value to compare.
+     * @param  b Value to compare.
      * @return The lesser value.
      */
-    function min240(uint240 a_, uint240 b_) internal pure returns (uint240) {
-        return a_ < b_ ? a_ : b_;
+    function min240(uint240 a, uint240 b) internal pure returns (uint240) {
+        return a < b ? a : b;
     }
 
     /**
      * @notice Compares two uint112 values and returns the lesser one.
-     * @param  a_  Value to check.
-     * @param  b_  Value to check.
+     * @param  a Value to compare.
+     * @param  b Value to compare.
      * @return The lesser value.
      */
-    function min112(uint112 a_, uint112 b_) internal pure returns (uint112) {
-        return a_ < b_ ? a_ : b_;
+    function min112(uint112 a, uint112 b) internal pure returns (uint112) {
+        return a < b ? a : b;
     }
 
     /**
      * @notice Compares two uint256 values and returns the lesser one.
-     * @param  a_  Value to check.
-     * @param  b_  Value to check.
+     * @param  a Value to compare.
+     * @param  b Value to compare.
      * @return The lesser value.
      */
-    function min256(uint256 a_, uint256 b_) internal pure returns (uint256) {
-        return a_ < b_ ? a_ : b_;
+    function min256(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a < b ? a : b;
     }
 }

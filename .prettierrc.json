@@ -6,7 +6,7 @@
     {
       "files": "*.sol",
       "options": {
-        "compiler": "0.8.26",
+        "compiler": ">=0.8.20 <0.9.0",
         "parser": "solidity-parse",
         "tabWidth": 4,
         "singleQuote": false,

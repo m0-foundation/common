@@ -17,7 +17,7 @@ contract ERC20ExtendedHandler is CommonBase, StdCheats, StdUtils {
         _token = token_;
     }
 
-    function mint(address to_, uint256 amount_) public {
+    function mint(address to_, uint256 amount_) external {
         if (to_ == address(0)) return;
 
         amount_ = bound(amount_, 0, type(uint256).max - sum);
@@ -26,18 +26,18 @@ contract ERC20ExtendedHandler is CommonBase, StdCheats, StdUtils {
         sum += amount_;
     }
 
-    function burn(address from_, uint256 amount_) public {
+    function burn(address from_, uint256 amount_) external {
         amount_ = bound(amount_, 0, _token.balanceOf(from_));
 
         _token.burn(from_, amount_);
         sum -= amount_;
     }
 
-    function approve(address to_, uint256 amount_) public {
+    function approve(address to_, uint256 amount_) external {
         _token.approve(to_, amount_);
     }
 
-    function transferFrom(address from_, address to_, uint256 amount_) public {
+    function transferFrom(address from_, address to_, uint256 amount_) external {
         if (from_ == address(0) || to_ == address(0)) return;
 
         amount_ = bound(amount_, 0, _token.balanceOf(from_));
@@ -54,7 +54,7 @@ contract ERC20ExtendedHandler is CommonBase, StdCheats, StdUtils {
         _token.transferFrom(from_, to_, amount_);
     }
 
-    function transfer(address to_, uint256 amount_) public {
+    function transfer(address to_, uint256 amount_) external {
         if (msg.sender == address(0) || to_ == address(0)) return;
 
         amount_ = bound(amount_, 0, _token.balanceOf(msg.sender));
@@ -77,7 +77,7 @@ contract ERC20ExtendedInvariantTests is TestUtils {
     ERC20ExtendedHarness internal _token;
     ERC20ExtendedHandler internal _handler;
 
-    function setUp() public {
+    function setUp() external {
         _token = new ERC20ExtendedHarness("ERC20Extended Token", "ERC20E_TKN", 18);
         _handler = new ERC20ExtendedHandler(_token);
 
@@ -93,7 +93,7 @@ contract ERC20ExtendedInvariantTests is TestUtils {
         targetSelector(FuzzSelector({ addr: address(_handler), selectors: selectors }));
     }
 
-    function invariant_main() public {
+    function invariant_main() external view {
         assertEq(_token.totalSupply(), _handler.sum());
     }
 }
