@@ -24,7 +24,7 @@ interface IERC712 {
 
     /**
      * @notice Revert message when a signature is being used beyond its deadline (i.e. expiry).
-     * @param  deadline  The deadline of the signature.
+     * @param  deadline  The last timestamp where the signature is still valid.
      * @param  timestamp The current timestamp.
      */
     error SignatureExpired(uint256 deadline, uint256 timestamp);
