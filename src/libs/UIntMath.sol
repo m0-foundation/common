@@ -146,6 +146,26 @@ library UIntMath {
     }
 
     /**
+     * @notice Compares two uint128 values and returns the larger one.
+     * @param  a Value to compare.
+     * @param  b Value to compare.
+     * @return The larger value.
+     */
+    function max128(uint128 a, uint128 b) internal pure returns (uint128) {
+        return a > b ? a : b;
+    }
+
+    /**
+     * @notice Compares two uint240 values and returns the larger one.
+     * @param  a Value to compare.
+     * @param  b Value to compare.
+     * @return The larger value.
+     */
+    function max240(uint240 a, uint240 b) internal pure returns (uint240) {
+        return a > b ? a : b;
+    }
+
+    /**
      * @notice Compares two uint32 values and returns the lesser one.
      * @param  a Value to compare.
      * @param  b Value to compare.
