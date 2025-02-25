@@ -104,12 +104,12 @@ abstract contract ERC20Extended is IERC20Extended, ERC3009 {
     /* ============ View/Pure Functions ============ */
 
     /// @inheritdoc IERC20
-    function name() external view returns (string memory) {
+    function name() external view virtual returns (string memory) {
         return Bytes32String.toString(_name);
     }
 
     /// @inheritdoc IERC20
-    function symbol() external view returns (string memory) {
+    function symbol() external view virtual returns (string memory) {
         return Bytes32String.toString(_symbol);
     }
 
