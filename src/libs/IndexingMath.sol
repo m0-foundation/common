@@ -86,6 +86,16 @@ library IndexingMath {
     }
 
     /**
+     * @dev    Returns the present amount (rounded up) given the principal amount and an index.
+     * @param  principalAmount The principal amount.
+     * @param  index           An index.
+     * @return The present amount rounded up.
+     */
+    function getPresentAmountRoundedUp(uint112 principalAmount, uint128 index) internal pure returns (uint240) {
+        return multiply112By128Up(principalAmount, index);
+    }
+
+    /**
      * @dev    Returns the principal amount given the present amount, using the current index.
      * @param  presentAmount The present amount.
      * @param  index         An index.

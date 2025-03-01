@@ -79,6 +79,16 @@ contract UIntMathTests is Test {
         assertEq(_uintMath.max40(2, 1), 2);
     }
 
+    function test_max128() external view {
+        assertEq(_uintMath.max128(1, 2), 2);
+        assertEq(_uintMath.max128(2, 1), 2);
+    }
+
+    function test_max240() external view {
+        assertEq(_uintMath.max240(1, 2), 2);
+        assertEq(_uintMath.max240(2, 1), 2);
+    }
+
     function test_min32() external view {
         assertEq(_uintMath.min32(1, 2), 1);
         assertEq(_uintMath.min32(2, 1), 1);
