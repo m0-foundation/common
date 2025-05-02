@@ -10,6 +10,10 @@ contract UIntMathHarness {
         return UIntMath.safe16(n);
     }
 
+    function safe32(uint256 n) external pure returns (uint32) {
+        return UIntMath.safe32(n);
+    }
+
     function safe40(uint256 n) external pure returns (uint40) {
         return UIntMath.safe40(n);
     }
