@@ -12,6 +12,9 @@ library UIntMath {
     /// @notice Emitted when a passed value is greater than the maximum value of uint16.
     error InvalidUInt16();
 
+    /// @notice Emitted when a passed value is greater than the maximum value of uint32.
+    error InvalidUInt32();
+
     /// @notice Emitted when a passed value is greater than the maximum value of uint40.
     error InvalidUInt40();
 
@@ -37,6 +40,16 @@ library UIntMath {
     function safe16(uint256 n) internal pure returns (uint16) {
         if (n > type(uint16).max) revert InvalidUInt16();
         return uint16(n);
+    }
+
+    /**
+     * @notice Casts a uint256 value to a uint32, ensuring that it is less than or equal to the maximum uint32 value.
+     * @param  n The value to cast.
+     * @return The value casted to uint32.
+     */
+    function safe32(uint256 n) internal pure returns (uint32) {
+        if (n > type(uint32).max) revert InvalidUInt32();
+        return uint32(n);
     }
 
     /**

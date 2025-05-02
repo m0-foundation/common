@@ -18,6 +18,13 @@ contract UIntMathTests is Test {
         _uintMath.safe16(uint256(type(uint16).max) + 1);
     }
 
+    function test_safe32() external {
+        assertEq(_uintMath.safe32(uint256(type(uint32).max)), type(uint32).max);
+
+        vm.expectRevert(UIntMath.InvalidUInt32.selector);
+        _uintMath.safe32(uint256(type(uint32).max) + 1);
+    }
+
     function test_safe40() external {
         assertEq(_uintMath.safe40(uint256(type(uint40).max)), type(uint40).max);
 
