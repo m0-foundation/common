@@ -4,7 +4,9 @@ pragma solidity >=0.8.20 <0.9.0;
 
 import { ERC712Extended } from "../../src/ERC712Extended.sol";
 
-contract ERC712ExtendedHarness is ERC712Extended {
+import { IERC712ExtendedHarness } from "./IERC712ExtendedHarness.sol";
+
+contract ERC712ExtendedHarness is IERC712ExtendedHarness, ERC712Extended {
     constructor(string memory name_) ERC712Extended(name_) {}
 
     function getDomainSeparator() external view returns (bytes32) {

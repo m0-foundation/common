@@ -4,7 +4,9 @@ pragma solidity >=0.8.20 <0.9.0;
 
 import { ERC20Extended } from "../../src/ERC20Extended.sol";
 
-contract ERC20ExtendedHarness is ERC20Extended {
+import { IERC20ExtendedHarness } from "./IERC20ExtendedHarness.sol";
+
+contract ERC20ExtendedHarness is IERC20ExtendedHarness, ERC20Extended {
     mapping(address => uint256) public balanceOf;
 
     uint256 public totalSupply;
