@@ -15,6 +15,8 @@ verbosity = 3
 ignored_error_codes = []
 block_number = 17_740_856
 block_timestamp = 1_689_934_508
+# Ignore base test files to avoid running tests twice
+no_match_path = "./test/base/*.t.sol"
 
 [profile.default.fuzz]
 runs = 256
