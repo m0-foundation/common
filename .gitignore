@@ -21,3 +21,4 @@ node_modules/
 
 results.sarif
 yarn-error.log
+soljson-latest.js

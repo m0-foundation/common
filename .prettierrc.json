@@ -1,13 +1,11 @@
 {
-  "plugins": [
-    "prettier-plugin-solidity"
-  ],
+  "plugins": ["prettier-plugin-solidity"],
   "overrides": [
     {
       "files": "*.sol",
       "options": {
         "compiler": ">=0.8.20 <0.9.0",
-        "parser": "solidity-parse",
+        "parser": "slang",
         "tabWidth": 4,
         "singleQuote": false,
         "printWidth": 120,
