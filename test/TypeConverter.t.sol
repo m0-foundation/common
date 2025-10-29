@@ -182,7 +182,9 @@ contract TypeConverterTest is Test {
 
     function testFuzz_isValidAddress_invalid(uint96 topBits) external pure {
         vm.assume(topBits != 0);
-        bytes32 bytes32Value = bytes32((uint256(topBits) << 160) | uint256(uint160(address(0x1234567890123456789012345678901234567890))));
+        bytes32 bytes32Value = bytes32(
+            (uint256(topBits) << 160) | uint256(uint160(address(0x1234567890123456789012345678901234567890)))
+        );
         assertFalse(TypeConverter.isValidAddress(bytes32Value));
     }
 }

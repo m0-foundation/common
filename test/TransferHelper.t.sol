@@ -290,7 +290,9 @@ contract TransferHelperTest is Test {
         assertEq(token.balanceOf(bob), amount);
     }
 
-    function testFuzz_safeTransferExactFrom_feeOnTransfer_reverts(uint256 amount) external givenFeeOnTransferToken(100) {
+    function testFuzz_safeTransferExactFrom_feeOnTransfer_reverts(
+        uint256 amount
+    ) external givenFeeOnTransferToken(100) {
         amount = (amount % (INITIAL_BALANCE - 99)) + 100; // ensure amount >= 100
 
         vm.prank(alice);
@@ -300,13 +302,12 @@ contract TransferHelperTest is Test {
         transferHelper.safeTransferExactFrom(token, alice, bob, amount);
     }
 
-
     // safeApprove
     // [X] given the token returns a boolean from the approve call
     //   [X] given the approve succeeds
     //     [X] it succeeds
     //   [X] given the approve fails
-    //     [X] it reverts with 'SA' 
+    //     [X] it reverts with 'SA'
     // [X] given the token does not return a boolean from the approve call
     //   [X] given the approve succeeds
     //     [X] it succeeds
@@ -342,5 +343,4 @@ contract TransferHelperTest is Test {
         vm.expectRevert(abi.encodePacked("SA"));
         transferHelper.safeApprove(token, address(0), amount);
     }
-
 }

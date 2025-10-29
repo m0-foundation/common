@@ -7,45 +7,23 @@ import { IERC20 } from "../../src/interfaces/IERC20.sol";
 
 /// @title TransferHelper harness used to correctly display test coverage.
 contract TransferHelperHarness {
-    function safeTransferFrom(
-        IERC20 token,
-        address from,
-        address to,
-        uint256 value
-    ) external {
+    function safeTransferFrom(IERC20 token, address from, address to, uint256 value) external {
         TransferHelper.safeTransferFrom(token, from, to, value);
     }
 
-    function safeTransferExactFrom(
-        IERC20 token,
-        address from,
-        address to,
-        uint256 value
-    ) external {
+    function safeTransferExactFrom(IERC20 token, address from, address to, uint256 value) external {
         TransferHelper.safeTransferExactFrom(token, from, to, value);
     }
 
-    function safeTransfer(
-        IERC20 token,
-        address to,
-        uint256 value
-    ) external {
+    function safeTransfer(IERC20 token, address to, uint256 value) external {
         TransferHelper.safeTransfer(token, to, value);
     }
 
-    function safeTransferExact(
-        IERC20 token,
-        address to,
-        uint256 value
-    ) external {
+    function safeTransferExact(IERC20 token, address to, uint256 value) external {
         TransferHelper.safeTransferExact(token, to, value);
     }
 
-    function safeApprove(
-        IERC20 token,
-        address spender,
-        uint256 value
-    ) external {
+    function safeApprove(IERC20 token, address spender, uint256 value) external {
         TransferHelper.safeApprove(token, spender, value);
     }
 }
