@@ -10,8 +10,6 @@ import { TimelockController } from "../../lib/openzeppelin-contracts-upgradeable
 import { DeployHelpers } from "./DeployHelpers.sol";
 
 contract DeployTimelock is Script, DeployHelpers { 
-    /// @dev Contract name for salt computation
-    string public constant CONTRACT_NAME = "TimelockController";
 
     /// @dev Deploy with native Forge arguments
     function run(
