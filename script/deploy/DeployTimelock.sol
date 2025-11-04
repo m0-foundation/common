@@ -32,7 +32,7 @@ contract DeployTimelock is Script, DeployHelpers {
 
         vm.startBroadcast();
 
-        // Deploy TimelockController using CREATE3 for deterministic addressing
+        // Deploy TimelockController
         timelockAddress = _deployTimelockController(minDelay, proposers, executors, admin);
 
         vm.stopBroadcast();
