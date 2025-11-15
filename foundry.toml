@@ -17,7 +17,6 @@ block_number = 17_740_856
 block_timestamp = 1_689_934_508
 # Ignore base test files to avoid running tests twice
 no_match_path = "./test/base/*.t.sol"
-ignored_warnings_from = ["lib", "test", "script"]
 
 [lint]
 lint_on_build = false
