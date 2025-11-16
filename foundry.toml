@@ -18,6 +18,9 @@ block_timestamp = 1_689_934_508
 # Ignore base test files to avoid running tests twice
 no_match_path = "./test/base/*.t.sol"
 
+[lint]
+lint_on_build = false
+
 [profile.default.fuzz]
 runs = 256
 
