@@ -2,7 +2,7 @@
 
 pragma solidity >=0.8.20 <0.9.0;
 
-/// @notice Common EVM chain IDs shared across M^0 protocol repos.
+/// @notice Common EVM chain IDs shared across M0 protocol repos.
 library ChainsBase {
     // Mainnet
     uint256 internal constant ETHEREUM = 1;
