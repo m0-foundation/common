@@ -29,6 +29,16 @@ runs = 512
 depth = 25
 fail_on_revert = true
 
+[profile.ci]
+optimizer = true
+
+[profile.ci.fuzz]
+runs = 10_000
+
+[profile.ci.invariant]
+runs = 512
+depth = 250
+
 [profile.production]
 evm_version = "cancun"
 optimizer = true
