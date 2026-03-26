@@ -7,6 +7,90 @@ import { TypeConverter } from "../src/libs/TypeConverter.sol";
 
 contract TypeConverterTest is Test {
     ///////////////////////////////////////////////////////////////////////////
+    //                               toUint16                                //
+    ///////////////////////////////////////////////////////////////////////////
+
+    function test_toUint16_basic() external pure {
+        uint256 value = 100;
+        uint16 result = TypeConverter.toUint16(value);
+        assertEq(result, uint16(100));
+    }
+
+    function test_toUint16_maxUint16() external pure {
+        uint256 value = type(uint16).max;
+        uint16 result = TypeConverter.toUint16(value);
+        assertEq(result, type(uint16).max);
+    }
+
+    function test_toUint16_zero() external pure {
+        uint256 value = 0;
+        uint16 result = TypeConverter.toUint16(value);
+        assertEq(result, 0);
+    }
+
+    function testFuzz_toUint16(uint16 value) external pure {
+        uint256 uint256Value = uint256(value);
+        uint16 result = TypeConverter.toUint16(uint256Value);
+        assertEq(result, value);
+    }
+
+    /// forge-config: default.allow_internal_expect_revert = true
+    function test_toUint16_overflow() external {
+        uint256 value = uint256(type(uint16).max) + 1;
+        vm.expectRevert(TypeConverter.Uint16Overflow.selector);
+        TypeConverter.toUint16(value);
+    }
+
+    /// forge-config: default.allow_internal_expect_revert = true
+    function testFuzz_toUint16_overflow(uint256 value) external {
+        vm.assume(value > type(uint16).max);
+        vm.expectRevert(TypeConverter.Uint16Overflow.selector);
+        TypeConverter.toUint16(value);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    //                               toUint32                                //
+    ///////////////////////////////////////////////////////////////////////////
+
+    function test_toUint32_basic() external pure {
+        uint256 value = 100;
+        uint32 result = TypeConverter.toUint32(value);
+        assertEq(result, uint32(100));
+    }
+
+    function test_toUint32_maxUint32() external pure {
+        uint256 value = type(uint32).max;
+        uint32 result = TypeConverter.toUint32(value);
+        assertEq(result, type(uint32).max);
+    }
+
+    function test_toUint32_zero() external pure {
+        uint256 value = 0;
+        uint32 result = TypeConverter.toUint32(value);
+        assertEq(result, 0);
+    }
+
+    function testFuzz_toUint32(uint32 value) external pure {
+        uint256 uint256Value = uint256(value);
+        uint32 result = TypeConverter.toUint32(uint256Value);
+        assertEq(result, value);
+    }
+
+    /// forge-config: default.allow_internal_expect_revert = true
+    function test_toUint32_overflow() external {
+        uint256 value = uint256(type(uint32).max) + 1;
+        vm.expectRevert(TypeConverter.Uint32Overflow.selector);
+        TypeConverter.toUint32(value);
+    }
+
+    /// forge-config: default.allow_internal_expect_revert = true
+    function testFuzz_toUint32_overflow(uint256 value) external {
+        vm.assume(value > type(uint32).max);
+        vm.expectRevert(TypeConverter.Uint32Overflow.selector);
+        TypeConverter.toUint32(value);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     //                                toUint64                               //
     ///////////////////////////////////////////////////////////////////////////
 
