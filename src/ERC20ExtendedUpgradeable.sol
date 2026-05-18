@@ -63,7 +63,7 @@ abstract contract ERC20ExtendedUpgradeable is
     /* ============ Interactive Functions ============ */
 
     /// @inheritdoc IERC20
-    function approve(address spender_, uint256 amount_) external returns (bool) {
+    function approve(address spender_, uint256 amount_) external virtual returns (bool) {
         _approve(msg.sender, spender_, amount_);
         return true;
     }
@@ -77,7 +77,7 @@ abstract contract ERC20ExtendedUpgradeable is
         uint8 v_,
         bytes32 r_,
         bytes32 s_
-    ) external {
+    ) external virtual {
         _revertIfInvalidSignature(owner_, _permitAndGetDigest(owner_, spender_, value_, deadline_), v_, r_, s_);
     }
 
@@ -88,18 +88,18 @@ abstract contract ERC20ExtendedUpgradeable is
         uint256 value_,
         uint256 deadline_,
         bytes memory signature_
-    ) external {
+    ) external virtual {
         _revertIfInvalidSignature(owner_, _permitAndGetDigest(owner_, spender_, value_, deadline_), signature_);
     }
 
     /// @inheritdoc IERC20
-    function transfer(address recipient_, uint256 amount_) external returns (bool) {
+    function transfer(address recipient_, uint256 amount_) external virtual returns (bool) {
         _transfer(msg.sender, recipient_, amount_);
         return true;
     }
 
     /// @inheritdoc IERC20
-    function transferFrom(address sender_, address recipient_, uint256 amount_) external returns (bool) {
+    function transferFrom(address sender_, address recipient_, uint256 amount_) external virtual returns (bool) {
         ERC20ExtendedStorageStruct storage $ = _getERC20ExtendedStorageLocation();
         uint256 spenderAllowance_ = $.allowance[sender_][msg.sender]; // Cache `spenderAllowance_` to stack.
 
@@ -119,7 +119,7 @@ abstract contract ERC20ExtendedUpgradeable is
     /* ============ View/Pure Functions ============ */
 
     /// @inheritdoc IERC20
-    function allowance(address account, address spender) public view returns (uint256) {
+    function allowance(address account, address spender) public view virtual returns (uint256) {
         return _getERC20ExtendedStorageLocation().allowance[account][spender];
     }
 
