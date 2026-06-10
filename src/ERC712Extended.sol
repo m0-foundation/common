@@ -28,6 +28,9 @@ abstract contract ERC712Extended is IERC712Extended {
     /// @dev Initial EIP-712 domain separator set at deployment.
     bytes32 internal immutable _INITIAL_DOMAIN_SEPARATOR;
 
+    /// @dev Initial address of this contract set at deployment, used to detect proxy (delegatecall) context.
+    address internal immutable _INITIAL_THIS;
+
     /// @dev The name of the contract (stored as a bytes32 instead of a string in order to be immutable).
     bytes32 internal immutable _name;
 
@@ -41,6 +44,7 @@ abstract contract ERC712Extended is IERC712Extended {
         _name = Bytes32String.toBytes32(name_);
 
         _INITIAL_CHAIN_ID = block.chainid;
+        _INITIAL_THIS = address(this);
         _INITIAL_DOMAIN_SEPARATOR = _getDomainSeparator();
     }
 
@@ -74,7 +78,10 @@ abstract contract ERC712Extended is IERC712Extended {
 
     /// @inheritdoc IERC712
     function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
-        return block.chainid == _INITIAL_CHAIN_ID ? _INITIAL_DOMAIN_SEPARATOR : _getDomainSeparator();
+        return
+            (address(this) == _INITIAL_THIS && block.chainid == _INITIAL_CHAIN_ID)
+                ? _INITIAL_DOMAIN_SEPARATOR
+                : _getDomainSeparator();
     }
 
     /* ============ Internal View/Pure Functions ============ */
