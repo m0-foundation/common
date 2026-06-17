@@ -72,7 +72,7 @@ abstract contract ERC3009Upgradeable is IERC3009, ERC3009UpgradeableStorageLayou
         uint256 validBefore_,
         bytes32 nonce_,
         bytes memory signature_
-    ) external {
+    ) external virtual {
         _revertIfInvalidSignature(
             from_,
             _getTransferWithAuthorizationDigest(from_, to_, value_, validAfter_, validBefore_, nonce_),
@@ -92,7 +92,7 @@ abstract contract ERC3009Upgradeable is IERC3009, ERC3009UpgradeableStorageLayou
         bytes32 nonce_,
         bytes32 r_,
         bytes32 vs_
-    ) external {
+    ) external virtual {
         _revertIfInvalidSignature(
             from_,
             _getTransferWithAuthorizationDigest(from_, to_, value_, validAfter_, validBefore_, nonce_),
@@ -114,7 +114,7 @@ abstract contract ERC3009Upgradeable is IERC3009, ERC3009UpgradeableStorageLayou
         uint8 v_,
         bytes32 r_,
         bytes32 s_
-    ) external {
+    ) external virtual {
         _revertIfInvalidSignature(
             from_,
             _getTransferWithAuthorizationDigest(from_, to_, value_, validAfter_, validBefore_, nonce_),
@@ -135,7 +135,7 @@ abstract contract ERC3009Upgradeable is IERC3009, ERC3009UpgradeableStorageLayou
         uint256 validBefore_,
         bytes32 nonce_,
         bytes memory signature_
-    ) external {
+    ) external virtual {
         _revertIfInvalidSignature(
             from_,
             _getReceiveWithAuthorizationDigest(from_, to_, value_, validAfter_, validBefore_, nonce_),
@@ -155,7 +155,7 @@ abstract contract ERC3009Upgradeable is IERC3009, ERC3009UpgradeableStorageLayou
         bytes32 nonce_,
         bytes32 r_,
         bytes32 vs_
-    ) external {
+    ) external virtual {
         _revertIfInvalidSignature(
             from_,
             _getReceiveWithAuthorizationDigest(from_, to_, value_, validAfter_, validBefore_, nonce_),
@@ -177,7 +177,7 @@ abstract contract ERC3009Upgradeable is IERC3009, ERC3009UpgradeableStorageLayou
         uint8 v_,
         bytes32 r_,
         bytes32 s_
-    ) external {
+    ) external virtual {
         _revertIfInvalidSignature(
             from_,
             _getReceiveWithAuthorizationDigest(from_, to_, value_, validAfter_, validBefore_, nonce_),
