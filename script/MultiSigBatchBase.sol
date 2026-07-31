@@ -2,7 +2,11 @@
 
 pragma solidity >=0.8.20 <0.9.0;
 
+import { Enum } from "../lib/safe-utils/lib/safe-smart-account/contracts/common/Enum.sol";
+import { OwnerManager } from "../lib/safe-utils/lib/safe-smart-account/contracts/base/OwnerManager.sol";
 import { Safe } from "../lib/safe-utils/src/Safe.sol";
+
+import { console } from "../lib/forge-std/src/console.sol";
 import { Script } from "../lib/forge-std/src/Script.sol";
 
 abstract contract MultiSigBatchBase is Script {
@@ -17,19 +21,42 @@ abstract contract MultiSigBatchBase is Script {
         _data.push(data_);
     }
 
-    function _proposeBatch(address safe_, address sender) internal {
+    /// @dev The Safe's on-chain nonce only advances on execution, so it collides with already queued proposals.
+    ///      Set the `SAFE_NONCE` environment variable to queue behind them instead of conflicting with them.
+    function _proposeBatch(address safe_, address sender_) internal {
         _safeMultiSig.initialize(safe_);
-        _safeMultiSig.proposeTransactions(_targets, _data, sender, "");
+        _propose(sender_, vm.envOr("SAFE_NONCE", _safeMultiSig.getNonce()));
     }
 
-    function _simulateBatch(address safe_) internal {
-        vm.startPrank(safe_);
+    function _proposeBatch(address safe_, address sender_, uint256 nonce_) internal {
+        _safeMultiSig.initialize(safe_);
+        _propose(sender_, nonce_);
+    }
 
-        for (uint256 i = 0; i < _targets.length; i++) {
-            (bool success, ) = _targets[i].call(_data[i]);
-            require(success, "Simulation failed");
+    /// @dev Simulates the batch through the Safe itself, using synthetic owner approvals, so that the MultiSend
+    ///      encoding, the threshold check and any guard or fallback handler are exercised too.
+    function _simulateBatch(address safe_) internal {
+        _safeMultiSig.initialize(safe_);
+
+        address[] memory owners_ = OwnerManager(safe_).getOwners();
+
+        // NOTE: `isolate` mode runs each top-level call as its own transaction, requiring the signer to pay for gas.
+        for (uint256 i = 0; i < owners_.length; i++) {
+            vm.deal(owners_[i], owners_[i].balance + 1 ether);
         }
 
-        vm.stopPrank();
+        require(_safeMultiSig.simulateTransactionsMultiSigNoSign(_targets, _data, owners_), "Simulation failed");
+    }
+
+    function _propose(address sender_, uint256 nonce_) private {
+        console.log("Safe nonce:", nonce_);
+
+        (address to_, bytes memory data_) = _safeMultiSig.getProposeTransactionsTargetAndData(_targets, _data);
+
+        // NOTE: Batches are executed via DelegateCall to preserve `msg.sender` across the sub-calls, and the signed
+        //       operation must match the proposed one.
+        bytes memory signature_ = _safeMultiSig.sign(to_, data_, Enum.Operation.DelegateCall, sender_, nonce_, "");
+
+        _safeMultiSig.proposeTransactionsWithSignature(_targets, _data, sender_, signature_, nonce_);
     }
 }
