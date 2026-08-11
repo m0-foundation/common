@@ -12,6 +12,10 @@ abstract contract TimelockBatchBase is Script {
     uint256[] internal _timelockValues;
     bytes[] internal _timelockPayloads;
 
+    /// @notice Thrown in case an operation is tried to be executed but isn't ready yet.
+    /// @param id_ The hashed operation identifier.
+    error OperationNotReady(bytes32 id_);
+
     function _addToTimelockBatch(address target_, bytes memory payload_) internal {
         _timelockTargets.push(target_);
         _timelockValues.push(0);
@@ -22,6 +26,28 @@ abstract contract TimelockBatchBase is Script {
         _timelockTargets.push(target_);
         _timelockValues.push(value_);
         _timelockPayloads.push(payload_);
+    }
+
+    /// @notice Executes a previously scheduled timelock batch after the delay has elapsed.
+    /// @param  target_ The address of the TimelockController.
+    /// @param  predecessor_  The predecessor operation id, or bytes32(0) if none.
+    /// @param  salt_     The salt used when scheduling the timelock operation.
+    function _executeTimelockBatch(address target_, bytes32 predecessor_, bytes32 salt_) internal {
+        TimelockController timelock = TimelockController(payable(target_));
+
+        bytes32 id = timelock.hashOperationBatch(
+            _timelockTargets,
+            _timelockValues,
+            _timelockPayloads,
+            predecessor_,
+            salt_
+        );
+
+        if (!timelock.isOperationReady(id)) {
+            revert OperationNotReady(id);
+        }
+
+        timelock.executeBatch(_timelockTargets, _timelockValues, _timelockPayloads, predecessor_, salt_);
     }
 
     function _getScheduleBatchCallData(
