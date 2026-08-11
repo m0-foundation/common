@@ -16,12 +16,19 @@ abstract contract TimelockBatchBase is Script {
     /// @param id_ The hashed operation identifier.
     error OperationNotReady(bytes32 id_);
 
+    /// @notice Adds a new transaction with no sent value to the timelock call stack.
+    /// @param target_ The address of the contract to interact with.
+    /// @param payload_ The transaction payload.
     function _addToTimelockBatch(address target_, bytes memory payload_) internal {
         _timelockTargets.push(target_);
         _timelockValues.push(0);
         _timelockPayloads.push(payload_);
     }
 
+    /// @notice Adds a new combination of target contract, sent value, and transaction payload to the timelock call stack.
+    /// @param target_ The address of the contract to interact with.
+    /// @param value_ The value to send along with the transaction.
+    /// @param payload_ The transaction payload.
     function _addToTimelockBatch(address target_, uint256 value_, bytes memory payload_) internal {
         _timelockTargets.push(target_);
         _timelockValues.push(value_);
@@ -62,17 +69,23 @@ abstract contract TimelockBatchBase is Script {
         );
     }
 
+    /// @notice Builds the calldata to schedule a batch of transactions on the timelock.
+    /// @param predecessor_ The predecessor operation id, or bytes32(0) if none.
+    /// @param salt_ The salt used when scheduling the timelock operation.
+    /// @param delay_ The delay with which to schedule the transaction execution.
     function _getScheduleBatchCallData(
-        bytes32 predecessor,
-        bytes32 salt,
-        uint256 delay
+        bytes32 predecessor_,
+        bytes32 salt_,
+        uint256 delay_
     ) internal view returns (bytes memory) {
         return abi.encodeCall(
             TimelockController.scheduleBatch,
-            (_timelockTargets, _timelockValues, _timelockPayloads, predecessor, salt, delay)
+            (_timelockTargets, _timelockValues, _timelockPayloads, predecessor_, salt_, delay_)
         );
     }
 
+    /// @notice Simulates the timelock execution based on the accumulated call stack.
+    /// @param timelock_ The address of the timelock contract to execute from.
     function _simulateBatch(address timelock_) internal {
         vm.startPrank(timelock_);
 
