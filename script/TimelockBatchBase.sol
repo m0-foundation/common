@@ -35,19 +35,31 @@ abstract contract TimelockBatchBase is Script {
     function _executeTimelockBatch(address target_, bytes32 predecessor_, bytes32 salt_) internal {
         TimelockController timelock = TimelockController(payable(target_));
 
-        bytes32 id = timelock.hashOperationBatch(
-            _timelockTargets,
-            _timelockValues,
-            _timelockPayloads,
-            predecessor_,
-            salt_
-        );
+        bytes32 id = _getOperationBatchId(target_, predecessor_, salt_);
 
         if (!timelock.isOperationReady(id)) {
             revert OperationNotReady(id);
         }
 
         timelock.executeBatch(_timelockTargets, _timelockValues, _timelockPayloads, predecessor_, salt_);
+    }
+
+    /// @notice Returns the operation id of the accumulated batch, as hashed by the TimelockController.
+    /// @param  target_ The address of the TimelockController.
+    /// @param  predecessor_  The predecessor operation id, or bytes32(0) if none.
+    /// @param  salt_     The salt used when scheduling the timelock operation.
+    function _getOperationBatchId(
+        address target_,
+        bytes32 predecessor_,
+        bytes32 salt_
+    ) internal view returns (bytes32) {
+        return TimelockController(payable(target_)).hashOperationBatch(
+            _timelockTargets,
+            _timelockValues,
+            _timelockPayloads,
+            predecessor_,
+            salt_
+        );
     }
 
     function _getScheduleBatchCallData(
