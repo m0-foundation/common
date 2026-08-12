@@ -32,6 +32,17 @@ contract DeployTimelockHelpersHarness is DeployTimelockHelpers {
             );
     }
 
+    function verifyTimelock(
+        address timelock_,
+        uint256 minDelay_,
+        address[] memory proposers_,
+        address[] memory executors_,
+        address deployer_,
+        bytes32 codeHash_
+    ) external view {
+        _verifyTimelock(timelock_, minDelay_, proposers_, executors_, deployer_, codeHash_);
+    }
+
     function getCreate3Address(address deployer_, bytes32 salt_) external view returns (address) {
         return _getCreate3Address(deployer_, salt_);
     }

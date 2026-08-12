@@ -90,4 +90,27 @@ contract DeployTimelockHelpersTests is Test {
         assertFalse(timelock.hasRole(timelock.DEFAULT_ADMIN_ROLE(), address(_harness)));
         assertTrue(timelock.hasRole(timelock.DEFAULT_ADMIN_ROLE(), deployed));
     }
+
+    function test_deployCreate3TimelockWithRolesGranted_revertsOnAdminRole() external {
+        DeployTimelockHelpers.GrantedRole[] memory grantedRoles = new DeployTimelockHelpers.GrantedRole[](1);
+        // Admin role is bytes32(0), which is also the default value of an unset role field.
+        grantedRoles[0] = DeployTimelockHelpers.GrantedRole({ role: bytes32(0), account: _cancellerSafe });
+
+        vm.expectRevert(DeployTimelockHelpers.AdminRoleGrantNotAllowed.selector);
+        _harness.deployTimelockWithRolesGranted(_salt, _MIN_DELAY, _proposers, _executors, grantedRoles);
+    }
+
+    function test_verifyTimelock() external {
+        address deployed = _harness.deployTimelock(_salt, _MIN_DELAY, _proposers, _executors, address(0));
+
+        _harness.verifyTimelock(deployed, _MIN_DELAY, _proposers, _executors, address(_harness), deployed.codehash);
+    }
+
+    function test_verifyTimelock_revertsIfDeployerStillAdmin() external {
+        // Deploy with the harness kept as admin (interrupted-run scenario: renounce never happened).
+        address deployed = _harness.deployTimelock(_salt, _MIN_DELAY, _proposers, _executors, address(_harness));
+
+        vm.expectRevert("Deployer still admin");
+        _harness.verifyTimelock(deployed, _MIN_DELAY, _proposers, _executors, address(_harness), bytes32(0));
+    }
 }
