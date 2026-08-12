@@ -12,29 +12,80 @@ abstract contract TimelockBatchBase is Script {
     uint256[] internal _timelockValues;
     bytes[] internal _timelockPayloads;
 
+    /// @notice Thrown in case an operation is tried to be executed but isn't ready yet.
+    /// @param id_ The hashed operation identifier.
+    error OperationNotReady(bytes32 id_);
+
+    /// @notice Adds a new transaction with no sent value to the timelock call stack.
+    /// @param target_ The address of the contract to interact with.
+    /// @param payload_ The transaction payload.
     function _addToTimelockBatch(address target_, bytes memory payload_) internal {
         _timelockTargets.push(target_);
         _timelockValues.push(0);
         _timelockPayloads.push(payload_);
     }
 
+    /// @notice Adds a new combination of target contract, sent value, and transaction payload to the timelock call stack.
+    /// @param target_ The address of the contract to interact with.
+    /// @param value_ The value to send along with the transaction.
+    /// @param payload_ The transaction payload.
     function _addToTimelockBatch(address target_, uint256 value_, bytes memory payload_) internal {
         _timelockTargets.push(target_);
         _timelockValues.push(value_);
         _timelockPayloads.push(payload_);
     }
 
-    function _getScheduleBatchCallData(
-        bytes32 predecessor,
-        bytes32 salt,
-        uint256 delay
-    ) internal view returns (bytes memory) {
-        return abi.encodeCall(
-            TimelockController.scheduleBatch,
-            (_timelockTargets, _timelockValues, _timelockPayloads, predecessor, salt, delay)
+    /// @notice Executes a previously scheduled timelock batch after the delay has elapsed.
+    /// @param  target_ The address of the TimelockController.
+    /// @param  predecessor_  The predecessor operation id, or bytes32(0) if none.
+    /// @param  salt_     The salt used when scheduling the timelock operation.
+    function _executeTimelockBatch(address target_, bytes32 predecessor_, bytes32 salt_) internal {
+        TimelockController timelock = TimelockController(payable(target_));
+
+        bytes32 id = _getOperationBatchId(target_, predecessor_, salt_);
+
+        if (!timelock.isOperationReady(id)) {
+            revert OperationNotReady(id);
+        }
+
+        timelock.executeBatch(_timelockTargets, _timelockValues, _timelockPayloads, predecessor_, salt_);
+    }
+
+    /// @notice Returns the operation id of the accumulated batch, as hashed by the TimelockController.
+    /// @param  target_ The address of the TimelockController.
+    /// @param  predecessor_  The predecessor operation id, or bytes32(0) if none.
+    /// @param  salt_     The salt used when scheduling the timelock operation.
+    function _getOperationBatchId(
+        address target_,
+        bytes32 predecessor_,
+        bytes32 salt_
+    ) internal view returns (bytes32) {
+        return TimelockController(payable(target_)).hashOperationBatch(
+            _timelockTargets,
+            _timelockValues,
+            _timelockPayloads,
+            predecessor_,
+            salt_
         );
     }
 
+    /// @notice Builds the calldata to schedule a batch of transactions on the timelock.
+    /// @param predecessor_ The predecessor operation id, or bytes32(0) if none.
+    /// @param salt_ The salt used when scheduling the timelock operation.
+    /// @param delay_ The delay with which to schedule the transaction execution.
+    function _getScheduleBatchCallData(
+        bytes32 predecessor_,
+        bytes32 salt_,
+        uint256 delay_
+    ) internal view returns (bytes memory) {
+        return abi.encodeCall(
+            TimelockController.scheduleBatch,
+            (_timelockTargets, _timelockValues, _timelockPayloads, predecessor_, salt_, delay_)
+        );
+    }
+
+    /// @notice Simulates the timelock execution based on the accumulated call stack.
+    /// @param timelock_ The address of the timelock contract to execute from.
     function _simulateBatch(address timelock_) internal {
         vm.startPrank(timelock_);
 
