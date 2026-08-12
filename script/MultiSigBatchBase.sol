@@ -21,13 +21,14 @@ abstract contract MultiSigBatchBase is Script {
         _data.push(data_);
     }
 
-    /// @dev The Safe's on-chain nonce only advances on execution, so it collides with already queued proposals.
-    ///      Set the `SAFE_NONCE` environment variable to queue behind them instead of conflicting with them.
+    /// @dev Proposes the batch at the Safe's current on-chain nonce.
     function _proposeBatch(address safe_, address sender_) internal {
         _safeMultiSig.initialize(safe_);
-        _propose(sender_, vm.envOr("SAFE_NONCE", _safeMultiSig.getNonce()));
+        _propose(sender_, _safeMultiSig.getNonce());
     }
 
+    /// @dev Proposes the batch at an explicit nonce. The Safe's on-chain nonce only advances on execution, so
+    ///      proposing at it can collide with already queued proposals instead of queueing behind them.
     function _proposeBatch(address safe_, address sender_, uint256 nonce_) internal {
         _safeMultiSig.initialize(safe_);
         _propose(sender_, nonce_);
