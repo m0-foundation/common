@@ -2,7 +2,7 @@
 
 pragma solidity >=0.8.20 <0.9.0;
 
-import { Initializable } from "../lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import { IERC712 } from "./interfaces/IERC712.sol";
 import { IERC712Extended } from "./interfaces/IERC712Extended.sol";

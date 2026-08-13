@@ -2,9 +2,9 @@
 
 pragma solidity >=0.8.20 <0.9.0;
 
-import { CommonBase } from "../../lib/forge-std/src/Base.sol";
-import { StdCheats } from "../../lib/forge-std/src/StdCheats.sol";
-import { StdUtils } from "../../lib/forge-std/src/StdUtils.sol";
+import { CommonBase } from "forge-std/Base.sol";
+import { StdCheats } from "forge-std/StdCheats.sol";
+import { StdUtils } from "forge-std/StdUtils.sol";
 
 import { ERC20ExtendedHarness } from "../utils/ERC20ExtendedHarness.sol";
 import { TestUtils } from "../utils/TestUtils.t.sol";

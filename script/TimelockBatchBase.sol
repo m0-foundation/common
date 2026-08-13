@@ -2,10 +2,8 @@
 
 pragma solidity >=0.8.20 <0.9.0;
 
-import {
-    TimelockController
-} from "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/governance/TimelockController.sol";
-import { Script } from "../lib/forge-std/src/Script.sol";
+import { TimelockController } from "@openzeppelin/contracts/governance/TimelockController.sol";
+import { Script } from "forge-std/Script.sol";
 
 abstract contract TimelockBatchBase is Script {
     address[] internal _timelockTargets;

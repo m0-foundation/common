@@ -2,7 +2,7 @@
 
 pragma solidity >=0.8.20 <0.9.0;
 
-import { Test } from "../lib/forge-std/src/Test.sol";
+import { Test } from "forge-std/Test.sol";
 
 import { Bytes32StringHarness } from "./utils/Bytes32StringHarness.sol";
 

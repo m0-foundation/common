@@ -2,7 +2,7 @@
 
 pragma solidity >=0.8.20 <0.9.0;
 
-import { TimelockController } from "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/governance/TimelockController.sol";
+import { TimelockController } from "@openzeppelin/contracts/governance/TimelockController.sol";
 
 import { DeployHelpers } from "./DeployHelpers.sol";
 

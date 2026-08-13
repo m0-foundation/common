@@ -3,10 +3,8 @@ pragma solidity >=0.8.20 <0.9.0;
 
 import { TimelockBatchBase } from "./TimelockBatchBase.sol";
 
-import { Safe } from "../lib/safe-utils/src/Safe.sol";
-import {
-    TimelockController
-} from "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/governance/TimelockController.sol";
+import { Safe } from "safe-utils/Safe.sol";
+import { TimelockController } from "@openzeppelin/contracts/governance/TimelockController.sol";
 
 abstract contract SafeTimelockBatchBase is TimelockBatchBase {
     using Safe for *;

@@ -2,9 +2,9 @@
 
 pragma solidity >=0.8.20 <0.9.0;
 
-import { Test } from "../lib/forge-std/src/Test.sol";
+import { Test } from "forge-std/Test.sol";
 
-import { TimelockController } from "../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/governance/TimelockController.sol";
+import { TimelockController } from "@openzeppelin/contracts/governance/TimelockController.sol";
 
 import { DeployTimelockHelpers } from "../script/deploy/DeployTimelockHelpers.sol";
 

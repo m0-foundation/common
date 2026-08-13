@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import { Test } from "../lib/forge-std/src/Test.sol";
+import { Test } from "forge-std/Test.sol";
 
 import { TypeConverter } from "../src/libs/TypeConverter.sol";
 

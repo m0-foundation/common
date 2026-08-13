@@ -2,7 +2,7 @@
 
 pragma solidity >=0.8.20 <0.9.0;
 
-import { Test } from "../lib/forge-std/src/Test.sol";
+import { Test } from "forge-std/Test.sol";
 
 import { ContinuousIndexingMath } from "../src/libs/ContinuousIndexingMath.sol";
 import { IndexingMath } from "../src/libs/IndexingMath.sol";

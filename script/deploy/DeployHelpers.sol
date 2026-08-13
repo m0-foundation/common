@@ -2,7 +2,7 @@
 
 pragma solidity >=0.8.20 <0.9.0;
 
-import { TransparentUpgradeableProxy } from "../../lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import { ICreateXLike } from "./interfaces/ICreateXLike.sol";
 

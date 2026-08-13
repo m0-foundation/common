@@ -4,7 +4,6 @@ test = "test"
 script = "script"
 out = "out"
 libs = ["lib"]
-remappings = ["safe-smart-account/=lib/safe-utils/lib/safe-smart-account/contracts/"]
 cache = true
 cache_path = "cache"
 broadcast = "broadcast"

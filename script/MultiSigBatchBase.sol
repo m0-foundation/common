@@ -2,12 +2,12 @@
 
 pragma solidity >=0.8.20 <0.9.0;
 
-import { Enum } from "../lib/safe-utils/lib/safe-smart-account/contracts/common/Enum.sol";
-import { OwnerManager } from "../lib/safe-utils/lib/safe-smart-account/contracts/base/OwnerManager.sol";
-import { Safe } from "../lib/safe-utils/src/Safe.sol";
+import { Enum } from "safe-smart-account/common/Enum.sol";
+import { OwnerManager } from "safe-smart-account/base/OwnerManager.sol";
+import { Safe } from "safe-utils/Safe.sol";
 
-import { console } from "../lib/forge-std/src/console.sol";
-import { Script } from "../lib/forge-std/src/Script.sol";
+import { console } from "forge-std/console.sol";
+import { Script } from "forge-std/Script.sol";
 
 abstract contract MultiSigBatchBase is Script {
     using Safe for *;

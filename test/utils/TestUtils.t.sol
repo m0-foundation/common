@@ -2,7 +2,7 @@
 
 pragma solidity >=0.8.20 <0.9.0;
 
-import { Test } from "../../lib/forge-std/src/Test.sol";
+import { Test } from "forge-std/Test.sol";
 
 contract TestUtils is Test {
     uint256 internal constant _MAX_S = uint256(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0);
